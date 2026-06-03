@@ -6,6 +6,8 @@ navbar:
     - text: "Home"
       href: index.html
     - text: "Introduction to R"
-      href: intro_r.html
-    - text: "Introduction to R - solutions"
-      href: intro_r_solutions.html
+      menu:
+      - text: "Workbook"
+        href: intro_r.html
+      - text: "Solutions"
+        href: intro_r_solutions.html
