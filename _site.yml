@@ -1,9 +1,11 @@
-name: "my-website"
+name: "PK course"
 output_dir: "docs"
 navbar:
   title: "My Website"
   left:
     - text: "Home"
       href: index.html
-    - text: "intro_r"
+    - text: "Introduction to R"
       href: intro_r.html
+    - text: "Introduction to R - solutions"
+      href: intro_r_solutions.html

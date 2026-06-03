@@ -11,7 +11,7 @@
 
 
 
-<title>Introduction to visualising pharmacokinetic data using ‘R’</title>
+<title>Solutions - Introduction to visualising pharmacokinetic data using ‘R’</title>
 
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -28,9 +28,6 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
-<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
-<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
-<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
@@ -223,69 +220,6 @@ $(document).ready(function () {
 
 
 
-<style type="text/css">
-
-#TOC {
-  margin: 25px 0px 20px 0px;
-}
-@media (max-width: 768px) {
-#TOC {
-  position: relative;
-  width: 100%;
-}
-}
-
-@media print {
-.toc-content {
-  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
-  float: right;
-}
-}
-
-.toc-content {
-  padding-left: 30px;
-  padding-right: 40px;
-}
-
-div.main-container {
-  max-width: 1200px;
-}
-
-div.tocify {
-  width: 20%;
-  max-width: 260px;
-  max-height: 85%;
-}
-
-@media (min-width: 768px) and (max-width: 991px) {
-  div.tocify {
-    width: 25%;
-  }
-}
-
-@media (max-width: 767px) {
-  div.tocify {
-    width: 100%;
-    max-width: none;
-  }
-}
-
-.tocify ul, .tocify li {
-  line-height: 20px;
-}
-
-.tocify-subheader .tocify-item {
-  font-size: 0.90em;
-}
-
-.tocify .list-group-item {
-  border-radius: 0px;
-}
-
-
-</style>
-
-
 
 </head>
 
@@ -293,16 +227,6 @@ div.tocify {
 
 
 <div class="container-fluid main-container">
-
-
-<!-- setup 3col/9col grid for toc_float and main content  -->
-<div class="row">
-<div class="col-xs-12 col-sm-4 col-md-3">
-<div id="TOC" class="tocify">
-</div>
-</div>
-
-<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -340,7 +264,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Introduction to visualising pharmacokinetic data using ‘<TT>R</TT>’</h1>
+<h1 class="title toc-ignore">Solutions - Introduction to visualising pharmacokinetic data using ‘<TT>R</TT>’</h1>
 
 </div>
 
@@ -386,13 +310,13 @@ text-align: justify}
 </ul></li>
 <li>Use <TT>R</TT> to undertake basic, descriptive (non-compartmental) analysis of some pharmacokinetic data to
 <ul>
-<li>Estimate <span class="math inline">\(C_{max}\)</span></li>
+<li>Estimate C~max</li>
 </ul></li>
 </ul>
 <p>This document is designed to provide you with notes of the session and be a handy resource when you come to revision. There are examples of code and the corresponding output from <TT>R</TT> as we go along.</p>
 </div>
 <div id="accessing-r-and-rstudio-on-a-university-computer" class="section level2">
-<h2>Accessing <TT>R</TT> and <TT>RStudio</TT> on a University computer</h2>
+<h2>Accessing <TT>R</TT> and <TT>RStudio</TT> on a University computer <img align="centre" height="50" src="R.png"/></h2>
 <p>The two key tools for this session will be <TT>R</TT> and <TT>RStudio</TT>. These are free, open source pieces of software. They are both available on the University computers, but you may choose to download them onto your personal laptop or home computer.</p>
 <p>‘<TT>R</TT>’ is a language and environment for statistical computing. <TT>R</TT> is very powerful but it was not designed with the ‘everyday’ user in mind. ‘<TT>RStudio</TT>’ is a user interface that makes using ‘<TT>R</TT>’ far easier. You can think of the relationship between ‘<TT>R</TT>’ and ‘<TT>RStudio</TT>’ as similar to the relationship between the lines of code (<TT>R</TT>) running your computer that you do not see behind the user interface you use - MS Windows (<TT>RStudio</TT>) or as the relationship between equipment for an experiment (<TT>R</TT>) and the laboratory that houses it (<TT>RStudio</TT>).</p>
 <p>When you are using a University computer, you need to access <TT>RStudio</TT> via the University servers.</p>
@@ -1242,7 +1166,7 @@ library(tidyverse)</code></pre>
 <pre class="r"><code>ggplot(data=amox, aes(x=time, y=conc))+
   geom_point()</code></pre>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:scatt2"></span>
-<img src="intro_r_files/figure-html/scatt2-1.png" alt="Simple scatter plot" width="432" />
+<img src="intro_r_solutions_files/figure-html/scatt2-1.png" alt="Simple scatter plot" width="432" />
 <p class="caption">
 Figure 1: Simple scatter plot
 </p>
@@ -1258,7 +1182,7 @@ Figure 1: Simple scatter plot
   ggtitle(&quot;Amoxicillin PK data&quot;)+
   geom_line()</code></pre>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:linebad"></span>
-<img src="intro_r_files/figure-html/linebad-1.png" alt="Plot with labels and an attempt at adding lines between points" width="432" />
+<img src="intro_r_solutions_files/figure-html/linebad-1.png" alt="Plot with labels and an attempt at adding lines between points" width="432" />
 <p class="caption">
 Figure 2: Plot with labels and an attempt at adding lines between points
 </p>
@@ -1271,7 +1195,7 @@ Figure 2: Plot with labels and an attempt at adding lines between points
   ggtitle(&quot;Amoxicillin PK data&quot;)+
   geom_line()</code></pre>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:lineok"></span>
-<img src="intro_r_files/figure-html/lineok-1.png" alt="Simple scatter plot with lines between data points for each ID" width="432" />
+<img src="intro_r_solutions_files/figure-html/lineok-1.png" alt="Simple scatter plot with lines between data points for each ID" width="432" />
 <p class="caption">
 Figure 3: Simple scatter plot with lines between data points for each ID
 </p>
@@ -1285,12 +1209,71 @@ Figure 3: Simple scatter plot with lines between data points for each ID
 <li>Plot data for <em>just</em> <TT>ID==A</TT></li>
 <li>Plot each individual</li>
 </ul>
+<p><br></p>
+<pre class="r"><code>ggplot(data=amox, aes(x=time, y=conc, group=ID))+ 
+  geom_point()+
+  xlab(&quot;Time (hours)&quot;)+
+  ylab(&quot;Concentration of amoxicillin mg/L&quot;)+
+  ggtitle(&quot;Amoxicillin PK data&quot;)+
+  geom_line()+
+  theme_bw()  # this is my favourite theme, what is yours?</code></pre>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:bwtheme"></span>
+<img src="intro_r_solutions_files/figure-html/bwtheme-1.png" alt="Plot using theme\_bw()" width="432" />
+<p class="caption">
+Figure 4: Plot using theme_bw()
+</p>
+</div>
+<pre class="r"><code>ggplot(data=amox, aes(time,conc, group=ID))+ 
+  geom_point()+
+  xlab(&quot;Time (hours)&quot;) + ylab(&quot;Concentration of amoxicillin (mg/L)&quot;)+
+  geom_line()+
+  scale_y_continuous(trans=&#39;log2&#39;) + #note that you have options log2 and log10 here
+  theme_bw()</code></pre>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:logy"></span>
+<img src="intro_r_solutions_files/figure-html/logy-1.png" alt="Semi-log plot" width="432" />
+<p class="caption">
+Figure 5: Semi-log plot
+</p>
+</div>
+<pre class="r"><code>ggplot(data=amox, aes(time,conc, group=ID,linetype=ID))+ 
+  geom_point()+
+  xlab(&quot;Time (hours)&quot;) + ylab(&quot;Concentration of amoxicillin (mg/L)&quot;)+
+  geom_line() +
+  theme_bw() </code></pre>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:difline"></span>
+<img src="intro_r_solutions_files/figure-html/difline-1.png" alt="Plot with a different line type for each participant" width="432" />
+<p class="caption">
+Figure 6: Plot with a different line type for each participant
+</p>
+</div>
+<pre class="r"><code>ggplot(data=subset(amox,ID==&#39;A&#39;), aes(time,conc, group=ID))+ 
+  geom_point()+
+  ggtitle(&quot;Participant A data&quot;)+ #note I have put a title in here
+  xlab(&quot;Time (hours)&quot;) + ylab(&quot;Concentration of amoxicillin (mg/L)&quot;)+
+  geom_line()+
+  theme_bw()</code></pre>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:subseta"></span>
+<img src="intro_r_solutions_files/figure-html/subseta-1.png" alt="Plot of data for participant 'A'" width="432" />
+<p class="caption">
+Figure 7: Plot of data for participant ‘A’
+</p>
+</div>
+<pre class="r"><code>ggplot(data=subset(amox), aes(time,conc, group=ID))+ 
+  geom_point()+
+  xlab(&quot;Time (hours)&quot;) + ylab(&quot;Concentration of amoxicillin (mg/L)&quot;)+
+  geom_line()+ 
+  facet_wrap(vars(ID))+
+  theme_bw()</code></pre>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:facet"></span>
+<img src="intro_r_solutions_files/figure-html/facet-1.png" alt="Plot using facet_wrap() to give panel per ID" width="672" />
+<p class="caption">
+Figure 8: Plot using facet_wrap() to give panel per ID
+</p>
+</div>
 </div>
 
 
 
-</div>
-</div>
 
 </div>
 
@@ -1323,35 +1306,6 @@ $(document).ready(function () {
 
 <!-- code folding -->
 
-<script>
-$(document).ready(function ()  {
-
-    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
-    $('.unlisted.unnumbered').addClass('toc-ignore')
-
-    // move toc-ignore selectors from section div to header
-    $('div.section.toc-ignore')
-        .removeClass('toc-ignore')
-        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
-
-    // establish options
-    var options = {
-      selectors: "h1,h2,h3",
-      theme: "bootstrap3",
-      context: '.toc-content',
-      hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
-      },
-      ignoreSelector: ".toc-ignore",
-      scrollTo: 0
-    };
-    options.showAndHide = true;
-    options.smoothScroll = true;
-
-    // tocify
-    var toc = $("#TOC").tocify(options).data("toc-tocify");
-});
-</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
