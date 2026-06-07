@@ -21,6 +21,8 @@ navbar:
       menu:
       # - text: "Compartments"
       #  href: compartments.html
+      - text: "Compartments"
+        href: compartments.html
       - text: "Non-linear mixed effects modelling"
         href: nlmem.html
     - text: "Additional materials"
