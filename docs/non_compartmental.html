@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Introduction to non-compartmental analysis using ‘R’</title>
+
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">PK course</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Introduction to R
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="intro_r.html">Workbook</a>
+    </li>
+    <li>
+      <a href="intro_r_solutions.html">Solutions</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Non-compartmental analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="non_compartmental.html">Workbook</a>
+    </li>
+    <li>
+      <a href="solutions_non_compartmental.html">Solutions</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Introduction to compartmental analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="compartments.html">Compartments</a>
+    </li>
+    <li>
+      <a href="nlmem.html">Non-linear mixed effects modelling</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Additional materials
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="model_diagnostics.html">Model diagnostics</a>
+    </li>
+    <li>
+      <a href="covariate_analysis.html">Covariate analysis</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Introduction to non-compartmental analysis using ‘<TT>R</TT>’</h1>
+
+</div>
+
+
+<style>
+h1.title {
+  font-size: 48px;
+
+  text-align: center;
+}
+h1 {
+  font-size: 24px;
+}
+h2 {
+  font-size: 20px;
+}
+h3 {
+  font-size: 16px;
+}
+
+h4.author { 
+  text-align: center;
+}
+body {
+text-align: justify}
+</style>
+<center>
+<img src="PK.png"/>
+</center>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>In this session, we will build on our knowledge of coding and use ‘<TT>R</TT>’ to estimate some basic pharmacokinetic parameters using what is known as non-compartmental techniques.</p>
+</div>
+<div id="learning-outcomes" class="section level1">
+<h1>Learning outcomes</h1>
+<p>By the end of this week you should be able to:</p>
+<ul>
+<li>Use <TT>R</TT> to undertake basic, descriptive (non-compartmental) analysis of some pharmacokinetic data to estimate
+<ul>
+<li><span class="math inline">\(C_{max}\)</span></li>
+<li><span class="math inline">\(T_{max}\)</span></li>
+<li><span class="math inline">\(AUC_{0-t}\)</span></li>
+<li>Bioavailability (<span class="math inline">\(F\)</span>)</li>
+</ul></li>
+<li>Describe the linear trapezoidal method of estimating <span class="math inline">\(AUC\)</span>
+<ul>
+<li>State one disadvantage of this method</li>
+<li>Explain an alternative method that avoids this disadvantage</li>
+</ul></li>
+</ul>
+</div>
+<div id="accessing-r-and-rstudio-on-a-university-computer" class="section level1">
+<h1>Accessing <TT>R</TT> and <TT>RStudio</TT> on a University computer</h1>
+<p>The two key tools for this session will be <TT>R</TT> and <TT>RStudio</TT>. These are free, open source pieces of software. They are both available on the University computers, but you may choose to download them onto your personal laptop or home computer.</p>
+<p>When you are using a University computer, you need to access <TT>RStudio</TT> via the University servers.</p>
+<p>The link for this is <a href="https://stats3.sgul.ac.uk/rstudio">here</a>. I suggest you save this as a ‘favourite’.</p>
+<p>Some reminders from last time:</p>
+<div id="setting-the-working-directory" class="section level2">
+<h2>Setting the working directory</h2>
+<p>Last session, I recommended that you make a folder on your personal (H:) drive to contain all your work for this module. You will need to remember (or check) what you called it.</p>
+<p>You can <TT>setwd()</TT> using your mouse and clicking on ‘session’ and ‘set working directory’. Alternatively (and more rapidly), you can use <TT>R</TT> code and the <TT>setwd()</TT> function.</p>
+<p><br></p>
+<pre class="r"><code>setwd()
+setwd(&quot;INSERT YOUR FILE PATH HERE&quot;)
+# or if on the server setwd(&quot;~/your_file_name/sub_folder_if_used/&quot;) </code></pre>
+<div id="packages-you-need-for-this-session" class="section level3">
+<h3>Packages you need for this session</h3>
+<p>Link your path using the following line of code and then call <TT>library(tidyverse)</TT>.</p>
+<pre class="r"><code>.libPaths( c( .libPaths(),
+              &quot;/homes/dlonsdale-pharmacokinetics/sghms/bms/shares/Advanced-Pharmacokinetics/4.4.2/library&quot;) )
+#note that you need the &#39;.&#39; before &#39;libPaths&#39;
+library(tidyverse)</code></pre>
+</div>
+</div>
+</div>
+<div id="accessing-data-for-this-session" class="section level1">
+<h1>Accessing data for this session</h1>
+<p>For this session we will be using PK data for an anti-epileptic. 6 participants were given an IV dose and then one week later they were given an oral dose. Drug concentrations were measured.</p>
+<p>You can download the data for this session directly from GitHub. There are two files. Copy and paste my code.</p>
+<pre class="r"><code>IV&lt;-read.csv(&quot;https://raw.githubusercontent.com/dlonsdal/non_compartmental/main/docs/PK_IV.csv&quot;)
+
+
+ORAL&lt;-read.csv(&quot;https://raw.githubusercontent.com/dlonsdal/non_compartmental/main/docs/PK_oral.csv&quot;)</code></pre>
+<p><strong>Task:</strong> Plot the data for the IV and oral data.</p>
+<p><em>Hint: Review the <a href="https://dlonsdal.github.io/intro_r_solutions/">notes</a> from the last session and use some <TT>ggplot()</TT> code</em></p>
+</div>
+<div id="estimating-c_max" class="section level1">
+<h1>Estimating <span class="math inline">\(C_{max}\)</span></h1>
+<p>Remember that <span class="math inline">\(C_{max}\)</span> is observed from our data. We find the max value per participant and report it. We actually did this in the last session.</p>
+<p><strong>Tasks:</strong></p>
+<ul>
+<li>Estimate <span class="math inline">\(C_{max}\)</span> for the IV and oral data</li>
+<li>Estimate the mean <span class="math inline">\(C_{max}\)</span> for the IV and oral data</li>
+</ul>
+<p><em>Advanced: Output both IV and oral data together in one table</em></p>
+</div>
+<div id="estimating-t_max" class="section level1">
+<h1>Estimating <span class="math inline">\(T_{max}\)</span></h1>
+<p>This is a little more tricky. We need to get <TT>R</TT> to find <span class="math inline">\(C_{max}\)</span> and then keep the associated value for time.</p>
+<p>Try a Google search for this. Something like ‘using group by to get the value corresponding to the max value of another column’.</p>
+<p><strong>Task:</strong> Estimate <span class="math inline">\(T_{max}\)</span> for the IV and oral data</p>
+</div>
+<div id="estimating-the-area-under-the-curve-auc_0-t" class="section level1">
+<h1>Estimating the area under the curve (<span class="math inline">\(AUC_{0-t}\)</span>)</h1>
+<p><span class="math inline">\(AUC_{0-t}\)</span> is the area under the time concentration curve from <span class="math inline">\(time=0\)</span> to <span class="math inline">\(time=t\)</span> (<span class="math inline">\(t\)</span> will usually be the time of the last observed sample but it doesnt have to be). In non-compartmental analysis, this is often estimated using a method that breaks up the time concentration data into small chunks, estimates the area under each chunk and adds them together. The most straightforward way of doing this is using the trapezoid method.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:trap"></span>
+<img src="non_compartmental_files/figure-html/trap-1.png" alt="Participant 'A' oral concentration-time profile, with trapezoids indicated in colour" width="672" />
+<p class="caption">
+Figure 1: Participant ‘A’ oral concentration-time profile, with trapezoids indicated in colour
+</p>
+</div>
+<p>To calculate the area under the curve of the trapezoid ABCD in Figure <a href="#fig:trap">1</a> we use the equation for the area of a trapezoid. <span class="math display">\[Area = \frac{1}{2}*(height_{1,AB}+height_{2,CD})*base_{AD}\]</span>
+The two heights correspond to concentrations B and C and the base is the distance A to D (the change in time <span class="math inline">\(\Delta t\)</span>) in Figure <a href="#fig:trap">1</a>. So more fully for this example, where <em>height</em> is replaced with <em>concentration</em> <span class="math inline">\((C)\)</span>: <span class="math display">\[AUC_{0-8} = \sum_{t=0}^{t=8} \Delta t\frac{(C_1+C_2)}{2}\]</span></p>
+<p>Fortunately,<TT>R</TT> has an inbuilt function that allows us to calculate the <span class="math inline">\(AUC\)</span>. The handily named <TT>AUC()</TT> function. You need to provide it with three commands, <TT>x=…,y=…</TT> and <TT>method=“trapezoid”</TT>. It is in the <TT>DescTools</TT> library.</p>
+<p>I will show you how to calculate using the oral data.</p>
+<pre class="r"><code>library(DescTools)
+ORAL%&gt;% 
+  group_by(id) %&gt;% 
+  summarise(AUC=AUC(time,conc,method=&#39;trapezoid&#39;))</code></pre>
+<pre><code>## # A tibble: 6 × 2
+##   id      AUC
+##   &lt;chr&gt; &lt;dbl&gt;
+## 1 A      133.
+## 2 B      131.
+## 3 C      130.
+## 4 D      139.
+## 5 E      129.
+## 6 F      136.</code></pre>
+<p><strong>Tasks:</strong></p>
+<ul>
+<li>Calculate <span class="math inline">\(AUC\)</span> for the IV data</li>
+<li>Calculate mean <span class="math inline">\(AUC\)</span> for each dataset</li>
+<li>Estimate the bioavailability (<span class="math inline">\(F\)</span>) of the drug</li>
+</ul>
+<div id="limitations-of-the-linear-trapezoid-method" class="section level2">
+<h2>Limitations of the linear trapezoid method</h2>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:trapbest"></span>
+<img src="non_compartmental_files/figure-html/trapbest-1.png" alt="Participant 'A' IV concentration-time profile with curved line of best fit" width="432" />
+<p class="caption">
+Figure 2: Participant ‘A’ IV concentration-time profile with curved line of best fit
+</p>
+</div>
+<p>It is worth noting the trapezoid method has limitations. Most notably that it will <em>overestimate</em> <span class="math inline">\(AUC\)</span> by virtue of taking a straight line between points, when the true concentration will fall in an logarithmic (curve) fashion (Figure <a href="#fig:trapbest">2</a>). There are methods to improve this accuracy, such as the logarithmic trapezoidal method. With this method, the ‘trapezoid’ is given a curved top (like the red line in Figure <a href="#fig:trapbest">2</a>). The formula for this method is <span class="math display">\[AUC = \sum_{t=0}^{t=\tau} \frac{\Delta t}{ln(\frac{C_1}{C_2})} (C_1+C_2)\]</span></p>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

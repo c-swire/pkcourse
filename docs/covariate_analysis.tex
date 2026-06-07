@@ -1,0 +1,990 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{float}
+\floatplacement{figure}{H}
+\floatplacement{table}{H}
+\usepackage{booktabs}
+\usepackage{caption}
+\captionsetup{labelfont=bf,margin=12pt}
+\usepackage{subfig}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Chapter 6: Covariate analysis},
+  pdfauthor={Dagan Lonsdale},
+  colorlinks=true,
+  linkcolor={Maroon},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={blue},
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Chapter 6: Covariate analysis}
+\author{Dagan Lonsdale}
+\date{}
+
+\begin{document}
+\maketitle
+
+{
+\hypersetup{linkcolor=}
+\setcounter{tocdepth}{2}
+\tableofcontents
+}
+\newpage
+
+\section{Introduction}\label{introduction}
+
+In this chapter, we will explore the idea of how covariates may be used in a model improve model fit.
+
+\subsection{Learning outcomes}\label{learning-outcomes}
+
+\begin{itemize}
+\tightlist
+\item
+  Define covariate
+\item
+  Explain, with examples common types of variables that may be tested as a covariate
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Continuous
+  \item
+    Categorical
+
+    \begin{itemize}
+    \tightlist
+    \item
+      Ordinal
+    \item
+      Non-ordinal
+    \item
+      Dichotomous
+    \end{itemize}
+  \end{itemize}
+\item
+  Describe the concept of step-wise covariate modelling and the alternative option of using biological and pharmacological prior information to select covariates to test
+\item
+  Describe how plots of model parameters vs variables can be used to identify potential covariates to test in a model
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Write code to plot parameter vs covariates\\
+  \end{itemize}
+\item
+  Using the example of weight, explain how a continuous covariate may be modeled
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Describe the concept of allometric scaling and using this concept explain the different effects a covariate may have on different pharmacokinetic parameters including
+
+    \begin{itemize}
+    \tightlist
+    \item
+      Clearance
+    \item
+      Weight
+    \end{itemize}
+  \end{itemize}
+\item
+  Write code to model covariates with \texttt{nlmixr2}
+\item
+  Explain how the objective function value can aid decisions on whether to retain a covariate in a model
+\end{itemize}
+
+\section{Definition of a covariate}\label{definition-of-a-covariate}
+
+A reminder that (in statistical terms) a variable is something that can be quantified in some way - e.g.~measured or counted.
+
+A covariate is a variable that changes (varies) with (co) the outcome of interest. In modeling covariates are variables additional to the core predictor variable in the model (e.g.~dose) that may be used to help model the outcome variable (e.g.~concentration). An example might be that weight would be expected to affect volume of distribution for many drugs and so it might be reasonable to include a weight effect on the volume of distribution parameter in a pharmacokinetic model.
+
+\section{Common types of covariate}\label{common-types-of-covariate}
+
+Hopefully it will not come as a surprise to you that covariates may be described as:
+
+\begin{itemize}
+\tightlist
+\item
+  Continuous variable
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Taking any possible (real) value (even within a range of values)
+  \item
+    Examples might include serum creatinine, weight or age
+  \end{itemize}
+\item
+  Discrete variable
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Countable numeric
+  \item
+    For example integer values like number of doses
+  \end{itemize}
+\item
+  Categorical variable
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Data that is placed in a number of discrete (uncountable) categories
+  \item
+    There are sub-types of categorical variable that it is useful to know:
+
+    \begin{itemize}
+    \tightlist
+    \item
+      Binary (e.g.~sex)
+    \item
+      Ordered (e.g.~grade of renal injury 1, 2, 3 with increasing severity)
+    \item
+      Un-ordered (e.g.~ethnicity)
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+\section{Why bother to include covariates in a model?}\label{why-bother-to-include-covariates-in-a-model}
+
+We have discussed how non-linear mixed-effects models allow us to describe inter-individual differences in pharmacokinetic parameters - these are our \(\eta\) terms.
+
+As an extension of this, it would be nice to try and understand and explain some of this variability so that we can:
+
+\begin{itemize}
+\tightlist
+\item
+  Explain it biologically, rather than just mathematically
+\item
+  Use this information to make decisions about our drugs
+
+  \begin{itemize}
+  \tightlist
+  \item
+    For example if we find that renal function is linked with clearance of a drug, we might recommend different doses for those with kidney disease
+  \end{itemize}
+\end{itemize}
+
+\section{Choosing covariates to include in a model}\label{choosing-covariates-to-include-in-a-model}
+
+The choice of what covariates one should include in a model is complex.
+
+Broadly (and briefly) modelers may take an approach to test the effect of all variables in a data set on all parameters in the model. A process of testing each covariate can be automated by programs like \texttt{nlmixr2} and \texttt{NONMEM}. In such a process, each varibble is tested in turn in a step-wise fashion. If inclusion of a variable provides an improved model fit, it is retained in the model as a covariate and the program then moves on to test the next variable. This is known as step-wise covariate modelling (SCM). This can be a time-consuming (and processor hungry) process.
+
+Alternatively, knowledge about the drug's pharmacology (prior information) may be used by the modeler to choose specific variables to test as part of the model building process. For example, in the knowledge that a drug is renally excreted, it would be prudent to test the effect of some measure of kidney function (for example serum creatinine or estimated glomerular filtration rate) on drug clearance.
+
+There are some tools that can help us. For example we can plot pharmacokinetic parameters (or \(\eta\)) against potential covariates to look for trends/relationships to then text in our mode.
+
+\section{Phenobarbital data}\label{phenobarbital-data}
+
+Let's dive straight in to some practical work and look at the phenobarbital data that comes with the \texttt{nlmixr2} package.
+
+These data were published in 1985(!) and come from some clinical data on neonates given the drug, which has been used as a sedative and general anaesthetic (although is less frequently used now). Neonates were given a loading dose IV injection followed by a maintenance 12 hourly IV dose.
+
+For those interested, the reference is:
+
+Grasela and Donn (1985), Neonatal population pharmacokinetics of phenobarbital derived from routine clinical data, Developmental Pharmacology and Therapeutics, 8, 374-383.
+
+\subsection{Task 1}\label{task-1}
+
+\begin{itemize}
+\tightlist
+\item
+  Call \texttt{nlmixr2} and save the data set pheno\_sd as an object in your environment
+\item
+  Explore the data with some summary tables and plots
+
+  \begin{itemize}
+  \tightlist
+  \item
+    What is the mean loading dose given?
+  \item
+    What potential covariates are there in the data?
+  \end{itemize}
+\item
+  Fit a one-compartment model to these data and report the pharmacokinetic parameters
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Make some goodness-of-fit plots
+  \end{itemize}
+\end{itemize}
+
+\newpage
+
+\subsection{Solution to phenobarbital Task 1}\label{solution-to-phenobarbital-task-1}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(nlmixr2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: package 'nlmixr2' was built under R version 4.5.2
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'lotri' was built under R version 4.5.2
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'nlmixr2data' was built under R version 4.5.2
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'nlmixr2est' was built under R version 4.5.2
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'nlmixr2extra' was built under R version 4.5.2
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'nlmixr2plot' was built under R version 4.5.2
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'rxode2' was built under R version 4.5.2
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pheno}\OtherTok{\textless{}{-}}\NormalTok{pheno\_sd}
+\FunctionTok{head}\NormalTok{(pheno)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   ID TIME  AMT  WT APGR   DV MDV EVID
+## 1  1  0.0 25.0 1.4    7  0.0   1    1
+## 2  1  2.0  0.0 1.4    7 17.3   0    0
+## 3  1 12.5  3.5 1.4    7  0.0   1    1
+## 4  1 24.5  3.5 1.4    7  0.0   1    1
+## 5  1 37.0  3.5 1.4    7  0.0   1    1
+## 6  1 48.0  3.5 1.4    7  0.0   1    1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(pheno)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##        ID             TIME             AMT               WT            APGR       
+##  Min.   : 1.00   Min.   :  0.00   Min.   : 0.000   Min.   :0.60   Min.   : 1.000  
+##  1st Qu.:13.00   1st Qu.: 19.23   1st Qu.: 2.300   1st Qu.:1.10   1st Qu.: 5.000  
+##  Median :25.00   Median : 59.30   Median : 3.000   Median :1.30   Median : 7.000  
+##  Mean   :28.24   Mean   : 63.70   Mean   : 5.281   Mean   :1.49   Mean   : 6.394  
+##  3rd Qu.:44.00   3rd Qu.: 96.42   3rd Qu.: 4.400   3rd Qu.:1.70   3rd Qu.: 8.000  
+##  Max.   :59.00   Max.   :389.80   Max.   :70.000   Max.   :3.60   Max.   :10.000  
+##        DV              MDV              EVID       
+##  Min.   : 0.000   Min.   :0.0000   Min.   :0.0000  
+##  1st Qu.: 0.000   1st Qu.:1.0000   1st Qu.:1.0000  
+##  Median : 0.000   Median :1.0000   Median :1.0000  
+##  Mean   : 5.328   Mean   :0.7917   Mean   :0.7917  
+##  3rd Qu.: 0.000   3rd Qu.:1.0000   3rd Qu.:1.0000  
+##  Max.   :67.900   Max.   :1.0000   Max.   :1.0000
+\end{verbatim}
+
+OK, so we can see we've got an ID variable, WT which is hopefully easy to interpret as weight and APGR which is APGAR score (a measure of how unwell a neonate is when they are born).
+
+The other variables are hopefully recognisable as \texttt{nlmixr2} default variables.
+
+Let's see if we can have a little more of a sophisticated summary.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(gtsummary)}
+\NormalTok{pheno }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{group\_by}\NormalTok{(ID) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{slice}\NormalTok{(}\DecValTok{1}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{ungroup}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{select}\NormalTok{(}\StringTok{"AMT"}\NormalTok{,}\StringTok{"WT"}\NormalTok{, }\StringTok{"APGR"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{tbl\_summary}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{as\_kable\_extra}\NormalTok{(}\AttributeTok{booktabs=}\ConstantTok{TRUE}\NormalTok{, }\AttributeTok{caption=}\StringTok{"Summary of loading dose, weight and APGR characteristics"}\NormalTok{)}\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{kable\_styling}\NormalTok{(}\AttributeTok{latex\_options =}\FunctionTok{c}\NormalTok{(}\StringTok{"striped"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{table}
+\centering
+\caption{\label{tab:load}Summary of loading dose, weight and APGR characteristics}
+\centering
+\begin{tabular}[t]{lc}
+\toprule
+\textbf{Characteristic} & \textbf{N = 59}\\
+\midrule
+\cellcolor{gray!10}{AMT} & \cellcolor{gray!10}{23 (17, 27)}\\
+WT & 1.30 (1.10, 1.70)\\
+\cellcolor{gray!10}{APGR} & \cellcolor{gray!10}{7 (5, 8)}\\
+\bottomrule
+\multicolumn{2}{l}{\rule{0pt}{1em}\textsuperscript{1} Median (Q1, Q3)}\\
+\end{tabular}
+\end{table}
+
+Table \ref{tab:load} provides summary of loading dose (by sub-setting the first entry for each neonate) and the two covariates.
+
+If we want to check out the maintenance dose we can do that too.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pheno }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{group\_by}\NormalTok{(ID) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{slice}\NormalTok{(}\DecValTok{2}\SpecialCharTok{:}\FunctionTok{n}\NormalTok{()) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{subset}\NormalTok{(AMT}\SpecialCharTok{\textgreater{}}\DecValTok{0}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{mean\_dose\_byid=} \FunctionTok{round}\NormalTok{(}\FunctionTok{mean}\NormalTok{(AMT),}\DecValTok{2}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{ungroup}\NormalTok{()}\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{mean\_overall=} \FunctionTok{round}\NormalTok{(}\FunctionTok{mean}\NormalTok{(mean\_dose\_byid),}\DecValTok{2}\NormalTok{),}
+            \AttributeTok{min=}\FunctionTok{round}\NormalTok{(}\FunctionTok{min}\NormalTok{(mean\_dose\_byid),}\DecValTok{2}\NormalTok{),}
+            \AttributeTok{max=}\FunctionTok{round}\NormalTok{(}\FunctionTok{max}\NormalTok{(mean\_dose\_byid),}\DecValTok{2}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{kbl}\NormalTok{(}\AttributeTok{booktabs=}\ConstantTok{TRUE}\NormalTok{, }\AttributeTok{caption=}\StringTok{"Summary of maintenance dose data"}\NormalTok{)}\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{kable\_styling}\NormalTok{(}\AttributeTok{latex\_options =}\FunctionTok{c}\NormalTok{(}\StringTok{"striped"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{table}
+\centering
+\caption{\label{tab:maint}Summary of maintenance dose data}
+\centering
+\begin{tabular}[t]{rrr}
+\toprule
+mean\_overall & min & max\\
+\midrule
+\cellcolor{gray!10}{4.84} & \cellcolor{gray!10}{1.5} & \cellcolor{gray!10}{15.36}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table \ref{tab:maint} shows an example of how this might be done. It is not sophisticated!
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(pheno, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{TIME, }\AttributeTok{y=}\NormalTok{DV, }\AttributeTok{col=}\NormalTok{ID))}\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+
+{\centering \includegraphics{covariate_analysis_files/figure-latex/pheno1-1} 
+
+}
+
+\caption{First attempt at phenobarbital concentration-time plots}\label{fig:pheno1}
+\end{figure}
+
+First attempt at a plot is a flop (Figure \ref{fig:pheno1}). \texttt{R} has interpreted the ID variable as an integer/numeric and because I have plotted dose rows as well as concentration rows there are a load of DV=0 at the bottom. Let's try again.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pheno}\SpecialCharTok{$}\NormalTok{ID}\OtherTok{\textless{}{-}}\FunctionTok{as.factor}\NormalTok{(pheno}\SpecialCharTok{$}\NormalTok{ID)}
+\FunctionTok{ggplot}\NormalTok{(}\FunctionTok{subset}\NormalTok{(pheno,EVID}\SpecialCharTok{==}\DecValTok{0}\NormalTok{), }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{TIME, }\AttributeTok{y=}\NormalTok{DV, }\AttributeTok{col=}\NormalTok{ID))}\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{()}\SpecialCharTok{+}
+  \FunctionTok{theme\_bw}\NormalTok{(}\AttributeTok{base\_size=}\DecValTok{9}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+
+{\centering \includegraphics{covariate_analysis_files/figure-latex/pheno2-1} 
+
+}
+
+\caption{Second attempt at phenobarbital concentration-time plots}\label{fig:pheno2}
+\end{figure}
+
+Second attempt still a flop if we are honest (Figure \ref{fig:pheno2}). Too many participants to have a colour for each. Probably best to stick to no grouping variable.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pheno}\SpecialCharTok{$}\NormalTok{ID}\OtherTok{\textless{}{-}}\FunctionTok{as.factor}\NormalTok{(pheno}\SpecialCharTok{$}\NormalTok{ID)}
+\FunctionTok{ggplot}\NormalTok{(}\FunctionTok{subset}\NormalTok{(pheno,EVID}\SpecialCharTok{==}\DecValTok{0}\NormalTok{), }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{TIME, }\AttributeTok{y=}\NormalTok{DV))}\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{size=}\FloatTok{0.5}\NormalTok{)}\SpecialCharTok{+}
+  \FunctionTok{theme\_bw}\NormalTok{(}\AttributeTok{base\_size=}\DecValTok{9}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+
+{\centering \includegraphics{covariate_analysis_files/figure-latex/pheno3-1} 
+
+}
+
+\caption{Final phenobarbital concentration-time plots}\label{fig:pheno3}
+\end{figure}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{one.cmt }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{() \{}
+  \FunctionTok{ini}\NormalTok{(\{ }
+\NormalTok{    tcl }\OtherTok{\textless{}{-}} \FunctionTok{log}\NormalTok{(}\FloatTok{0.01}\NormalTok{) }
+\NormalTok{    tv }\OtherTok{\textless{}{-}} \FunctionTok{log}\NormalTok{(}\DecValTok{1}\NormalTok{)}
+\NormalTok{    eta.cl }\SpecialCharTok{\textasciitilde{}} \FloatTok{0.1}
+\NormalTok{    eta.v }\SpecialCharTok{\textasciitilde{}} \FloatTok{0.1}
+\NormalTok{    add.sd }\OtherTok{\textless{}{-}} \FloatTok{0.1}
+\NormalTok{  \})}
+  \FunctionTok{model}\NormalTok{(\{}
+\NormalTok{    cl }\OtherTok{\textless{}{-}} \FunctionTok{exp}\NormalTok{(tcl }\SpecialCharTok{+}\NormalTok{ eta.cl)}
+\NormalTok{    v }\OtherTok{\textless{}{-}} \FunctionTok{exp}\NormalTok{(tv }\SpecialCharTok{+}\NormalTok{ eta.v)}
+    \FunctionTok{linCmt}\NormalTok{() }\SpecialCharTok{\textasciitilde{}} \FunctionTok{add}\NormalTok{(add.sd)}
+\NormalTok{  \})}
+\NormalTok{\}}
+\CommentTok{\#nlmixr2(one.cmt)}
+\NormalTok{run1}\OtherTok{\textless{}{-}}\FunctionTok{nlmixr2}\NormalTok{(one.cmt,pheno,}\AttributeTok{est=}\StringTok{"saem"}\NormalTok{, }
+              \FunctionTok{list}\NormalTok{(}\AttributeTok{print=}\DecValTok{0}\NormalTok{),}\AttributeTok{table =} \FunctionTok{tableControl}\NormalTok{(}\AttributeTok{cwres =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{keep=}\StringTok{\textquotesingle{}WT\textquotesingle{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{table}
+\centering
+\caption{\label{tab:nlmixfix}Fixed effect parameter estimates from pheno analysis}
+\centering
+\begin{tabular}[t]{lllllll}
+\toprule
+  & Est. & SE & \%RSE & Back-transformed(95\%CI) & BSV(CV\%) & Shrink(SD)\%\\
+\midrule
+\cellcolor{gray!10}{tcl} & \cellcolor{gray!10}{-5.18} & \cellcolor{gray!10}{0.0884} & \cellcolor{gray!10}{1.71} & \cellcolor{gray!10}{0.00563 (0.00473, 0.0067)} & \cellcolor{gray!10}{51.2} & \cellcolor{gray!10}{30.0\%=}\\
+tv & 0.366 & 0.0607 & 16.6 & 1.44 (1.28, 1.62) & 46.9 & 2.90\%<\\
+\cellcolor{gray!10}{add.sd} & \cellcolor{gray!10}{2.79} & \cellcolor{gray!10}{} & \cellcolor{gray!10}{} & \cellcolor{gray!10}{2.79} & \cellcolor{gray!10}{} & \cellcolor{gray!10}{}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}
+\centering
+\caption{\label{tab:nlmixran}Random effects parameter estimates}
+\centering
+\begin{tabular}[t]{lr}
+\toprule
+  & Estimate\\
+\midrule
+\cellcolor{gray!10}{eta.cl} & \cellcolor{gray!10}{0.48}\\
+eta.v & 0.45\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+You can see in Table \ref{tab:nlmixran} that there is quite a bit of inter-individual variability.
+
+For completeness, we should plot our diagnostic plots.
+
+\begin{figure}
+
+{\centering \subfloat[DV vs PRED\label{fig:phenofit-1}]{\includegraphics[width=0.33\linewidth]{covariate_analysis_files/figure-latex/phenofit-1} }\subfloat[DV vs IPRED\label{fig:phenofit-2}]{\includegraphics[width=0.33\linewidth]{covariate_analysis_files/figure-latex/phenofit-2} }\subfloat[CWRES vs TAD\label{fig:phenofit-3}]{\includegraphics[width=0.33\linewidth]{covariate_analysis_files/figure-latex/phenofit-3} }
+
+}
+
+\caption{Basic diagnostic plots forone-compartment  model fit of pheno data}\label{fig:phenofit}
+\end{figure}
+
+\section{Choosing a covariate in the pheno dataset}\label{choosing-a-covariate-in-the-pheno-dataset}
+
+You can see that there is quite a lot of inter-individual variability here. Let's think about our data set and our available variables.
+
+Let's plot dose against our potential covariates weight and APGR.
+
+\begin{figure}
+
+{\centering \subfloat[Dose vs weight\label{fig:varpt-1}]{\includegraphics[width=0.5\linewidth]{covariate_analysis_files/figure-latex/varpt-1} }\subfloat[Dose vs APGR\label{fig:varpt-2}]{\includegraphics[width=0.5\linewidth]{covariate_analysis_files/figure-latex/varpt-2} }
+
+}
+
+\caption{Dose against potential covariates}\label{fig:varpt}
+\end{figure}
+
+Figure \ref{fig:varpt} suggests that there might have been some relationship between weight and dose. What do you think this relationship might be?
+
+Let's try plotting against AMT/WT instead.
+
+\begin{figure}
+
+{\centering \includegraphics{covariate_analysis_files/figure-latex/varpt2-1} 
+
+}
+
+\caption{Dose/WT vs weight}\label{fig:varpt2}
+\end{figure}
+
+Why do you think we see this relationship that we see in Figure \ref{fig:varpt2}?
+
+\subsection{Allometric scaling}\label{allometric-scaling}
+
+You will remember from your first year lectures, that pharmacokinetic parameters scale with body size. As a consequence, dosing is often weight based.
+
+Let's look at a typical plot of how clearance scales with age.
+
+\begin{figure}
+
+{\centering \includegraphics{covariate_analysis_files/figure-latex/allo-1} 
+
+}
+
+\caption{Typical allometric scaling for pharmacokinetic parameters by weight relative to 70 kg individual. In general, volume of distribution scales linearly (red dashed line) and clearance scales with an exponent of ~0.75}\label{fig:allo}
+\end{figure}
+
+Figure \ref{fig:allo} shows a typical change of pharmacokinetic parameters with body size. This concept is known as allometric scaling. The curve of these lines is described by a power model.
+
+For clearance: \[CL_i=CL_{ref}\bigg( \frac{W_i}{W_{ref}} \bigg) ^ {\theta_{W_{CL}}} \] Here, we describe clearance for an individual (\(CL_i\)) as the product of:
+
+\begin{itemize}
+\tightlist
+\item
+  The individual's weight (\(W_i\)) scaled to the reference weight (\(W_{ref}\), which is often a 70 kg individual or the median weight of the data set), all raised to a power (\({\theta_{W_{CL}}}\), a parameter which we can estimate)
+\end{itemize}
+
+with
+
+\begin{itemize}
+\tightlist
+\item
+  The reference clearance (\(CL_{ref}\)), which is clearance for the individual with the reference weight
+
+  \begin{itemize}
+  \tightlist
+  \item
+    From our modelling perspective, \(CL_{ref}\) becomes our \(\theta_{CL}\)
+  \end{itemize}
+\end{itemize}
+
+For volume of distribution: \[V_i=V_{ref}\bigg( \frac{W_i}{W_{ref}} \bigg) ^ {\theta_{W_{V}}} \] Here, we describe volume for an individual (\(V_i\)) as the product of:
+
+\begin{itemize}
+\tightlist
+\item
+  The individual's weight (\(W_i\)) scaled to the reference weight (\(W_{ref}\), which is often a 70 kg individual or the median weight of the data set), all raised to a power (\({\theta_{W_{V}}}\), a parameter which we can estimate)
+\end{itemize}
+
+with
+
+\begin{itemize}
+\tightlist
+\item
+  The reference volume (\(V_{ref}\)), which is volume for the individual with the reference weight
+
+  \begin{itemize}
+  \tightlist
+  \item
+    From our modelling perspective, \(V_{ref}\) becomes our \(\theta_{V}\)
+  \end{itemize}
+\end{itemize}
+
+In our plot (Figure \ref{fig:allo}) we have shown that volume scales linearly, in effect this means that \(\theta_{W_{V}}=1\). It is generally accepted that volume of distribution scales linearly, although not universally. Some modelers therefore don't estimate \(\theta_{W_{V}}\), we just fix it in our model.
+
+You should note that the concept of allometric scaling often falls down in very young patients (neonates-infants, below 10 kg). This is because in the first months of life there is rapid maturation of the function of organs that clear drugs, like the liver and kidneys. This effect is far greater than the effect of a growing baby. This maturation can itself be modeled (of course!), but we will leave that for another day\ldots\ldots\ldots{}
+
+\subsection{Task 2}\label{task-2}
+
+\begin{itemize}
+\tightlist
+\item
+  Using the output from your one-compartment model, plot CL or \(\eta_{CL}\) vs weight
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Add in `keep='WT'\,' to your model fit to keep WT in the output data
+  \end{itemize}
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{run1}\OtherTok{\textless{}{-}}\FunctionTok{nlmixr2}\NormalTok{(one.cmt,pheno,}\AttributeTok{est=}\StringTok{"saem"}\NormalTok{, }\FunctionTok{list}\NormalTok{(}\AttributeTok{print=}\DecValTok{0}\NormalTok{),}
+              \AttributeTok{table =} \FunctionTok{tableControl}\NormalTok{(}\AttributeTok{cwres =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{keep=}\StringTok{\textquotesingle{}WT\textquotesingle{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
+\item
+  Decide whether it is sensible to use 70 kg for the pheno data
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Suggest an alternative reference weight
+  \end{itemize}
+\item
+  Amend your one-compartment model code to include this weight scaling such that you can estimate \({\theta_{W}}\)
+\end{itemize}
+
+\newpage
+
+\subsection{Solution to phenobarbital Task 2}\label{solution-to-phenobarbital-task-2}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(modfit,}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{WT,}\AttributeTok{y=}\NormalTok{cl))}\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{()}\SpecialCharTok{+}
+  \FunctionTok{theme\_bw}\NormalTok{(}\AttributeTok{base\_size=}\DecValTok{9}\NormalTok{)}\SpecialCharTok{+}
+  \FunctionTok{xlab}\NormalTok{(}\StringTok{\textquotesingle{}Weight (kg)\textquotesingle{}}\NormalTok{)}\SpecialCharTok{+}\FunctionTok{ylab}\NormalTok{(}\StringTok{\textquotesingle{}Clearance (L/hr)\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+
+{\centering \includegraphics{covariate_analysis_files/figure-latex/covwt-1} 
+
+}
+
+\caption{Phenobarbital $CL$ vs weight}\label{fig:covwt}
+\end{figure}
+
+Hopefully you can see from Figure \ref{fig:covwt} that there appears to be some relationship between clearance and weight.
+
+We know from our summary statistics that the median weight for individuals in our data set is 1.3 kg, and that this is a set of neonatal data. We should therefore choose 1.3 kg as our reference weight.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mw}\OtherTok{\textless{}{-}}\NormalTok{ pheno }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{group\_by}\NormalTok{(ID) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{slice}\NormalTok{(}\DecValTok{1}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{ungroup}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{summarise}\NormalTok{(}\FunctionTok{median}\NormalTok{(WT)) }\SpecialCharTok{\%\textgreater{}\%} 
+\NormalTok{  as.numeric}
+
+\NormalTok{pheno}\SpecialCharTok{$}\NormalTok{rWT}\OtherTok{\textless{}{-}}\FunctionTok{log}\NormalTok{(pheno}\SpecialCharTok{$}\NormalTok{WT}\SpecialCharTok{/}\NormalTok{mw)}
+\NormalTok{run2.mod }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{() \{}
+  \FunctionTok{ini}\NormalTok{(\{ }
+\NormalTok{    tcl }\OtherTok{\textless{}{-}} \FunctionTok{log}\NormalTok{(}\FloatTok{0.007}\NormalTok{) }
+\NormalTok{    tv }\OtherTok{\textless{}{-}} \FunctionTok{log}\NormalTok{(}\FloatTok{1.4}\NormalTok{)}
+\NormalTok{    tw }\OtherTok{\textless{}{-}} \DecValTok{1}
+\NormalTok{    eta.cl }\SpecialCharTok{\textasciitilde{}} \FloatTok{0.1}
+\NormalTok{    eta.v }\SpecialCharTok{\textasciitilde{}} \FloatTok{0.1}
+\NormalTok{    add.sd }\OtherTok{\textless{}{-}} \FloatTok{0.1}
+\NormalTok{  \})}
+  \FunctionTok{model}\NormalTok{(\{}
+\NormalTok{    cl }\OtherTok{\textless{}{-}} \FunctionTok{exp}\NormalTok{(tcl }\SpecialCharTok{+}\NormalTok{ eta.cl }\SpecialCharTok{+}\NormalTok{rWT}\SpecialCharTok{*}\NormalTok{tw)}
+\NormalTok{    v }\OtherTok{\textless{}{-}} \FunctionTok{exp}\NormalTok{(tv }\SpecialCharTok{+}\NormalTok{ eta.v)}
+    \FunctionTok{linCmt}\NormalTok{() }\SpecialCharTok{\textasciitilde{}} \FunctionTok{add}\NormalTok{(add.sd)}
+\NormalTok{  \})}
+\NormalTok{\}}
+
+\CommentTok{\#nlmixr2(one.cmt)}
+\NormalTok{run2}\OtherTok{\textless{}{-}}\FunctionTok{nlmixr2}\NormalTok{(run2.mod,pheno,}\AttributeTok{est=}\StringTok{"saem"}\NormalTok{,}
+              \FunctionTok{list}\NormalTok{(}\AttributeTok{print=}\DecValTok{0}\NormalTok{),}\AttributeTok{table =} \FunctionTok{tableControl}\NormalTok{(}\AttributeTok{cwres =} \ConstantTok{TRUE}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{table}
+\centering
+\caption{\label{tab:nlmixfix2}Fixed effect parameter estimates from pheno analysis run 2}
+\centering
+\begin{tabular}[t]{lllllll}
+\toprule
+  & Est. & SE & \%RSE & Back-transformed(95\%CI) & BSV(CV\%) & Shrink(SD)\%\\
+\midrule
+\cellcolor{gray!10}{tcl} & \cellcolor{gray!10}{-5.14} & \cellcolor{gray!10}{0.0483} & \cellcolor{gray!10}{0.939} & \cellcolor{gray!10}{0.00585 (0.00532, 0.00643)} & \cellcolor{gray!10}{18.5} & \cellcolor{gray!10}{47.2\%>}\\
+tv & 0.348 & 0.0555 & 15.9 & 1.42 (1.27, 1.58) & 42.4 & 2.74\%<\\
+\cellcolor{gray!10}{tw} & \cellcolor{gray!10}{1.22} & \cellcolor{gray!10}{0.123} & \cellcolor{gray!10}{10.1} & \cellcolor{gray!10}{1.22 (0.974, 1.46)} & \cellcolor{gray!10}{} & \cellcolor{gray!10}{}\\
+add.sd & 2.8 &  &  & 2.8 &  & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}
+\centering
+\caption{\label{tab:nlmixran2}Random effects parameter estimates run 2}
+\centering
+\begin{tabular}[t]{lr}
+\toprule
+  & Estimate\\
+\midrule
+\cellcolor{gray!10}{eta.cl} & \cellcolor{gray!10}{0.18}\\
+eta.v & 0.41\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Compare the parameter estimates from Table \ref{tab:nlmixfix} \& \ref{tab:nlmixran} and Table \ref{tab:nlmixfix2} \& \ref{tab:nlmixran2}.
+
+Repeat the goodness-of-fit plots.
+
+\begin{figure}
+
+{\centering \subfloat[DV vs PRED\label{fig:phenofit2-1}]{\includegraphics[width=0.33\linewidth]{covariate_analysis_files/figure-latex/phenofit2-1} }\subfloat[DV vs IPRED\label{fig:phenofit2-2}]{\includegraphics[width=0.33\linewidth]{covariate_analysis_files/figure-latex/phenofit2-2} }\subfloat[CWRES vs TAD\label{fig:phenofit2-3}]{\includegraphics[width=0.33\linewidth]{covariate_analysis_files/figure-latex/phenofit2-3} }
+
+}
+
+\caption{Basic diagnostic plots forone-compartment  model fit of pheno data with weight on clearance as a covariate}\label{fig:phenofit2}
+\end{figure}
+
+The PRED vs DV plot shows improved model fit with run2 (Figure \ref{fig:phenofit2} (a)). Although there is still some room for improvement.
+
+\section{Using the Objective Function Value to test for improvement in model fit}\label{using-the-objective-function-value-to-test-for-improvement-in-model-fit}
+
+We discussed previously that the objective function value could be used to test an improvement in model fit. It just so happens that, where models are nested, the difference in two objective functions follows a \(\chi^2\) distribution with degrees of freedom \(n=\) number of additional parameters. This is known as the likelihood-ratio test.
+
+If that is all a bit too much maths for you, then the easier thing to remember is that if you add one parameter to your model and compare the objective function with and without that parameter, a drop in objective function value \textgreater3.84 suggests a statistically significant (p\textless0.05) improvement in model fit.
+
+Have a look at the objective function for your two model runs.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{run1}\SpecialCharTok{$}\NormalTok{OBJF}
+\NormalTok{run2}\SpecialCharTok{$}\NormalTok{OBJF}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 726.5
+\end{verbatim}
+
+\begin{verbatim}
+## [1] 673.6
+\end{verbatim}
+
+With a drop in OFV of 52.9, we can be confident that adding clearance as a covariate significantly improves model fit.
+
+\subsection{Task 3}\label{task-3}
+
+\begin{itemize}
+\tightlist
+\item
+  Repeat this exercise adding weight onto volume of distribution
+\end{itemize}
+
+\newpage
+
+\section{Alternative methods of modelling continuous covariates}\label{alternative-methods-of-modelling-continuous-covariates}
+
+There are a raft of alternative methods of modelling covariate effects. Some common ones are listed below. Note that I have used weight as the example covariate in all of them. Whilst you could test weight in your model with all of these approaches, it is generally accepted that the power (allometric) model is preferred for weight:
+
+Power model (as above):\[CL_i=CL_{ref}\bigg( \frac{W_i}{W_{ref}} \bigg) ^ {\theta_{W_{CL}}} \]
+
+Exponential model:\[CL_i=CL_{ref} ^{\frac{W_i}{W_{ref}} {\theta_{W_{CL}}}} \]
+
+Linear model: \[CL_i=CL_{ref}+\bigg( \frac{W_i}{W_{ref}} \bigg) {\theta_{W_{CL}}} \]
+
+\section{Modelling categorical or discrete covariates}\label{modelling-categorical-or-discrete-covariates}
+
+Easiest example of modelling a categorical covariate is where you have two categories - a common example of this might be smoking/non-smoking or perhaps takes an enzyme inducer/doesn't take an enzyme inducer. In a data set, this should be coded with `0' (doesn't have e.g.~non-smoking) or `1'.
+
+The model for the covariate may then be (with smoking as an example :\[CL_i=CL_{\theta}(1+ SM\times{\theta_{smoke}}) \] As \(SM\) is smoker (1=yes, 2=0), you can see that for a non-smoker \(CL_i\) = \(CL_{\theta}\) (since \(SM=0\), \(SM\times{\theta_{smoke}} = 0\) for a non-smoker)
+
+For multiple categories it is possible to implement this modelling too, although a little complex involving multiple \(0/1\) coded variables in the dataset.
+
+Where a discrete variable is ordered, you could also consider modelling as if it were a continuous covariate.
+
+\subsection{Task 4}\label{task-4}
+
+\begin{itemize}
+\tightlist
+\item
+  Look up APGAR score and choose a cut off for a `good' and a `bad' APGAR score
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Make a new variable with \(0/1\) to reflect this
+  \end{itemize}
+\item
+  Model APGAR effect on a PK parameter
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Justify your choice of \(V\) or \(CL\)
+  \item
+    Is there a significant improvement in model fit?
+  \end{itemize}
+\end{itemize}
+
+\newpage
+
+\subsection{Solution to phenobarbital Task 4}\label{solution-to-phenobarbital-task-4}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pheno}\SpecialCharTok{$}\NormalTok{AB}\OtherTok{\textless{}{-}}\FunctionTok{ifelse}\NormalTok{(pheno}\SpecialCharTok{$}\NormalTok{APGR}\SpecialCharTok{\textgreater{}}\DecValTok{6}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{)}
+\NormalTok{run3.mod }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{() \{}
+  \FunctionTok{ini}\NormalTok{(\{ }
+\NormalTok{    tcl }\OtherTok{\textless{}{-}} \FunctionTok{log}\NormalTok{(}\FloatTok{0.007}\NormalTok{) }
+\NormalTok{    tv }\OtherTok{\textless{}{-}} \FunctionTok{log}\NormalTok{(}\FloatTok{1.4}\NormalTok{)}
+\NormalTok{    tw }\OtherTok{\textless{}{-}} \DecValTok{1}
+\NormalTok{    ABeff}\OtherTok{\textless{}{-}} \SpecialCharTok{{-}}\FloatTok{0.5}
+\NormalTok{    eta.cl }\SpecialCharTok{\textasciitilde{}} \FloatTok{0.1}
+\NormalTok{    eta.v }\SpecialCharTok{\textasciitilde{}} \FloatTok{0.1}
+\NormalTok{    add.sd }\OtherTok{\textless{}{-}} \FloatTok{0.1}
+\NormalTok{  \})}
+  \FunctionTok{model}\NormalTok{(\{}
+\NormalTok{    cl }\OtherTok{\textless{}{-}}\NormalTok{ (}\FunctionTok{exp}\NormalTok{(tcl }\SpecialCharTok{+}\NormalTok{ eta.cl }\SpecialCharTok{+}\NormalTok{rWT}\SpecialCharTok{*}\NormalTok{tw))}\SpecialCharTok{*}\NormalTok{(}\DecValTok{1}\SpecialCharTok{+}\NormalTok{AB}\SpecialCharTok{*}\NormalTok{ABeff)}
+\NormalTok{    v }\OtherTok{\textless{}{-}} \FunctionTok{exp}\NormalTok{(tv }\SpecialCharTok{+}\NormalTok{ eta.v)}
+    \FunctionTok{linCmt}\NormalTok{() }\SpecialCharTok{\textasciitilde{}} \FunctionTok{add}\NormalTok{(add.sd)}
+\NormalTok{  \})}
+\NormalTok{\}}
+
+\CommentTok{\#nlmixr2(one.cmt)}
+\NormalTok{run3}\OtherTok{\textless{}{-}}\FunctionTok{nlmixr2}\NormalTok{(run3.mod,pheno,}\AttributeTok{est=}\StringTok{"saem"}\NormalTok{, }
+              \FunctionTok{list}\NormalTok{(}\AttributeTok{print=}\DecValTok{0}\NormalTok{),}\AttributeTok{table =} \FunctionTok{tableControl}\NormalTok{(}\AttributeTok{cwres =} \ConstantTok{TRUE}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+I have chosen a cut off of \textless7 as a poor score. You may have chosen 4 (or any other number). I have chosen to model an effect on clearance on the basis that being very unwell may have had an impact on organs that clear the drug (e.g.~liver).
+
+Let's have a look at the objective function value.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{run1}\SpecialCharTok{$}\NormalTok{OBJF}
+\NormalTok{run2}\SpecialCharTok{$}\NormalTok{OBJF}
+\NormalTok{run3}\SpecialCharTok{$}\NormalTok{OBJF}
+\NormalTok{run2}\SpecialCharTok{$}\NormalTok{OBJF}\SpecialCharTok{{-}}\NormalTok{run3}\SpecialCharTok{$}\NormalTok{OBJF}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 726.5
+\end{verbatim}
+
+\begin{verbatim}
+## [1] 673.6
+\end{verbatim}
+
+\begin{verbatim}
+## [1] 690.5
+\end{verbatim}
+
+We can see that there is no significant improvement in model fit (in fact it is worse, with an increase in OFV of 17).
+
+\newpage
+
+\section{Homework}\label{homework}
+
+For homework this week suggest:
+
+\begin{itemize}
+\item
+  Add weight as a covariate on volume in the pheno model and estimate \(\theta_{WT}\)
+\item
+  Have a look at the theophylline data set \texttt{theo\_sd}. Is there any effect of weight on the PK parameters when modelling this drug
+\end{itemize}
+
+\end{document}

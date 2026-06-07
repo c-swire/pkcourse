@@ -1,0 +1,548 @@
+---
+title: "Chapter 6: Covariate analysis"
+author: "Dagan Lonsdale"
+
+output:
+  bookdown::html_document2:
+    fig_caption : TRUE
+    number_sections: no
+    toc: yes
+    toc_float: yes
+    
+header-includes:
+  - \usepackage{float}
+  - \floatplacement{figure}{H}
+  - \floatplacement{table}{H}
+  - \usepackage{booktabs}
+  - \usepackage{caption}
+  - \captionsetup{labelfont=bf,margin=12pt}
+urlcolor: blue
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(kableExtra)
+library(gridExtra)
+library(PKNCA) 
+library(RColorBrewer)
+library(flextable)
+```
+
+
+# Introduction 
+
+In this chapter, we will explore the idea of how covariates may be used in a model improve model fit.  
+
+## Learning outcomes
+
+* Define covariate
+* Explain, with examples common types of variables that may be tested as a covariate 
+  + Continuous
+  + Categorical
+    - Ordinal
+    - Non-ordinal
+    - Dichotomous
+* Describe the concept of step-wise covariate modelling and the alternative option of using biological and pharmacological prior information to select covariates to test
+* Describe how plots of model parameters vs variables can be used to identify potential covariates to test in a model
+  + Write code to plot parameter vs covariates  
+* Using the example of weight, explain how a continuous covariate may be modeled
+  + Describe the concept of allometric scaling and using this concept explain the different effects a covariate may have on different pharmacokinetic parameters including
+    - Clearance
+    - Weight
+
+* Write code to model covariates with \texttt{nlmixr2}
+* Explain how the objective function value can aid decisions on whether to retain a covariate in a model
+
+
+# Definition of a covariate
+
+A reminder that (in statistical terms) a variable is something that can be quantified in some way - e.g. measured or counted. 
+
+A covariate is a variable that changes (varies) with (co) the outcome of interest. In modeling covariates are variables additional to the core predictor variable in the model (e.g. dose) that may be used to help model the outcome variable (e.g. concentration). An example might be that weight would be expected to affect volume of distribution for many drugs and so it might be reasonable to include a weight effect on the volume of distribution parameter in a pharmacokinetic model.  
+
+# Common types of covariate
+
+Hopefully it will not come as a surprise to you that covariates may be described as:
+
+* Continuous variable
+  + Taking any possible (real) value (even within a range of values)
+  + Examples might include serum creatinine, weight or age
+* Discrete variable
+  + Countable numeric
+  + For example integer values like number of doses
+* Categorical variable
+  + Data that is placed in a number of discrete (uncountable) categories
+  + There are sub-types of categorical variable that it is useful to know:
+    - Binary (e.g. sex)
+    - Ordered (e.g. grade of renal injury 1, 2, 3 with increasing severity)
+    - Un-ordered (e.g. ethnicity)
+
+# Why bother to include covariates in a model?
+
+We have discussed how non-linear mixed-effects models allow us to describe inter-individual differences in pharmacokinetic parameters - these are our $\eta$ terms. 
+
+As an extension of this, it would be nice to try and understand and explain some of this variability so that we can:
+
+* Explain it biologically, rather than just mathematically 
+* Use this information to make decisions about our drugs
+  + For example if we find that renal function is linked with clearance of a drug, we might recommend different doses for those with kidney disease
+
+# Choosing covariates to include in a model
+
+The choice of what covariates one should include in a model is complex. 
+
+Broadly (and briefly) modelers may take an approach to test the effect of all variables in a data set on all parameters in the model. A process of testing each covariate can be automated by programs like \texttt{nlmixr2} and \texttt{NONMEM}. In such a process, each varibble is tested in turn in a step-wise fashion. If inclusion of a variable provides an improved model fit, it is retained in the model as a covariate and the program then moves on to test the next variable. This is known as step-wise covariate modelling (SCM). This can be a time-consuming (and processor hungry) process. 
+
+Alternatively, knowledge about the drug's pharmacology (prior information) may be used by the modeler to choose specific variables to test as part of the model building process. For example, in the knowledge that a drug is renally excreted, it would be prudent to test the effect of some measure of kidney function (for example serum creatinine or estimated glomerular filtration rate) on drug clearance. 
+
+There are some tools that can help us. For example we can plot pharmacokinetic parameters (or $\eta$) against potential covariates to look for trends/relationships to then text in our mode. 
+
+# Phenobarbital data
+
+Let's dive straight in to some practical work and look at the phenobarbital data that comes with the \texttt{nlmixr2} package. 
+
+These data were published in 1985(!) and come from some clinical data on neonates given the drug, which has been used as a sedative and general anaesthetic (although is less frequently used now). Neonates were given a loading dose IV injection followed by a maintenance 12 hourly IV dose. 
+
+For those interested, the reference is:
+
+Grasela and Donn (1985), Neonatal population pharmacokinetics of phenobarbital derived from routine clinical data, Developmental Pharmacology and Therapeutics, 8, 374-383.
+
+## Task 1
+
+* Call \texttt{nlmixr2} and save the data set pheno_sd as an object in your environment
+* Explore the data with some summary tables and plots
+  + What is the mean loading dose given?
+  + What potential covariates are there in the data?
+* Fit a one-compartment model to these data and report the pharmacokinetic parameters
+  + Make some goodness-of-fit plots
+
+
+## Solution to phenobarbital Task 1
+
+```{r,echo = TRUE,eval=TRUE, message=FALSE}
+library(nlmixr2)
+pheno<-pheno_sd
+head(pheno)
+```
+
+```{r,echo = TRUE,eval=TRUE, message=FALSE}
+summary(pheno)
+```
+
+OK, so we can see we've got an ID variable, WT which is hopefully easy to interpret as weight and APGR which is APGAR score (a measure of how unwell a neonate is when they are born). 
+
+The other variables are hopefully recognisable as \texttt{nlmixr2} default variables. 
+
+Let's see if we can have a little more of a sophisticated summary.
+
+```{r load,echo = TRUE,eval=TRUE, message=FALSE}
+library(gtsummary)
+pheno %>% 
+  group_by(ID) %>% 
+  slice(1) %>% 
+  ungroup() %>% 
+  select("AMT","WT", "APGR") %>% 
+  tbl_summary() %>% 
+  as_kable_extra(booktabs=TRUE, caption="Summary of loading dose, weight and APGR characteristics")%>%
+  kable_styling(latex_options =c("striped"))
+```
+
+Table \@ref(tab:load) provides summary of loading dose (by sub-setting the first entry for each neonate) and the two covariates. 
+
+If we want to check out the maintenance dose we can do that too. 
+
+```{r maint,echo = TRUE,eval=TRUE, message=FALSE}
+pheno %>% 
+  group_by(ID) %>% 
+  slice(2:n()) %>% 
+  subset(AMT>0) %>% 
+  summarise(mean_dose_byid= round(mean(AMT),2)) %>% 
+  ungroup()%>%
+  summarise(mean_overall= round(mean(mean_dose_byid),2),
+            min=round(min(mean_dose_byid),2),
+            max=round(max(mean_dose_byid),2)) %>%
+  kbl(booktabs=TRUE, caption="Summary of maintenance dose data")%>%
+  kable_styling(latex_options =c("striped"))
+```
+Table \@ref(tab:maint) shows an example of how this might be done. It is not sophisticated! 
+
+
+```{r pheno1,echo = T,eval=T, fig.cap="First attempt at phenobarbital concentration-time plots",fig.width=5,fig.height=2,fig.align='center',message=FALSE, fig.show='hold'}
+
+ggplot(pheno, aes(x=TIME, y=DV, col=ID))+
+  geom_point()
+
+```
+
+First attempt at a plot is a flop (Figure \@ref(fig:pheno1)). \texttt{R} has interpreted the ID variable as an integer/numeric and because I have plotted dose rows as well as concentration rows there are a load of DV=0 at the bottom. Let's try again. 
+
+
+
+```{r pheno2,echo = T,eval=T, fig.cap="Second attempt at phenobarbital concentration-time plots",fig.width=5,fig.height=2,fig.align='center',message=FALSE, fig.show='hold'}
+pheno$ID<-as.factor(pheno$ID)
+ggplot(subset(pheno,EVID==0), aes(x=TIME, y=DV, col=ID))+
+  geom_point()+
+  theme_bw(base_size=9)
+
+```
+
+
+Second attempt still a flop if we are honest (Figure \@ref(fig:pheno2)). Too many participants to have a colour for each. Probably best to stick to no grouping variable.
+
+
+
+```{r pheno3,echo = T,eval=T, fig.cap="Final phenobarbital concentration-time plots",fig.width=5,fig.height=2.5,fig.align='center',message=FALSE, fig.show='hold'}
+pheno$ID<-as.factor(pheno$ID)
+ggplot(subset(pheno,EVID==0), aes(x=TIME, y=DV))+
+  geom_point(size=0.5)+
+  theme_bw(base_size=9)
+```
+
+```{r, eval=T,cache=F, message=F,warning=FALSE,results='hide'}
+one.cmt <- function() {
+  ini({ 
+    tcl <- log(0.01) 
+    tv <- log(1)
+    eta.cl ~ 0.1
+    eta.v ~ 0.1
+    add.sd <- 0.1
+  })
+  model({
+    cl <- exp(tcl + eta.cl)
+    v <- exp(tv + eta.v)
+    linCmt() ~ add(add.sd)
+  })
+}
+#nlmixr2(one.cmt)
+run1<-nlmixr2(one.cmt,pheno,est="saem", 
+              list(print=0),table = tableControl(cwres = TRUE, keep='WT'))
+```
+
+
+```{r nlmixfix,echo=F,warning=T,message=F}
+
+kbl(run1$par.fixed ,booktabs = T, caption="Fixed effect parameter estimates from pheno analysis")%>%  kable_styling(latex_options =c("striped"))
+
+
+```
+
+```{r nlmixran,echo=F,warning=T,message=F}
+kbl(signif(diag(run1$omegaR),2), caption="Random effects parameter estimates",booktabs = T,col.names = c(
+                           "Estimate"))%>%  kable_styling(latex_options =c("striped"))
+```
+
+You can see in Table \@ref(tab:nlmixran) that there is quite a bit of inter-individual variability. 
+
+For completeness, we should plot our diagnostic plots.
+
+```{r phenofit,echo=F,eval=T,fig.cap="Basic diagnostic plots forone-compartment  model fit of pheno data", fig.subcap=c('DV vs PRED','DV vs IPRED', 'CWRES vs TAD'),fig.ncol = 3, out.width = "33%", fig.align = 'center', warning=F,message=F}
+
+modfit<-data.frame(run1)
+ggplot(run1,aes(x=PRED,y=DV))+
+  geom_point()+
+  theme_bw(base_size=27)+
+  geom_abline(intercept = 0, slope=1)+
+  geom_smooth(col='red',se=F)
+ggplot(run1,aes(x=IPRED,y=DV))+
+  geom_point()+
+  theme_bw(base_size=27)+
+  geom_abline(intercept = 0, slope=1)+
+  geom_smooth(col='red',se=F)
+
+ggplot(modfit,aes(x=tad,y=CWRES))+
+  geom_point()+
+  theme_bw(base_size=27)+
+  xlab('Time after dose (h)')+
+  geom_abline(intercept = 0, slope=0)+
+  geom_smooth(col='red',se=F)
+```
+
+# Choosing a covariate in the pheno dataset
+
+You can see that there is quite a lot of inter-individual variability here. Let's think about our data set and our available variables. 
+
+Let's plot dose against our potential covariates weight and APGR. 
+
+```{r varpt,echo=F,eval=T,fig.cap="Dose against potential covariates", fig.subcap=c('Dose vs weight','Dose vs APGR'),fig.ncol = 2, out.width = "50%", fig.align = 'center', warning=F,message=F}
+
+
+ggplot(subset(pheno,AMT>0), aes(WT, AMT))+
+  geom_point()+
+  theme_bw(base_size=18)
+
+ggplot(subset(pheno,AMT>0), aes(APGR, AMT))+
+  geom_point()+
+  theme_bw(base_size=18)
+```
+
+Figure \@ref(fig:varpt) suggests that there might have been some relationship between weight and dose. What do you think this relationship might be?
+
+Let's try plotting against AMT/WT instead. 
+
+```{r varpt2,echo=F,eval=T,fig.cap="Dose/WT vs weight", fig.align = 'center',fig.width=3,fig.height=2.5, warning=F,message=F}
+
+
+ggplot(subset(pheno,AMT>0), aes(WT, AMT/WT))+
+  geom_point(size=0.5)+
+  theme_bw(base_size=9)
+
+```
+
+Why do you think we see this relationship that we see in Figure \@ref(fig:varpt2)?
+
+## Allometric scaling
+
+You will remember from your first year lectures, that pharmacokinetic parameters scale with body size. As a consequence, dosing is often weight based. 
+
+Let's look at a typical plot of how clearance scales with age. 
+
+
+```{r allo,echo=F,eval=T,fig.cap="Typical allometric scaling for pharmacokinetic parameters by weight relative to 70 kg individual. In general, volume of distribution scales linearly (red dashed line) and clearance scales with an exponent of ~0.75", fig.align = 'center',fig.width=3,fig.height=2.5, warning=F,message=F}
+
+ggplot(data = data.frame(x = 0), mapping = aes(x = x))+
+  stat_function(fun = function(x) 100*(x/70)^0.75)+
+  stat_function(fun = function(x) 100*(x/70), col='red', alpha=0.4,linetype=3) +
+  ylab('PK parameter value relative to 70 kg person')+
+  xlab('Weight (kg)')+ 
+  scale_x_continuous(breaks=seq(10, 150, 20),limits=c(10,150)) +
+  theme_bw(base_size=9)
+mw<- pheno %>% 
+  group_by(ID) %>% 
+  slice(1) %>% 
+  ungroup() %>% 
+  summarise(median(WT)) %>% 
+  as.numeric
+```
+
+Figure \@ref(fig:allo) shows a typical change of pharmacokinetic parameters with body size. This concept is known as allometric scaling. The curve of these lines is described by a power model. 
+
+For clearance: $$CL_i=CL_{ref}\bigg( \frac{W_i}{W_{ref}} \bigg) ^ {\theta_{W_{CL}}} $$ Here, we describe clearance for an individual ($CL_i$) as the product of:
+
+* The individual's weight ($W_i$) scaled to the reference weight ($W_{ref}$, which is often a 70 kg individual or the median weight of the data set), all raised to a power (${\theta_{W_{CL}}}$, a parameter which we can estimate)
+
+with
+
+* The reference clearance ($CL_{ref}$), which is clearance for the individual with the reference weight
+  + From  our modelling perspective, $CL_{ref}$ becomes our $\theta_{CL}$
+
+For volume of distribution: $$V_i=V_{ref}\bigg( \frac{W_i}{W_{ref}} \bigg) ^ {\theta_{W_{V}}} $$ Here, we describe volume for an individual ($V_i$) as the product of:
+
+* The individual's weight ($W_i$) scaled to the reference weight ($W_{ref}$, which is often a 70 kg individual or the median weight of the data set), all raised to a power (${\theta_{W_{V}}}$, a parameter which we can estimate)
+
+with
+
+* The reference volume ($V_{ref}$), which is volume for the individual with the reference weight
+  + From  our modelling perspective, $V_{ref}$ becomes our $\theta_{V}$
+
+In our plot (Figure \@ref(fig:allo)) we have shown that volume scales linearly, in effect this means that $\theta_{W_{V}}=1$. It is generally accepted that volume of distribution scales linearly, although not universally. Some modelers therefore don't estimate $\theta_{W_{V}}$, we just fix it in our model. 
+
+You should note that the concept of allometric scaling often falls down in very young patients (neonates-infants, below 10 kg). This is because in the first months of life there is rapid maturation of the function of organs that clear drugs, like the liver and kidneys. This effect is far greater than the effect of a growing baby. This maturation can itself be modeled (of course!), but we will leave that for another day.........
+
+## Task 2
+
+* Using the output from your one-compartment model, plot CL or $\eta_{CL}$ vs weight
+  + Add in 'keep='WT'' to your model fit to keep WT in the output data
+
+``` {r,eval=F}
+run1<-nlmixr2(one.cmt,pheno,est="saem", list(print=0),
+              table = tableControl(cwres = TRUE, keep='WT'))
+
+```
+
+* Decide whether it is sensible to use 70 kg for the pheno data
+  + Suggest an alternative reference weight
+* Amend your one-compartment model code to include this weight scaling such that you can estimate ${\theta_{W}}$
+
+## Solution to phenobarbital Task 2
+
+```{r covwt,echo = T,eval=T, fig.cap="Phenobarbital $CL$ vs weight",fig.width=5,fig.height=2,fig.align='center',message=FALSE, fig.show='hold'}
+
+ggplot(modfit,aes(x=WT,y=cl))+
+  geom_point()+
+  theme_bw(base_size=9)+
+  xlab('Weight (kg)')+ylab('Clearance (L/hr)')
+```
+
+Hopefully you can see from Figure \@ref(fig:covwt) that there appears to be some relationship between clearance and weight.
+
+We know from our summary statistics that the median weight for individuals in our data set is `r mw` kg, and that this is a set of neonatal data. We should therefore choose `r mw` kg as our reference weight. 
+
+```{r, eval=T,cache=F, message=F,warning=FALSE,results='hide'}
+mw<- pheno %>% 
+  group_by(ID) %>% 
+  slice(1) %>% 
+  ungroup() %>% 
+  summarise(median(WT)) %>% 
+  as.numeric
+
+pheno$rWT<-log(pheno$WT/mw)
+run2.mod <- function() {
+  ini({ 
+    tcl <- log(0.007) 
+    tv <- log(1.4)
+    tw <- 1
+    eta.cl ~ 0.1
+    eta.v ~ 0.1
+    add.sd <- 0.1
+  })
+  model({
+    cl <- exp(tcl + eta.cl +rWT*tw)
+    v <- exp(tv + eta.v)
+    linCmt() ~ add(add.sd)
+  })
+}
+
+#nlmixr2(one.cmt)
+run2<-nlmixr2(run2.mod,pheno,est="saem",
+              list(print=0),table = tableControl(cwres = TRUE))
+```
+
+```{r nlmixfix2,echo=F,warning=T,message=F}
+
+kbl(run2$par.fixed ,booktabs = T, caption="Fixed effect parameter estimates from pheno analysis run 2")%>%  kable_styling(latex_options =c("striped"))
+```
+
+```{r nlmixran2,echo=F,warning=T,message=F}
+kbl(signif(diag(run2$omegaR),2), caption="Random effects parameter estimates run 2",booktabs = T,col.names = c(
+                           "Estimate"))%>%  kable_styling(latex_options =c("striped"))
+```
+
+Compare the parameter estimates from Table \@ref(tab:nlmixfix) & \@ref(tab:nlmixran)  and Table \@ref(tab:nlmixfix2) & \@ref(tab:nlmixran2). 
+
+Repeat the goodness-of-fit plots. 
+
+```{r phenofit2,echo=F,eval=T,fig.cap="Basic diagnostic plots forone-compartment  model fit of pheno data with weight on clearance as a covariate", fig.subcap=c('DV vs PRED','DV vs IPRED', 'CWRES vs TAD'),fig.ncol = 3, out.width = "33%", fig.align = 'center', warning=F,message=F}
+
+
+modfit<-data.frame(run2)
+ggplot(run2,aes(x=PRED,y=DV))+
+  geom_point()+
+  theme_bw(base_size=27)+
+  geom_abline(intercept = 0, slope=1)+
+  geom_smooth(col='red',se=F)
+ggplot(run2,aes(x=IPRED,y=DV))+
+  geom_point()+
+  theme_bw(base_size=27)+
+  geom_abline(intercept = 0, slope=1)+
+  geom_smooth(col='red',se=F)
+
+ggplot(run2,aes(x=tad,y=CWRES))+
+  geom_point()+
+  theme_bw(base_size=27)+
+  xlab('Time after dose (h)')+
+  geom_abline(intercept = 0, slope=0)+
+  geom_smooth(col='red',se=F)
+```
+
+The PRED vs DV plot shows improved model fit with run2 (Figure \@ref(fig:phenofit2) (a)). Although there is still some room for improvement. 
+
+# Using the Objective Function Value to test for improvement in model fit
+
+We discussed previously that the objective function value could be used to test an improvement in model fit. It just so happens that, where models are nested, the difference in two objective functions follows a $\chi^2$ distribution with degrees of freedom $n=$ number of additional parameters. This is known as the likelihood-ratio test.
+
+If that is all a bit too much maths for you, then the easier thing to remember is that if you add one parameter to your model and compare the objective function with and without that parameter, a drop in objective function value >3.84 suggests a statistically significant (p<0.05) improvement in model fit. 
+
+Have a look at the objective function for your two model runs.
+
+```{r,eval=F}
+run1$OBJF
+run2$OBJF
+```
+```{r,echo=F}
+726.5
+673.6
+```
+
+With a drop in OFV of `r round(726.5-673.6
+,1)`, we can be confident that adding clearance as a covariate significantly improves model fit. 
+
+## Task 3
+
+* Repeat this exercise adding weight onto volume of distribution
+
+
+# Alternative methods of modelling continuous covariates
+
+There are a raft of alternative methods of modelling covariate effects. Some common ones are listed below. Note that I have used weight as the example covariate in all of them. Whilst you could test weight in your model with all of these approaches, it is generally accepted that the power (allometric) model is preferred for weight:
+
+Power model (as above):$$CL_i=CL_{ref}\bigg( \frac{W_i}{W_{ref}} \bigg) ^ {\theta_{W_{CL}}} $$
+
+Exponential model:$$CL_i=CL_{ref} ^{\frac{W_i}{W_{ref}} {\theta_{W_{CL}}}} $$
+
+Linear model: $$CL_i=CL_{ref}+\bigg( \frac{W_i}{W_{ref}} \bigg) {\theta_{W_{CL}}} $$
+
+# Modelling categorical or discrete covariates
+
+Easiest example of modelling a categorical covariate is where you have two categories - a common example of this might be smoking/non-smoking or perhaps takes an enzyme inducer/doesn't take an enzyme inducer. In a data set, this should be coded with '0' (doesn't have e.g. non-smoking) or '1'.
+
+The model for the covariate may then be (with smoking as an example :$$CL_i=CL_{\theta}(1+ SM\times{\theta_{smoke}}) $$ As $SM$ is smoker (1=yes, 2=0), you can see that for a non-smoker $CL_i$ = $CL_{\theta}$ (since $SM=0$, $SM\times{\theta_{smoke}} = 0$ for a non-smoker)
+
+For multiple categories it is possible to implement this modelling too, although a little complex involving multiple $0/1$ coded variables in the dataset.
+
+Where a discrete variable is ordered, you could also consider modelling as if it were a continuous covariate.
+
+## Task 4
+
+* Look up APGAR score and choose a cut off for a 'good'  and a 'bad' APGAR score
+  + Make a new variable with $0/1$ to reflect this
+* Model APGAR effect on a PK parameter
+  + Justify your choice of $V$ or $CL$
+  + Is there a significant improvement in model fit?
+
+
+## Solution to phenobarbital Task 4
+
+```{r, eval=T,cache=F, message=F,warning=FALSE,results='hide'}
+
+pheno$AB<-ifelse(pheno$APGR>6,0,1)
+run3.mod <- function() {
+  ini({ 
+    tcl <- log(0.007) 
+    tv <- log(1.4)
+    tw <- 1
+    ABeff<- -0.5
+    eta.cl ~ 0.1
+    eta.v ~ 0.1
+    add.sd <- 0.1
+  })
+  model({
+    cl <- (exp(tcl + eta.cl +rWT*tw))*(1+AB*ABeff)
+    v <- exp(tv + eta.v)
+    linCmt() ~ add(add.sd)
+  })
+}
+
+#nlmixr2(one.cmt)
+run3<-nlmixr2(run3.mod,pheno,est="saem", 
+              list(print=0),table = tableControl(cwres = TRUE))
+
+
+```
+
+I have chosen a cut off of <7 as a poor score. You may have chosen 4 (or any other number). I have chosen to model an effect on clearance on the basis that being very unwell may have had an impact on organs that clear the drug (e.g. liver).
+
+Let's have a look at the objective function value.
+
+```{r, eval=F}
+run1$OBJF
+run2$OBJF
+run3$OBJF
+run2$OBJF-run3$OBJF
+```
+```{r,echo=F}
+726.5
+673.6
+690.5
+```
+We can see that there is no significant improvement in model fit (in fact it is worse, with an increase in OFV of 17). 
+
+
+# Homework
+
+For homework this week suggest:
+
+* Add weight as a covariate on volume in the pheno model and estimate $\theta_{WT}$
+
+* Have a look at the theophylline data set \texttt{theo\_sd}. Is there any effect of weight on the PK parameters when modelling this drug
+
+

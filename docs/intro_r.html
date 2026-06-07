@@ -337,6 +337,48 @@ div.tocify {
     </li>
   </ul>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Non-compartmental analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="non_compartmental.html">Workbook</a>
+    </li>
+    <li>
+      <a href="solutions_non_compartmental.html">Solutions</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Introduction to compartmental analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="nlmem.html">Non-linear mixed effects modelling</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Additional materials
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="model_diagnostics.html">Model diagnostics</a>
+    </li>
+    <li>
+      <a href="covariate_analysis.html">Covariate analysis</a>
+    </li>
+  </ul>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         
@@ -477,8 +519,8 @@ CAL #show &#39;CAL&#39; data frame in R console.</code></pre>
 ## 5  A    8  0.92
 ## 6  B    0 41.83</code></pre>
 <pre class="r"><code>amox$ID # shows you the &#39;ID&#39; column</code></pre>
-<pre><code>##  [1] &quot;A&quot; &quot;A&quot; &quot;A&quot; &quot;A&quot; &quot;A&quot; &quot;B&quot; &quot;B&quot; &quot;B&quot; &quot;B&quot; &quot;B&quot; &quot;C&quot; &quot;C&quot; &quot;C&quot; &quot;C&quot; &quot;C&quot; &quot;D&quot; &quot;D&quot; &quot;D&quot; &quot;D&quot; &quot;D&quot; &quot;E&quot; &quot;E&quot; &quot;E&quot;
-## [24] &quot;E&quot; &quot;E&quot; &quot;F&quot; &quot;F&quot; &quot;F&quot; &quot;F&quot; &quot;F&quot;</code></pre>
+<pre><code>##  [1] &quot;A&quot; &quot;A&quot; &quot;A&quot; &quot;A&quot; &quot;A&quot; &quot;B&quot; &quot;B&quot; &quot;B&quot; &quot;B&quot; &quot;B&quot; &quot;C&quot; &quot;C&quot; &quot;C&quot; &quot;C&quot; &quot;C&quot; &quot;D&quot; &quot;D&quot; &quot;D&quot; &quot;D&quot;
+## [20] &quot;D&quot; &quot;E&quot; &quot;E&quot; &quot;E&quot; &quot;E&quot; &quot;E&quot; &quot;F&quot; &quot;F&quot; &quot;F&quot; &quot;F&quot; &quot;F&quot;</code></pre>
 <pre class="r"><code>summary(amox$ID) #summarises the ID column. 5 samples per participant</code></pre>
 <pre><code>##    Length     Class      Mode 
 ##        30 character character</code></pre>
