@@ -349,7 +349,11 @@ You can see from Figure \@ref(fig:cwres) that we are lacking in a uniform distri
 ## Task 3
 
 ```{r twocpt, echo = FALSE, message=FALSE, fig.align='center', fig.cap='Two-compartment oral-absorption model',out.width="60%"}
+<<<<<<< HEAD
 knitr::include_graphics("tworal.png")
+=======
+knitr::include_graphics("./images/tworal.png")
+>>>>>>> dd8bbe93ccd50b2802a49ea97187518aea84272b
 ```
 
 * Fit a 2-compartment oral-absorption model to the Drug X data
