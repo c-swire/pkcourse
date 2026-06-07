@@ -19,8 +19,13 @@ navbar:
         href: solutions_non_compartmental.html
     - text: "Introduction to compartmental analysis"
       menu:
+<<<<<<< HEAD
       - text: "Compartments"
         href: compartments.html
+=======
+      # - text: "Compartments"
+      #  href: compartments.html
+>>>>>>> dd8bbe93ccd50b2802a49ea97187518aea84272b
       - text: "Non-linear mixed effects modelling"
         href: nlmem.html
     - text: "Additional materials"

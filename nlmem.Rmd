@@ -235,6 +235,7 @@ We are pharmacokinetic modelers. We have knowledge of mathematics and knowledge 
 
 ```{r oneor, echo = FALSE, message=FALSE, fig.align='center', fig.cap='One-compartment oral-absorption model',fig.height=3,out.width="100%"}
 knitr::include_graphics("oneor2.png")
+
 ```
 
 Figure \@ref(fig:oneor) shows the graphical representation of the one-compartment oral-absorption model. To remind you, the equation for this model is $$C=\frac{F.D.k_a}{V_d.(k_a-k_e)}.(e^{-k_et}-e^{-k_at}) $$ Remember, that without corresponding IV data, we cannot identify $F$. 
