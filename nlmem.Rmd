@@ -1,25 +1,46 @@
 ---
-title: "Chapter 4: Non-linear mixed effects models"
-author: "Dagan Lonsdale"
-bibliography: chapter4.bib
-csl: aa.csl
+#title: "Chapter 4: Non-linear mixed effects models"
+#author: "Dagan Lonsdale"
+#bibliography: chapter4.bib
+#csl: aa.csl
 
+#output:
+#  bookdown::html_document2:
+#    fig_caption : TRUE
+#    number_sections: no
+#    toc: yes
+#    toc_float: yes
+#    latex_engine: xelatex
+#    highlight: tango
+#    extra_dependencies: "subfig"
+#header-includes:
+#  - \usepackage{float}
+#  - \floatplacement{table}{H}
+#  - \usepackage{booktabs}
+#  - \usepackage{caption}
+#  - \captionsetup{labelfont=bf,margin=12pt}
+#urlcolor: blue
+
+title: "Chapter 4: Non-linear mixed effects models"
 output:
   bookdown::html_document2:
     fig_caption : TRUE
     number_sections: no
     toc: yes
     toc_float: yes
-    latex_engine: xelatex
-    highlight: tango
-    extra_dependencies: "subfig"
+
 header-includes:
+  - \usepackage{colortbl}
+  - \usepackage{multirow}
   - \usepackage{float}
+  - \floatplacement{figure}{H}
   - \floatplacement{table}{H}
   - \usepackage{booktabs}
   - \usepackage{caption}
-  - \captionsetup{labelfont=bf,margin=12pt}
-urlcolor: blue
+  - \captionsetup{labelfont=bf,margin=12pt} 
+  - \newcommand{\blandscape}{\begin{landscape}}
+  - \newcommand{\elandscape}{\end{landscape}}
+
 ---
 
 
@@ -31,7 +52,7 @@ library(gridExtra)
 library(PKNCA) 
 library(RColorBrewer)
 ```
-\newpage
+
 # Introduction 
 
 So far, we have only considered 'rich' data. This is data where there are lots of samples for each individual at each time point. This kind of data is really easy to produce in early-phase trials, including entry-into-human studies. However, at later phases of drug development, including post-marketing, pharmacokinetic data is often more challenging to obtain. In addition, rigid sampling times are less easy to implement outside of the confines of a dedicated pharmacokinetic study as patients or study participants are often at clinic or study visits at irregular times and so sampling may be somewhat opportunistic. Self-administered doses are also less likely to be accurately taken at prescribed times. These factors make modelling data using the non-compartmental methods we have used so far challenging and less accurate in these scenarios.
@@ -58,8 +79,6 @@ The purpose of today's session, is to introduce the concept of non-linear mixed-
 
 This document is designed to provide you with notes of the session and be a handy resource when you come to revision. There are examples of code and the corresponding output from \texttt{R} as we go along.    
   
-\newpage
-
 # Recap the one-compartment IV-bolus model
 You will remember that the time concentration profile of the one-compartment IV-bolus model (Figure \@ref(fig:onecpt)) may be described using the equation $$C=C_0e^{(-k_et)}$$ where $k_e=\frac{Cl}{V_d}$ and $C_0=\frac{Dose}{V_d}$
 
@@ -203,12 +222,12 @@ frud<-fru %>% subset(time==0) %>% mutate(dose=40)
 
 conc<-PKNCAconc(fru, conc~time|ID) #create sampling object
 dose<-PKNCAdose(frud, dose~time|ID) #create dosing object
-manual <- data.frame(start=0, end=8,vd.obs=TRUE,kel.last=TRUE, cl.obs=TRUE)
+manual <- data.frame(start=0, end=8,vz.obs=TRUE,kel.last=TRUE, cl.obs=TRUE)
 clvd<-PKNCAdata(conc,dose,intervals=manual)  #combine
 results<-pk.nca(clvd)  # analyse
 res<-results$result
 
-v<-res %>% subset(PPTESTCD=='vd.obs')%>% summarise(v=mean(PPORRES)) %>% unlist()
+v<-res %>% subset(PPTESTCD=='vz.obs')%>% summarise(v=mean(PPORRES)) %>% unlist()
 cl<-res %>% subset(PPTESTCD=='cl.obs')%>% summarise(cl=mean(PPORRES)) %>% unlist()
 rich<-ggplot(fru,aes(x=time,y=conc,group=ID,col=ID))+
   geom_line(alpha=0.2,col='grey')+
@@ -229,7 +248,7 @@ We have several options in our armory that we can use to describe these data. We
 summary(results) %>% 
     kable(booktabs = TRUE, caption = "Non compartmental analysis of oral PK data")
 ```
-\newpage  
+
 ## Fitting a model
 We are pharmacokinetic modelers. We have knowledge of mathematics and knowledge of pharmacology and biology. We can use our prior knowledge to choose a model to fit to the data that aligns with our knowledge of the system (human) that the data came from. In this case we will choose the one-compartment oral-absorption model. Note that there are 3 parameters to estimate in the one-compartment oral-absorption model - $k_e$ (or $Cl$), $V_d$, and $k_a$. Importantly, there are more samples per participant than there are model parameters. This indicates that we have *rich* data to model. 
 
@@ -544,7 +563,6 @@ ggplot()+
 
 ```
 
-\newpage
 
 # Non-linear, mixed-effects modelling, an alternative approach
 
@@ -601,7 +619,6 @@ You will finally note, that by choosing to model $$Cl=\theta_{Cl}\times e^{\eta_
 ### Non-linear mixed-effects model *or* population pharmacokinetic modelling (Pop-PK)?
 You will often see these terms used interchangeably. They are not quite the same, but don't worry about the nuances. 
 
-\newpage
 # Non-linear mixed-effects modelling in \texttt{R}  
 
 Non-linear mixed-effects modelling is computationally complex and requires knowledge of statistics, pharmacological models and how to use computer code...all skills that we have been developing. The industry standard non-linear mixed-effects modelling package is often cited as \texttt{NONMEM}. This proprietary software is pretty complicated to start using. We are going to enter into the world of population pharmacokinetic modelling by using the package \texttt{nlmixr}. This has the advantage of being open-source (and therefore free for you to download and use), as well as being based firmly in \texttt{R}. 
@@ -622,7 +639,6 @@ The first part of the function is to set the initial estimates for your model pa
 The second part of the function defines the model. The \texttt{model()} block. Here you describe the relationship between the fixed- and random-effects. A little more on this later. 
 
 After building the model we can run a check using \texttt{nlmixr(one.cmt)}, which describes the model we have built. And then we fit..........
-\newpage
 
 ```{r nlmixr,warning=F,message=F}
 
@@ -656,7 +672,7 @@ nlmixr2(one.cmt)
 fit<-nlmixr2(one.cmt,sparse,est="saem", list(print=0))
 
 ```
-\newpage
+
 You can run \texttt{print(fit)} and you will get an enormous amount of output from your model. Tables  \@ref(tab:nlmixfix) & \@ref(tab:nlmixran) show the fixed and random parameter estimates, along with confidence intervals. Don't worry about the other output, we will get there eventually. 
 ```{r nlmixfix,echo=F,warning=T,message=F}
 

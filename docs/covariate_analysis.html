@@ -361,6 +361,9 @@ div.tocify {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="compartments.html">Compartments</a>
+    </li>
+    <li>
       <a href="nlmem.html">Non-linear mixed effects modelling</a>
     </li>
   </ul>
@@ -507,8 +510,15 @@ div.tocify {
 </div>
 <div id="solution-to-phenobarbital-task-1" class="section level2">
 <h2>Solution to phenobarbital Task 1</h2>
-<pre class="r"><code>library(nlmixr2)
-pheno&lt;-pheno_sd
+<pre class="r"><code>library(nlmixr2)</code></pre>
+<pre><code>## Warning: package &#39;nlmixr2&#39; was built under R version 4.5.2</code></pre>
+<pre><code>## Warning: package &#39;lotri&#39; was built under R version 4.5.2</code></pre>
+<pre><code>## Warning: package &#39;nlmixr2data&#39; was built under R version 4.5.2</code></pre>
+<pre><code>## Warning: package &#39;nlmixr2est&#39; was built under R version 4.5.2</code></pre>
+<pre><code>## Warning: package &#39;nlmixr2extra&#39; was built under R version 4.5.2</code></pre>
+<pre><code>## Warning: package &#39;nlmixr2plot&#39; was built under R version 4.5.2</code></pre>
+<pre><code>## Warning: package &#39;rxode2&#39; was built under R version 4.5.2</code></pre>
+<pre class="r"><code>pheno&lt;-pheno_sd
 head(pheno)</code></pre>
 <pre><code>##   ID TIME  AMT  WT APGR   DV MDV EVID
 ## 1  1  0.0 25.0 1.4    7  0.0   1    1
@@ -518,20 +528,20 @@ head(pheno)</code></pre>
 ## 5  1 37.0  3.5 1.4    7  0.0   1    1
 ## 6  1 48.0  3.5 1.4    7  0.0   1    1</code></pre>
 <pre class="r"><code>summary(pheno)</code></pre>
-<pre><code>##        ID             TIME             AMT               WT            APGR       
-##  Min.   : 1.00   Min.   :  0.00   Min.   : 0.000   Min.   :0.60   Min.   : 1.000  
-##  1st Qu.:13.00   1st Qu.: 19.23   1st Qu.: 2.300   1st Qu.:1.10   1st Qu.: 5.000  
-##  Median :25.00   Median : 59.30   Median : 3.000   Median :1.30   Median : 7.000  
-##  Mean   :28.24   Mean   : 63.70   Mean   : 5.281   Mean   :1.49   Mean   : 6.394  
-##  3rd Qu.:44.00   3rd Qu.: 96.42   3rd Qu.: 4.400   3rd Qu.:1.70   3rd Qu.: 8.000  
-##  Max.   :59.00   Max.   :389.80   Max.   :70.000   Max.   :3.60   Max.   :10.000  
-##        DV              MDV              EVID       
-##  Min.   : 0.000   Min.   :0.0000   Min.   :0.0000  
-##  1st Qu.: 0.000   1st Qu.:1.0000   1st Qu.:1.0000  
-##  Median : 0.000   Median :1.0000   Median :1.0000  
-##  Mean   : 5.328   Mean   :0.7917   Mean   :0.7917  
-##  3rd Qu.: 0.000   3rd Qu.:1.0000   3rd Qu.:1.0000  
-##  Max.   :67.900   Max.   :1.0000   Max.   :1.0000</code></pre>
+<pre><code>##        ID             TIME             AMT               WT      
+##  Min.   : 1.00   Min.   :  0.00   Min.   : 0.000   Min.   :0.60  
+##  1st Qu.:13.00   1st Qu.: 19.23   1st Qu.: 2.300   1st Qu.:1.10  
+##  Median :25.00   Median : 59.30   Median : 3.000   Median :1.30  
+##  Mean   :28.24   Mean   : 63.70   Mean   : 5.281   Mean   :1.49  
+##  3rd Qu.:44.00   3rd Qu.: 96.42   3rd Qu.: 4.400   3rd Qu.:1.70  
+##  Max.   :59.00   Max.   :389.80   Max.   :70.000   Max.   :3.60  
+##       APGR              DV              MDV              EVID       
+##  Min.   : 1.000   Min.   : 0.000   Min.   :0.0000   Min.   :0.0000  
+##  1st Qu.: 5.000   1st Qu.: 0.000   1st Qu.:1.0000   1st Qu.:1.0000  
+##  Median : 7.000   Median : 0.000   Median :1.0000   Median :1.0000  
+##  Mean   : 6.394   Mean   : 5.328   Mean   :0.7917   Mean   :0.7917  
+##  3rd Qu.: 8.000   3rd Qu.: 0.000   3rd Qu.:1.0000   3rd Qu.:1.0000  
+##  Max.   :10.000   Max.   :67.900   Max.   :1.0000   Max.   :1.0000</code></pre>
 <p>OK, so we can see we’ve got an ID variable, WT which is hopefully easy to interpret as weight and APGR which is APGAR score (a measure of how unwell a neonate is when they are born).</p>
 <p>The other variables are hopefully recognisable as default variables.</p>
 <p>Let’s see if we can have a little more of a sophisticated summary.</p>

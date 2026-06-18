@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Chapter 4: Non-linear mixed effects models</title>
+
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">PK course</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Introduction to R
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="intro_r.html">Workbook</a>
+    </li>
+    <li>
+      <a href="intro_r_solutions.html">Solutions</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Non-compartmental analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="non_compartmental.html">Workbook</a>
+    </li>
+    <li>
+      <a href="solutions_non_compartmental.html">Solutions</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Introduction to compartmental analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="compartments.html">Compartments</a>
+    </li>
+    <li>
+      <a href="nlmem.html">Non-linear mixed effects modelling</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Additional materials
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="model_diagnostics.html">Model diagnostics</a>
+    </li>
+    <li>
+      <a href="covariate_analysis.html">Covariate analysis</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Chapter 4: Non-linear mixed effects models</h1>
+
+</div>
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>So far, we have only considered ‘rich’ data. This is data where there are lots of samples for each individual at each time point. This kind of data is really easy to produce in early-phase trials, including entry-into-human studies. However, at later phases of drug development, including post-marketing, pharmacokinetic data is often more challenging to obtain. In addition, rigid sampling times are less easy to implement outside of the confines of a dedicated pharmacokinetic study as patients or study participants are often at clinic or study visits at irregular times and so sampling may be somewhat opportunistic. Self-administered doses are also less likely to be accurately taken at prescribed times. These factors make modelling data using the non-compartmental methods we have used so far challenging and less accurate in these scenarios.</p>
+<p>The purpose of today’s session, is to introduce the concept of non-linear mixed-effects modelling. This will include introduction to the modelling package . This package is challenging to install on your own machine, may work. If you run a Windows operating system, you are likely to also need . You will need to follow instructions online on how to install and download this. Installation on an Apple Mac usually requires to be downloaded. I would recommend using the SGUL machines for today’s session.</p>
+<div id="learning-outcomes" class="section level2">
+<h2>Learning outcomes</h2>
+<ul>
+<li>Use linear regression to estimate PK parameters from a one-compartment IV-bolus model</li>
+<li>Explain the difference between rich and sparse data</li>
+<li>Explain different analytic approaches to modelling rich data
+<ul>
+<li>Describe naive pooled, naive average, two-stage and mixed-effects approaches</li>
+<li>Outline the difference between these approaches</li>
+</ul></li>
+<li>Explain the difference between a linear and non-linear model</li>
+<li>Explain the components of a non-linear mixed-effects pharmacokinetic model, including defining the structural and statistical components of the model</li>
+<li>Analyse sparse pharmacokinetic data using a non-linear mixed-effects approach</li>
+</ul>
+<p>This document is designed to provide you with notes of the session and be a handy resource when you come to revision. There are examples of code and the corresponding output from as we go along.</p>
+</div>
+</div>
+<div id="recap-the-one-compartment-iv-bolus-model" class="section level1">
+<h1>Recap the one-compartment IV-bolus model</h1>
+<p>You will remember that the time concentration profile of the one-compartment IV-bolus model (Figure <a href="#fig:onecpt">1</a>) may be described using the equation <span class="math display">\[C=C_0e^{(-k_et)}\]</span> where <span class="math inline">\(k_e=\frac{Cl}{V_d}\)</span> and <span class="math inline">\(C_0=\frac{Dose}{V_d}\)</span></p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:onecpt"></span>
+<img src="onecpt1.png" alt="One-compartment model" width="0.6\linewidth" />
+<p class="caption">
+Figure 1: One-compartment model
+</p>
+</div>
+<p>Recall also that taking the log of this equation provides us with <span class="math display">\[log(C)=log(C_0)-k_et\]</span> which is an equation of a straight line, i.e. of the form <span class="math display">\[y=mx+c\]</span> Data from a pharmacokinetic experiment may therefore be analysed using a compartmental approach and linear regression analysis, as calculating the gradient provides <span class="math inline">\(k_e\)</span> and the intercept provides <span class="math inline">\(C_0\)</span> from which <span class="math inline">\(V_d\)</span> may be calculated.</p>
+<p>So far, we have looked at pretty ‘clean’ data, that produces nice smooth lines of best fit that pass through all the data points. Real world experiments are not like this, there is additional (residual) variability that we have not simulated or thought about in our pharmacokinetic experiments (although we did see it when we were helping the particularly particular greengrocer). Let’s look at an example from a single individual with a slightly more realistic time-concentration profile (Figure <a href="#fig:single">2</a>).</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:single"></span>
+<img src="nlmem_files/figure-html/single-1.png" alt="PK data from an individual" width="50%" /><img src="nlmem_files/figure-html/single-2.png" alt="PK data from an individual" width="50%" />
+<p class="caption">
+Figure 2: PK data from an individual
+</p>
+</div>
+<div id="example-code-for-calculating-pharmacokinetic-parameters-using-linear-regression-with-a-one-compartment-iv-bolus-model" class="section level2">
+<h2>Example code for calculating pharmacokinetic parameters using linear regression with a one-compartment IV-bolus model</h2>
+<p>If you would like to run through the code for this, there is an example below. As always, explore your data before modelling. This is furosemide data again. The dose is 40 mg.</p>
+<pre class="r"><code>pk&lt;-read_csv(&quot;https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/main/messyonepersondata.csv&quot;)
+#first plot and review
+ggplot(pk,aes(x=time,y=conc))+
+  geom_point()+
+  theme_bw(base_size=18)+
+  theme(legend.position=&quot;none&quot;)+
+  ylab(&quot;Plasma concentration (mg/L)&quot;)+
+  xlab(&quot;Time (hr)&quot;)
+#add log conc data and plot
+pk$lconc&lt;-log(pk$conc)
+
+ggplot(pk,aes(x=time,y=lconc))+
+  geom_point()+
+  theme_bw(base_size=18)+
+  theme(legend.position=&quot;none&quot;)+
+  ylab(&quot;Plasma concentration (mg/L)&quot;)+
+  xlab(&quot;Time (hr)&quot;)+
+# you can add linear regression line
+  geom_smooth(method=lm,se=F)</code></pre>
+<p>The code above, produces the plots seen in (Figure <a href="#fig:single">2</a>). Now use linear regression approach to calculate individual PK parameters.</p>
+<pre class="r"><code>library(flextable)
+fit&lt;-lm(lconc~time,data=pk)
+summary(fit)
+#calculate Vd
+C0&lt;-exp(fit$coef[[1]])
+Vd&lt;-40/C0
+ke&lt;- -fit$coef[[2]]
+Cl&lt;-ke*Vd
+#Output as table
+Parameter&lt;-c(&#39;Clearance&#39;,&#39;Volume of distribution&#39;)
+Estimate&lt;-c(Cl,Vd)
+estpk&lt;-data.frame(Parameter,Estimate)
+flextable(estpk)</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:codeone">Table 1: </span>Estimated PK values using linear regression
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Parameter
+</th>
+<th style="text-align:right;">
+Estimate
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Clearance
+</td>
+<td style="text-align:right;">
+6.54
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Volume of distribution
+</td>
+<td style="text-align:right;">
+15.00
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="rich-versus-sparse-data" class="section level1">
+<h1>Rich versus sparse data</h1>
+<div id="rich-data-example" class="section level2">
+<h2>Rich data example</h2>
+<p>Let’s remind ourselves of what the output from a rich sampling schedule from a pharmacokinetic trial looks like. Figure <a href="#fig:rich">3</a> shows data from a simulated experiment of an orally administered 40mg dose of furosemide. There are 10 participants, each with a sample taken at 10 different time points. The fact that there are the same number of samples is important (it is known as <em>balanced</em> data). This reduces the possibility of one individual unduly influencing an analysis of data.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:rich"></span>
+<img src="nlmem_files/figure-html/rich-1.png" alt="Rich data from a simulated pharmacokinetic trial (n=10, 10 samples per participant)" width="50%" /><img src="nlmem_files/figure-html/rich-2.png" alt="Rich data from a simulated pharmacokinetic trial (n=10, 10 samples per participant)" width="50%" />
+<p class="caption">
+Figure 3: Rich data from a simulated pharmacokinetic trial (n=10, 10 samples per participant)
+</p>
+</div>
+<p>We have several options in our armory that we can use to describe these data. We could undertake a non-compartmental approach (Table <a href="#tab:nca">2</a>) and use the package. Or, we could fit a model to the data.</p>
+<table>
+<caption><span id="tab:nca">Table 2: </span>Non compartmental analysis of oral PK data</caption>
+<thead>
+<tr class="header">
+<th align="right">start</th>
+<th align="right">end</th>
+<th align="left">N</th>
+<th align="left">kel.last</th>
+<th align="left">cl.obs</th>
+<th align="left">vz.obs</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0</td>
+<td align="right">8</td>
+<td align="left">10</td>
+<td align="left">0.543 [19.5]</td>
+<td align="left">17.4 [40.1]</td>
+<td align="left">20.9 [15.9]</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="fitting-a-model" class="section level2">
+<h2>Fitting a model</h2>
+<p>We are pharmacokinetic modelers. We have knowledge of mathematics and knowledge of pharmacology and biology. We can use our prior knowledge to choose a model to fit to the data that aligns with our knowledge of the system (human) that the data came from. In this case we will choose the one-compartment oral-absorption model. Note that there are 3 parameters to estimate in the one-compartment oral-absorption model - <span class="math inline">\(k_e\)</span> (or <span class="math inline">\(Cl\)</span>), <span class="math inline">\(V_d\)</span>, and <span class="math inline">\(k_a\)</span>. Importantly, there are more samples per participant than there are model parameters. This indicates that we have <em>rich</em> data to model.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:oneor"></span>
+<img src="oneor2.png" alt="One-compartment oral-absorption model" width="100%" />
+<p class="caption">
+Figure 4: One-compartment oral-absorption model
+</p>
+</div>
+<p>Figure <a href="#fig:oneor">4</a> shows the graphical representation of the one-compartment oral-absorption model. To remind you, the equation for this model is <span class="math display">\[C=\frac{F.D.k_a}{V_d.(k_a-k_e)}.(e^{-k_et}-e^{-k_at}) \]</span> Remember, that without corresponding IV data, we cannot identify <span class="math inline">\(F\)</span>.</p>
+<div id="analytical-apprach" class="section level3">
+<h3>Analytical apprach</h3>
+<p>There are several ways to approach modelling these data:</p>
+<ul>
+<li>Treat all the data as if it is from a single individual, pool it together and fit a model (naive pooled approach)</li>
+<li>Average the data at each time point and then fit a model (naive average approach)</li>
+<li>Fit a model to each individual and then take an average of these pharmacokinetic parameters (two-stage approach)</li>
+</ul>
+<p>Each of these approaches provides a slightly different model fit and each has its own pro’s and con’s. If you would like to read more about these, I suggest taking a look at the excellent article by Ette &amp; Williams <span class="citation">@Ette</span>.</p>
+<p>Figure <a href="#fig:richfit">5</a> demonstrates the time-concentration profile modeled using each of these approaches. As the data was simulated, we also know the <em>true</em> population time-concentration profile. You can see that each of the different modeling approaches provides a slightly different fit to these data. None of them are perfect, but all provide an acceptable estimation of the true profile. They could all be used to make inferences from a pharmacokinetic study of this type.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:richfit"></span>
+<img src="nlmem_files/figure-html/richfit-1.png" alt="Concentration-time profile showing `true' population profile alonside a variety of approaches to modelling the rich data data" width="50%" /><img src="nlmem_files/figure-html/richfit-2.png" alt="Concentration-time profile showing `true' population profile alonside a variety of approaches to modelling the rich data data" width="50%" />
+<p class="caption">
+Figure 5: Concentration-time profile showing `true’ population profile alonside a variety of approaches to modelling the rich data data
+</p>
+</div>
+</div>
+</div>
+<div id="sparse-data-example" class="section level2">
+<h2>Sparse data example</h2>
+<p>Let’s look at what happens if the sampling is sparse (fewer samples) and less strictly taken at specified time points.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:sparse"></span>
+<img src="nlmem_files/figure-html/sparse-1.png" alt="Sparse data from a simulated pharmacokinetic trial (n=40, 1-3 samples per participant)" width="50%" /><img src="nlmem_files/figure-html/sparse-2.png" alt="Sparse data from a simulated pharmacokinetic trial (n=40, 1-3 samples per participant)" width="50%" />
+<p class="caption">
+Figure 6: Sparse data from a simulated pharmacokinetic trial (n=40, 1-3 samples per participant)
+</p>
+</div>
+<p>Figure <a href="#fig:sparse">6</a> shows a simulation of data that might more realistically be drawn from a later phase clinical trial. You can see that there are quite a number of participants (40) but that they do not contribute many samples. The shape of the data is the same (because the underlying PK parameters used to simulate the data are the same as I used in simulating the rich example). However, here one or two participants contribute 3-samples, but the majority have just 1-2 samples. The fact that there are different numbers of samples per participant is described as <em>unbalanced</em>. We therefore have fewer samples per participants than there are parameters to estimate in the model (sparse data). You can also see that samples were not taken at precisely the same time-points after a dose.</p>
+<p>Figure <a href="#fig:sparsefit">7</a> shows the same analytical approaches to these data as we used before with the rich data. The two-stage approach falls down entirely because most individuals don’t have enough samples to correctly determine absorption and elimination phases. The naive-pooled-average approach is equally unhelpful because samples were taken at non-uniform times so averaging out is inaccurate and leads to a poor model fit.</p>
+<p>The naive-pooled approach still gives a pretty good fit, primarily because there are so many samples. However, whilst the average trend is good, the problem with a naive pooled approach, is that it <em>overestimates</em> variability. Since we treat all the data as if it comes from one individual, all the variability is dumped into a single residual error term at the end of the equation. <span class="math display">\[C=\frac{F.D.k_a}{V_d.(k_a-k_e)}.(e^{-k_et}-e^{-k_at})+\epsilon\]</span> By lumping all of the residual error into this single error term, the naive-pooled modelling approach misses out on describing accurately the time-concentration profile of an individual. This is fine if you just care about the mean-concentration, but we often care about what is happening to the whole population (or at least most of it).</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:sparsefit"></span>
+<img src="nlmem_files/figure-html/sparsefit-1.png" alt="Concentration-time profile showing 'true' population profile alonside a variety of approaches to modelling sparse data" width="576" />
+<p class="caption">
+Figure 7: Concentration-time profile showing ‘true’ population profile alonside a variety of approaches to modelling sparse data
+</p>
+</div>
+</div>
+</div>
+<div id="non-linear-mixed-effects-modelling-an-alternative-approach" class="section level1">
+<h1>Non-linear, mixed-effects modelling, an alternative approach</h1>
+<p>Before we dip our toes into the water of population-pharmacokinetic modelling using non-linear mixed-effects techniques, we must briefly note a few definitions.</p>
+<div id="linear-versus-non-linear-models" class="section level2">
+<h2>Linear versus non-linear models</h2>
+<p>So far, we have broadly focussed on linear models. For example, we modelled carrot weight versus using a linear regression model of the form <span class="math display">\[Carrot_{weight} =\beta_0+\beta_1.Carrot_{height}+\epsilon\]</span> where <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> are model parameters and <span class="math inline">\(Carrot_{height}\)</span> is the predictor variable and <span class="math inline">\(\epsilon\)</span> is the residual (random) error.</p>
+<p>Non-linear models are named as such because they cannot be described with a linear combination of model parameters. For example, you will remember the <span class="math inline">\(E_{max}\)</span> model <span class="math display">\[E=\frac{E_{max}C}{EC_{50}+C}\]</span> where <span class="math inline">\(E\)</span> (observed effect) is the outcome variable, <span class="math inline">\(C\)</span> (drug concentration) is the predictor variable and <span class="math inline">\(E_{max}\)</span> (maximum effect) and <span class="math inline">\(EC_{50}\)</span> (concentration require to achieve half-max effect) are model parameters.</p>
+<p>In this model, <span class="math inline">\(E\)</span> cannot be expressed as a linear combination of the two parameters (<span class="math inline">\(EC_{50}\)</span> and <span class="math inline">\(E_{max}\)</span>).</p>
+<p>When modelling pharmacokinetic data so far, we have taken advantage of <em>linear transformations</em> to change our model from non-linear to linear domains. For example <span class="math display">\[C=C_{0}e^{-k_et}\]</span> is a non-linear model for concentration <span class="math inline">\(C\)</span> with model parameters <span class="math inline">\(C_0\)</span> and <span class="math inline">\(k_e\)</span>. We have used logarithm to turn this into a straight line <span class="math display">\[log(C)=log{(C_0)}-k_et\]</span></p>
+<p>The reason we have done this so far is that linear-models are (relatively) easy to solve and calculate estimates for model parameters. Linear transformations are not always possible. When undertaking a non-linear approach, computer programs use an <em>iterative approach</em> to finding values for model parameters. With an iterative approach, a series of values for model parameters are tested to see which provide the values for model parameters that best fit the data.</p>
+<p>The biggest difference you will notice in your introduction to non-linear modelling is that you will now be required to input an <em>initial estimate</em> for model parameters, i.e. you will have to give a value for clearance and volume of distribution that you want it to start at in its search for its final estimate of the population value of that parameter. That’s right, you give the program your best guess of what the true population value is and then the program tries to improve on it.</p>
+</div>
+<div id="fixed-effects-random-effects-and-mixed-effects-models" class="section level2">
+<h2>Fixed-effects, random-effects and mixed-effects models</h2>
+<p>Fixed-effects in an experiment or trial are controlled, or the same, for each individual. For example, drug dose and frequency of administration are usually fixed. They may also be variables where all possible values/levels are studied. For example, if you want to study the effect of smoking on the kinetics of a drug, you would study the drug kinetics in smokers- and non-smokers. The ‘smoking’ effect in your model is a fixed-effect since all levels of this factor (categorical)-variable are studied.</p>
+<p>Random-effects in an experiment or trial are less controlled and do not include all possible levels. For example, we take a sample of participants in a trial, but we really want to know/make inferences about the population from which they are sampled. Since we do not study every single subject from the population, the participants in the study are a random effect.</p>
+<p>This distinction is complex and we will come back to it again…and again…and again…</p>
+<p>Mixed-effects is the easiest to define here. It is simply a model which contains fixed- and random-effects.</p>
+<div id="using-a-compartmental-pharmacokinetic-model-to-provide-an-example-of-what-we-mean" class="section level3">
+<h3>Using a compartmental pharmacokinetic model to provide an example of what we mean</h3>
+<p>Let’s return to the one-compartment IV-bolus model once more. Let us parameterise using <em>primary</em> pharmacokinetic parameters (clearance and volume of distribution). Broadly, our model remains the same <span class="math display">\[C=C_{0}e^{-\frac{Cl}{V}t}\]</span> however, we now add a further layer, by stating that our parameters are made up of a fixed (population mean) effect and a random (inter-individual variability) effect. <span class="math display">\[Cl=\theta_{Cl}\times e^{\eta_{Cl}}\]</span> the modelling process then estimates <span class="math display">\[\theta_{Cl}\textrm{ -the population mean value for clearance (a fixed effect)}\]</span> and makes some estimate of <span class="math display">\[\eta_{Cl} \textrm{ -individual variability of clearance (a random-effect)}\]</span></p>
+<p>Similarly, we model volume of distribution as <span class="math display">\[V=\theta_{V}\times e^{\eta_{V}}\]</span> and by extension in the oral-absorption model <span class="math display">\[k_a=\theta_{k_a}\times e^{\eta_{k_a}}\]</span></p>
+</div>
+<div id="a-further-note-on-eta" class="section level3">
+<h3>A further note on <span class="math inline">\(\eta\)</span></h3>
+<p>I suspect this is somewhat mind-bending a set of ideas, compared to the modelling approaches you are used to from the course so far, but I need to extend the thought process a little. Let’s imagine an individual in a clinical trial, lets call them individual <span class="math inline">\(i\)</span>, or the <span class="math inline">\(i\)</span>th individual. For <span class="math inline">\(i\)</span>, their value of clearance will correspond to <span class="math display">\[Cl_i=\theta_{Cl}\times e^{\eta_i}\]</span> now, it should be noted that <span class="math inline">\(\eta\)</span> is assumed to follow a normal distribution with mean of zero and standard deviation <span class="math inline">\(\omega_{Cl}\)</span> The mathematical notation for this is as follows <span class="math display">\[\eta\sim N(0,\omega_{Cl}^2)\]</span> you will see from this that in a non-linear mixed-effects model, we do not estimate the population mean value of <span class="math inline">\(\eta\)</span> (since it is always zero), we estimate the variance, <span class="math inline">\(\omega^2\)</span>. Again, we have to tell our computer program a value to start looking for this.</p>
+<p>You will finally note, that by choosing to model <span class="math display">\[Cl=\theta_{Cl}\times e^{\eta_{Cl}}\]</span> we are modelling clearance with a log-normal distribution. We <em>could</em> choose to model it <span class="math display">\[Cl=\theta_{Cl}+ \eta_{Cl}\]</span>but as we have previously demonstrated, our <em>prior</em> knowledge of clearance is that it is likely to have a log-normal distribution so we should choose to model it as such.</p>
+</div>
+</div>
+<div id="advantages-and-disadvantages-of-non-linear-mixed-effects-models" class="section level2">
+<h2>Advantages and disadvantages of non-linear mixed-effects models</h2>
+<p><strong>Advantages of non-linear mixed-effects approach</strong></p>
+<ul>
+<li>Enables modelling of sparse data, useful in later phase studies</li>
+<li>Allows more complex identification of covariate effects (for example organ function)</li>
+<li>Alternative sampling and modelling may allow for populations to be studied that are not straightforward to study in traditional phase-0/1 design (for example children, or drugs in pregnancy)</li>
+<li>Allows complex simulations which can inform subsequent study design</li>
+</ul>
+<p><strong>Disadvantages of non-linear mixed-effects approach</strong></p>
+<ul>
+<li>Feels inherently more complex which can make people anxious about <em>undertaking</em> or <em>understanding</em> the process</li>
+<li>Computationally expensive</li>
+<li>Time consuming</li>
+<li>Often requires time cleaning/organising data from multiple sources</li>
+</ul>
+<div id="non-linear-mixed-effects-model-or-population-pharmacokinetic-modelling-pop-pk" class="section level3">
+<h3>Non-linear mixed-effects model <em>or</em> population pharmacokinetic modelling (Pop-PK)?</h3>
+<p>You will often see these terms used interchangeably. They are not quite the same, but don’t worry about the nuances.</p>
+</div>
+</div>
+</div>
+<div id="non-linear-mixed-effects-modelling-in" class="section level1">
+<h1>Non-linear mixed-effects modelling in </h1>
+<p>Non-linear mixed-effects modelling is computationally complex and requires knowledge of statistics, pharmacological models and how to use computer code…all skills that we have been developing. The industry standard non-linear mixed-effects modelling package is often cited as . This proprietary software is pretty complicated to start using. We are going to enter into the world of population pharmacokinetic modelling by using the package . This has the advantage of being open-source (and therefore free for you to download and use), as well as being based firmly in .</p>
+<p>Installing is a little complicated. You <em>may</em> be able to do it by simply calling or . However it is more likely that you will first need to install <a href="https://cran.rstudio.com/bin/windows/Rtools/"></a> (if you use a windows machine) or <a href="https://www.freecodecamp.org/news/install-xcode-command-line-tools/"></a> (if you are on an Apple Mac). These programs and the package take up a considerable amount of memory. The install on an Apple Mac can be particularly painful. It is unlikely that I will be able to support all of you to install this on your machines yourself so you will need to try to troubleshoot your own install issues if you choose to install on your own machine.</p>
+<p><strong>Please note that is available pre-installed when using via <a href="https://stats3.sgul.ac.uk/rstudio">RStudio server</a></strong>.</p>
+<div id="using" class="section level2">
+<h2>Using </h2>
+<p>Just like and using the package, there are a number of steps that are required when using .</p>
+<p>First you need to call to load the package. Then you need to build your model. We will attempt to fit a one-compartment oral-absorption model to the sparse furosemide data. The data set is available on the Advanced PK GitHub and can be called in the usual way using .</p>
+<p>Then you need to build your model. When building the model, you specify two blocks in a standard . As always, you give your function a name, I have chosen .</p>
+<p>The first part of the function is to set the initial estimates for your model parameters, this is known as the block. Remember that we are parameterising using <span class="math inline">\(k_a\)</span>, <span class="math inline">\(Cl\)</span> and <span class="math inline">\(V\)</span> in our one-compartment oral-absorption model. So we need to tell initial values for each of these parameters <em>as well as</em> values for the random-effects (<span class="math inline">\(\omega^2\)</span>) associate with each parameter.</p>
+<p>The second part of the function defines the model. The block. Here you describe the relationship between the fixed- and random-effects. A little more on this later.</p>
+<p>After building the model we can run a check using , which describes the model we have built. And then we fit……….</p>
+<pre class="r"><code>sparse&lt;-
+ read_csv(&quot;https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/main/sparsefru.csv&quot;)
+library(nlmixr2)
+
+# First make the model
+one.cmt &lt;- function() {
+  ini({ 
+    tka &lt;-log(1.3) 
+    tcl &lt;- log(8) 
+    tv &lt;- log(20)
+    eta.ka~0.1
+    eta.cl ~ 0.1
+    eta.v ~ 0.1
+    add.sd &lt;- 0.01
+  })
+  model({
+    ka &lt;- exp(tka + eta.ka)
+    cl &lt;- exp(tcl + eta.cl)
+    v &lt;- exp(tv + eta.v)
+    linCmt() ~ add(add.sd)
+  })
+}
+
+# Run a check
+nlmixr2(one.cmt)</code></pre>
+<p><span class="math display">\[\begin{align*}
+{ka} &amp; = \exp\left({tka}+{eta.ka}\right) \\
+{cl} &amp; = \exp\left({tcl}+{eta.cl}\right) \\
+{v} &amp; = \exp\left({tv}+{eta.v}\right) \\
+linCmt() &amp; \sim add({add.sd})
+\end{align*}\]</span></p>
+<pre class="r"><code># Fit the data using this model
+fit&lt;-nlmixr2(one.cmt,sparse,est=&quot;saem&quot;, list(print=0))</code></pre>
+<pre><code>## [====|====|====|====|====|====|====|====|====|====] 0:00:00</code></pre>
+You can run and you will get an enormous amount of output from your model. Tables <a href="#tab:nlmixfix">3</a> &amp; <a href="#tab:nlmixran">4</a> show the fixed and random parameter estimates, along with confidence intervals. Don’t worry about the other output, we will get there eventually.
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:nlmixfix">Table 3: </span>Fixed effect parameter estimates from Pop-PK analysis of sparse furosemide data
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+Est.
+</th>
+<th style="text-align:left;">
+SE
+</th>
+<th style="text-align:left;">
+%RSE
+</th>
+<th style="text-align:left;">
+Back-transformed(95%CI)
+</th>
+<th style="text-align:left;">
+BSV(CV%)
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+tka
+</td>
+<td style="text-align:left;">
+0.261
+</td>
+<td style="text-align:left;">
+0.0793
+</td>
+<td style="text-align:left;">
+30.4
+</td>
+<td style="text-align:left;">
+1.3 (1.11, 1.52)
+</td>
+<td style="text-align:left;">
+13.6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tcl
+</td>
+<td style="text-align:left;">
+2.74
+</td>
+<td style="text-align:left;">
+0.0326
+</td>
+<td style="text-align:left;">
+1.19
+</td>
+<td style="text-align:left;">
+15.5 (14.5, 16.5)
+</td>
+<td style="text-align:left;">
+18.6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tv
+</td>
+<td style="text-align:left;">
+2.91
+</td>
+<td style="text-align:left;">
+0.0661
+</td>
+<td style="text-align:left;">
+2.27
+</td>
+<td style="text-align:left;">
+18.4 (16.2, 21)
+</td>
+<td style="text-align:left;">
+15.5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+add.sd
+</td>
+<td style="text-align:left;">
+0.013
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+0.013
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+</tbody>
+</table>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:nlmixran">Table 4: </span>Random effects parameter estimates from Pop-PK analysis of sparse furosemide data
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Estimate
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+eta.ka
+</td>
+<td style="text-align:right;">
+0.14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+eta.cl
+</td>
+<td style="text-align:right;">
+0.18
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+eta.v
+</td>
+<td style="text-align:right;">
+0.15
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="comparing-output-from-the-non-linear-mixed-effects-approach-to-the-naive-pooled-approach" class="section level1">
+<h1>Comparing output from the non-linear mixed-effects approach to the naive-pooled approach</h1>
+<p>Figure <a href="#fig:nlmfit">8</a> shows the fit provided by the non-linear mixed-effects approach compared to the naive-pooled approach, which was our preferred of the other modelling approaches to sparse data from earlier in the session. You can see that the non-linear mixed-effects approach provides a superior fit to both absorption and elimination phases compared to the naive-pooled fit. Indeed, it is so close to the ‘true’ population value, I have had to fade the ‘true’ line so you can see it properly! Additionally, with the non-linear mixed-effects approach, we retain information on the inter-individual variability of model parameters.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:nlmfit"></span>
+<img src="nlmem_files/figure-html/nlmfit-1.png" alt="Concentration-time profile showing 'true' population profile alonside a variety of approaches to modelling sparse data" width="576" />
+<p class="caption">
+Figure 8: Concentration-time profile showing ‘true’ population profile alonside a variety of approaches to modelling sparse data
+</p>
+</div>
+</div>
+<div id="tidying-up-other-nuances-with" class="section level1">
+<h1>Tidying up other nuances with </h1>
+<div id="mu-referencing" class="section level2">
+<h2><span class="math inline">\(\mu\)</span> referencing</h2>
+<p>You will note in the code that we seem to for no good reason input a ‘<span class="math inline">\(log(value)\)</span>’ for our initial parameter estimates and then place them in the exponential domain in our block of code. This is known as <span class="math inline">\(\mu\)</span> referencing.</p>
+<p>Remember, we are modelling fixed and random effects for our model parameters <span class="math display">\[Cl=\theta_{Cl}\times e^{\eta_{Cl}}\]</span> now, it just so happens that the estimation algorithms work a little better if all of the parameters being estimated are in the exponential domain. We have to write our model with a little mathematical fiddling to achieve this. Recall that <span class="math display">\[e^a\times e^b=e^{a+b}\qquad  \textrm{AND}\qquad  e^{log(c)}=c\]</span> so instead of inputting <span class="math display">\[Cl=\theta_{Cl}\times e^{\eta_{Cl}}\]</span> into our model we instead input <span class="math display">\[Cl= e^{log(\theta_{Cl})+\eta_{Cl}}\]</span> you will have seen in Table <a href="#tab:nlmixfix">3</a> that estimates <span class="math inline">\(log(\theta)\)</span> and then automatically back-transforms the final parameter estimates to the standard domain.</p>
+</div>
+<div id="residual-variability" class="section level2">
+<h2>Residual variability</h2>
+<p>You will remember in our carrot linear regression model, all variability from the population mean was lumped into a residual variability term <span class="math inline">\(\epsilon\)</span> <span class="math display">\[Carrot_{weight} =\beta_0+\beta_1.Carrot_{height}+\epsilon\]</span> In our non-linear mixed-effects model, we are more sophisticated about how we model variability, applying <span class="math inline">\(\eta&#39;s\)</span> to the model parameters <span class="math display">\[Cl=\theta_{Cl}\times e^{\eta_{Cl}}\]</span> but these random-effects will not explain all of the deviation of the observed data. There will still be some left over, residual, error. So we add a residual error component to our model.</p>
+<p>This is done in the line of code. Here we tell that we wish our residual error to be modelled in an additive fashion, i.e. <span class="math display">\[C=\frac{F.D.k_a}{V_d.(k_a-k_e)}.(e^{-k_et}-e^{-k_at})+\epsilon\]</span> again, we assume this residual error follows a normal distribution with mean <span class="math inline">\(0\)</span> and variance <span class="math inline">\(\sigma^2\)</span> <span class="math display">\[\epsilon\sim N(0,\sigma^2)\]</span> and you will have noticed that we give a starting value for <span class="math inline">\(\sigma\)</span>.</p>
+</div>
+</div>
+<div id="components-of-a-mixed-effects-pharmacokinetic-model" class="section level1">
+<h1>Components of a mixed-effects pharmacokinetic model</h1>
+<p>We have above described two key parts of a pharmacokinetic model. The <strong>structural</strong> model and the <strong>statistical</strong> model.</p>
+<div id="the-structural-model" class="section level2">
+<h2>The structural model</h2>
+<p>The structural model is the underlying equation that describes the mean population trend. In short, this is the compartmental model you have chosen to model the data with. In the example above this was the one-compartment oral-absorption model. <span class="math display">\[C=\frac{F.D.k_a}{V_d.(k_a-k_e)}.(e^{-k_et}-e^{-k_at})\]</span></p>
+</div>
+<div id="the-statistical-model" class="section level2">
+<h2>The statistical model</h2>
+<p>The statistical model is how we have chosen to model the parameter- and residual- variability.</p>
+<p>Parameter variability you will recall referred to the <span class="math inline">\(\eta\)</span> terms, for example <span class="math display">\[Cl=\theta_{Cl}\times e^{\eta_{Cl}}\]</span> where <span class="math display">\[\eta\sim N(0,\omega_{Cl}^2)\]</span></p>
+<p>And our residual error model was the additive <span class="math inline">\(+\epsilon\)</span> where <span class="math display">\[\epsilon\sim N(0,\sigma^2)\]</span></p>
+<p>Later in the course we will add a further component - the <strong>covariate model</strong>.</p>
+</div>
+</div>
+<div id="tasks" class="section level1">
+<h1>Tasks</h1>
+<ul>
+<li>Download the sparse furosemide data from GitHub</li>
+<li>Plot the data</li>
+<li>Open the dataset and have a look at it. What do you notice about the variables?</li>
+<li>Model the data using
+<ul>
+<li>Can you model with a proportional error model instead of an additive error model</li>
+<li>What happens if you change the initial estimates for the model parameters?</li>
+</ul></li>
+<li>Open the built-in data set theo_sd (run: ) and undertake the same steps as above
+<ul>
+<li>How many participants in this trial?</li>
+<li>What can you tell us about them?</li>
+</ul></li>
+</ul>
+</div>
+<div id="reference" class="section level1">
+<h1>Reference</h1>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
