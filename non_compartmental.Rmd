@@ -43,8 +43,6 @@ body {
 text-align: justify}
 </style>
 
-<center><img src="PK.png"/></center>
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, fig.pos= "H")
 library(tidyverse)
