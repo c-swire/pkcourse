@@ -43,21 +43,14 @@ library(kableExtra)
 
 # Introduction 
 
-In this session you will be introduced to the practical side of pharmacokinetics - with a data workshop. You will be introduced to '<TT>R</TT>': a language and environment for statistical computing and its parter programme 'RStudio', which provides a handy user interface for '<TT>R</TT>'.
-
-We will use '<TT>R</TT>' to undertake visualisation of pharmacokinetic data using the '<TT>R</TT>' package '<TT>ggplot2</TT>'. We will also estimate an important pharmacokinetic parameter ($C_{max}$) associated with the time concentration profile of an IV-bolus dose of a drug.
-
-This session has been designed to progress your knowledge of pharmacokinetics and give you an introduction into the world of using code to analyse, visualise and communicate with data - skills that the drug development industry consistently tell us they need from graduates.
+This page walks you through an introduction to RStudio. 
 
 ## Learning outcomes  
 
-In today's session, we will aim to build on the material covered in the pre-session unit on Canvas. By the end of this week you should be able to:  
-  
-* Access <TT>R</TT> and <TT>RStudio</TT> onto your own computer or a University PC
+* Access <TT>R</TT> and <TT>RStudio</TT> using Posit Cloud
 * Understand the different windows in the <TT>RStudio</TT> desktop
 * Make and save an  <TT>R</TT> script
 * Undertake some basic calculations using  <TT>R</TT>
-* Create a directory and set the <TT>R</TT> working directory using  <TT>setwd()</TT>
 * Import a .csv data file into  <TT>R</TT> 
 * View a data frame
 * Describe the difference between 'long' and 'wide' data formats and which is used for pharmacokinetic modelling
@@ -69,11 +62,9 @@ In today's session, we will aim to build on the material covered in the pre-sess
 * Use  <TT>R</TT> to undertake basic, descriptive (non-compartmental) analysis of some pharmacokinetic data to 
     + Estimate $C_{max}$
 
-
-
 This document is designed to provide you with notes of the session and be a handy resource when you come to revision. There are examples of code and the corresponding output from <TT>R</TT> as we go along.  
 
-## Accessing <TT>R</TT> and <TT>RStudio</TT> on a University computer 
+## Accessing <TT>R</TT> and <TT>RStudio</TT> on Posit Cloud
 
 The two key tools for this session will be <TT>R</TT> and <TT>RStudio</TT>. These are free, open source pieces of software. They are both available on the University computers, but you may choose to download them onto your personal laptop or home computer.
 
@@ -268,13 +259,11 @@ For example:
 library(tidyverse)
 ```
 
-**Note** that if you are using RStudio on the stats4 server you _can_ download packages yourself by using <TT>install.packages()</TT> but this downloads the package to your personal hard drive and there is a limited amount of space on this so I recommend against doing this. 
-
 # Summarising data with <TT>summarise()</TT> function, using piping <TT>%>%</TT> and estimating $C_{max}$
 
 We will use the <TT>summarise()</TT> function (note this is different from <TT>summary()</TT>). Stick <TT>summarise()</TT> into help in your <TT>RStudio</TT> help tab and look at the options that <TT>summarise()</TT> gives you. If you scroll down, you will see some 'useful functions' and, at the bottom, it gives you some examples of the function in use. You will see here that there are some funny '<TT>%>%</TT>' symbols. This is known as piping. 
 
-Piping is a tool that allows us to undertake multiple logical steps to achieve a desired output in our text. Technically, <TT>%>%</TT> is found in the <TT>magrittr()</TT> package, but when you load <TT>tidyverse()</TT> , <TT>magrittr()</TT> is automatically loaded.  
+Piping is a tool that allows us to undertake multiple logical steps to achieve a desired output in our text. 
 
 Let's say we wanted to check the maximum concentration in our dataset made sense, to check for outliers. If we apply <TT>summarise(amox,max(conc))</TT> we are given `r summarise(amox,max(conc))`. This is the same output as from <TT>summary()</TT>, above. What if we want to know the maximum concentration for each ID number. Well, we can do this with piping.
 
@@ -301,7 +290,7 @@ amox%>%
 **Task:** use <TT>summarise()</TT> to summarise by sample time, rather than ID. What are the maximum, minimum and mean concentrations at each sample time? Do any stand out as outliers?  
 
 # Plotting data   
-OK. Now to have some fun with data visualisation. You are used to clicking with a user interface in excel or SPSS. I am going to show you how make plots with  <TT>R</TT> code. Why bother? Well, you can make awesome, customisable plot code and then when you have a new data set, you just copy and paste the code, change the variables and hey presto, rapid plotting without having to point and click.  
+OK. Now to have some fun with data visualisation. You are used to clicking with a user interface in Excel. I am going to show you how make plots with  <TT>R</TT> code. Why bother? Well, you can make awesome, customisable plot code and then when you have a new data set, you just copy and paste the code, change the variables and hey presto, rapid plotting without having to point and click.  
   
 # Plotting with <TT>ggplot2</TT>
   

@@ -51,68 +51,52 @@ library(kableExtra)
 ```
 
 
-# Introduction 
-
-
-In this session, we will build on our knowledge of coding and use '<TT>R</TT>' to estimate some basic pharmacokinetic parameters using what is known as non-compartmental techniques.
-
 # Learning outcomes  
 
-By the end of this week you should be able to:  
-  
+By the end of this session you should be able to:  
 
+* Interpret a concentration-time plot
+  
 * Use  <TT>R</TT> to undertake basic, descriptive (non-compartmental) analysis of some pharmacokinetic data to estimate
     + $C_{max}$
     + $T_{max}$
     + $AUC_{0-t}$
-    + Bioavailability ($F$)
-    
-* Describe the linear trapezoidal method of estimating $AUC$
-    + State one disadvantage of this method
-    + Explain an alternative method that avoids this disadvantage
-    
 
-# Accessing <TT>R</TT> and <TT>RStudio</TT> on a University computer 
+* Describe the relationship between clearance, dose and $AUC$
 
-The two key tools for this session will be <TT>R</TT> and <TT>RStudio</TT>. These are free, open source pieces of software. They are both available on the University computers, but you may choose to download them onto your personal laptop or home computer.
+* List some benefits and limitations of non-compartmental PK analysis    
 
-When you are using a University computer, you need to access <TT>RStudio</TT> via the University servers.
+# Tasks
 
-The link for this is [here](https://stats3.sgul.ac.uk/rstudio).  I suggest you save this as a 'favourite'.
+* Make a concentration-time plot for the 'Healthy' dataset
+* Make a concentration-time plot for 'Sepsis' dataset
 
-Some reminders from last time:
+* Calculate $C_{max}$, $T_{max}$ and $AUC_{0-t}$ for Healthy dataset
+* Calculate $C_{max}$, $T_{max}$ and $AUC_{0-t}$ for Sepsis dataset
 
-## Setting the working directory
+* Estimate Vd and Cl for Healthy dataset
+* Estimate Vd and Cl for Sepsis dataset
 
-Last session, I recommended that you make a folder on your personal (H:) drive to contain all your work for this module. You will need to remember (or check) what you called it.
+Extension tasks:
+* Can you put plots of Healthy and Sepsis datasets on the same Figure?
+* Can you make a table to compare $C_{max}$, $T_{max}$ and $AUC_{0-t}$ for Healthy and Sepsis datasets?
 
-You can <TT>setwd()</TT>  using your mouse and clicking on 'session' and 'set working directory'. Alternatively (and more rapidly), you can use <TT>R</TT> code and the <TT>setwd()</TT> function.
-
-<br>
-
-``` {r,eval=FALSE, results='hold', tidy=FALSE}
-  
-setwd()
-setwd("INSERT YOUR FILE PATH HERE")
-# or if on the server setwd("~/your_file_name/sub_folder_if_used/") 
-```
-
-### Packages you need for this session
+# Packages you need for this session
 
 Link your path using the following line of code and then call <TT>library(tidyverse)</TT>.
 
 ```{r, eval=FALSE}
 .libPaths( c( .libPaths(),
-"/homes/dlonsdale-pharmacokinetics/sghms/bms/shares/Advanced-Pharmacokinetics/4.4.2/library") )
+              "/homes/dlonsdale-pharmacokinetics/sghms/bms/shares/Advanced-Pharmacokinetics/4.4.2/library") )
 #note that you need the '.' before 'libPaths'
 library(tidyverse)
 ```
 
-# Accessing data for this session
+# Teaching data for this session
 
-For this session we will be using PK data for an anti-epileptic. 6 participants were given an IV dose and then one week later they were given an oral dose. Drug concentrations were measured.
+For this session we will be using PK data for an anti-epileptic drug. 6 participants were given an IV dose and then one week later they were given an oral dose. Drug concentrations were measured.
 
-You can download the data for this session directly from GitHub. There are two files. Copy and paste my code.
+If you want to access these datasets yourself you can copy the code below. 
 
 ```{r, eval=TRUE}
 
@@ -123,9 +107,9 @@ ORAL<-read.csv("https://raw.githubusercontent.com/dlonsdal/non_compartmental/mai
 
 ```
 
-**Task:** Plot the data for the IV and oral data.
+**How to:** Plot the data for the IV and oral data.
 
-_Hint: Review the [notes](https://dlonsdal.github.io/intro_r_solutions/) from the last session and use some <TT>ggplot()</TT> code_
+_Hint: More detailed notes on putting together plots are included in the Introduction to R page_
 
 ```{r plot,  message=FALSE, warning=FALSE}
 
@@ -144,12 +128,10 @@ ggplot(data=IV,aes(x=time, y=conc,col=id) )+
 
 Remember that $C_{max}$ is observed from our data. We find the max value per participant and report it. We actually did this in the last session. 
 
-**Tasks:** 
+**How to:** 
 
 * Estimate $C_{max}$ for the IV and oral data
 * Estimate the mean $C_{max}$ for the IV and oral data
-
-_Advanced: Output both IV and oral data together in one table_
 
 ```{r cmax_solution, message=FALSE, warning=FALSE}
 IV%>%
@@ -193,7 +175,7 @@ This is a little more tricky. We need to get <TT>R</TT> to find $C_{max}$ and th
 
 Try a Google search for this. Something like 'using group by to get the value corresponding to the max value of another column'.
 
-**Task:** Estimate $T_{max}$ for the IV and oral data
+**How to:** Estimate $T_{max}$ for the IV and oral data
 
 ```{r tmax_solution,   message=FALSE, warning=FALSE}
 
@@ -249,7 +231,7 @@ The two heights correspond to concentrations B and C and the base is the distanc
 
 Fortunately,<TT>R</TT> has an inbuilt function that allows us to calculate the $AUC$. The handily named <TT>AUC()</TT> function. You need to provide it with three commands, <TT>x=...,y=...</TT> and <TT>method="trapezoid"</TT>. It is in the <TT>DescTools</TT> library.
 
-I will show you how to calculate using the oral data. 
+Here is how to calculate using the oral data:
 
 ```{r AUC,   message=FALSE, warning=FALSE}
 library(DescTools)
@@ -259,7 +241,7 @@ ORAL%>%
 
 ```
 
-**Tasks:**
+**How to:**
 
 * Calculate $AUC$ for the IV data
 * Calculate mean $AUC$ for each dataset
@@ -288,7 +270,6 @@ FULL %>%
 
 ```
 
-
 ## Limitations of the linear trapezoid method 
 
 ```{r trapbest, echo=F, fig.cap="Participant 'A' IV concentration-time profile with curved line of best fit", fig.width=4.5,fig.height=2.5,fig.align = 'center'}
@@ -310,3 +291,116 @@ ggplot(data=sIV, aes(time,conc))+
 ```
 
 It is worth noting the trapezoid method has limitations. Most notably that it will *overestimate* $AUC$ by virtue of taking a straight line between points, when the true concentration will fall in an logarithmic (curve) fashion (Figure \@ref(fig:trapbest)). There are methods to improve this accuracy, such as the logarithmic trapezoidal method. With this method, the 'trapezoid' is given a curved top (like the red line in Figure \@ref(fig:trapbest)). The formula for this method is $$AUC = \sum_{t=0}^{t=\tau} \frac{\Delta t}{ln(\frac{C_1}{C_2})} (C_1+C_2)$$  
+
+\newpage 
+
+### Using \texttt{R} package \texttt{PKNCA} to undertake non-compartmental analysis  
+
+If that all seems like too much hard work and \texttt{R} should just jolly well get on and do for us then you are right! There are a few non-compartmental analysis packages available, we will use \texttt{PKNCA}. Remember you will need to run \texttt{install.packages("PKNCA")} the first time you wish to use this package, once it has been installed you need to run \texttt{library(PKNCA)}. 
+
+To run non-compartmental analysis using this package, we need to give \texttt{PKNCA} some dosing data. We know that all the participants were given a dose of 1000 mg of amoxicillin at time $t=0$. To add a new column (variable) using \texttt{\%>\%} we use the \texttt{mutate} function.  
+
+```{r, results='hold'}
+amox<- read.csv("https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/refs/heads/main/amoxicillinPK.csv") 
+
+damox<-amox %>%  # remember we will need to save this as a new object
+  subset(time==0) %>% 
+  mutate(dose=1000) #this produces a new variable dose 1000
+```
+
+**Task:** Run this line of code and have a look at the newly created 'damox' object 
+
+Now we can call and run \texttt{PKNCA}. First we create a sampling (or concentration) object and then a dosing object. In each function we instruct \texttt{PKNCA} of the names of our data object and the relevant variables in it. Then we combine the two and run our non-compartmental analysis. 
+
+```{r, results='hold', eval=FALSE}
+library(PKNCA)
+conc<-PKNCAconc(amox, conc~time|ID) #create sampling object
+dose<-PKNCAdose(damox, dose~time|ID) #create dosing object
+full<-PKNCAdata(conc, dose)  #combine
+results<-pk.nca(full)  # analyse
+summary(results) #summarise the results
+```
+```{r, results='hold', echo=FALSE}
+library(PKNCA)
+conc<-PKNCAconc(amox, conc~time|ID) #create sampling object
+dose<-PKNCAdose(damox, dose~time|ID) #create dosing object
+full<-PKNCAdata(conc, dose)  #combine
+results<-pk.nca(full)  # analyse
+
+knitr::kable(summary(results), "latex",booktabs = TRUE, caption='PKNCA output')%>%
+  kable_styling(latex_options = "striped")
+```
+
+
+**Task:** Look at the value for $AUC$ produced here and compare it to the one earlier. What do you notice? Why do you think there is a discrepancy?
+
+The answer is that by default, PKNCA uses logarithmic trapezoid method to calculate $AUC$. If you want to set this to linear logarithmic method you can set this as an option. Note that it also uses the 'geometric' rather than arithmetic mean.  
+
+
+```{r, results='hold',eval=F}
+full<-PKNCAdata(conc, dose,options=list(auc.method="linear")) 
+results<-pk.nca(full)  
+summary(results)
+```
+```{r, results='hold',echo=F, eval=T}
+full<-PKNCAdata(conc, dose,options=list(auc.method="linear"))  #combine
+results<-pk.nca(full)  # analyse
+knitr::kable(summary(results), "latex",booktabs = TRUE, caption='PKNCA output, linear logarithmic AUC method')%>%
+  kable_styling(latex_options = "striped")
+```
+
+```{r,echo = FALSE,eval=FALSE}
+PKNCA.set.summary(
+      name="half.life",
+      description="arithmetic mean and standard deviation",
+      point=business.mean,
+      spread=business.sd,
+      rounding=list(signif=3)
+    )
+
+#not run but code present in case someone asks how to do arithmetic mean
+```
+
+## Estimating clearance
+
+Remember that clearance can be calculated as $$CL = \frac{Dose}{AUC}$$
+
+\newpage
+
+## Limitations of non-compartmental analysis
+
+```{r traperror, echo=F, fig.cap="Participant A amoxicillin concentration-time profile showing impact of reduced sampliing on AUC calculation", fig.width=4.5,fig.height=2.5,fig.align = 'center'}
+
+Aamox<-amox%>%
+        subset(ID=='A')
+
+ggplot(data=Aamox, aes(time,conc))+ 
+    geom_ribbon(data=subset(Aamox,time < 5&time!=2), 
+          aes(ymin=0,ymax=conc),
+              fill='#B4464B',
+              alpha=0.1, outline.type = 'full',colour='gray44')+ 
+    geom_ribbon(data=subset(Aamox,  time < 3), 
+          aes(ymin=0,ymax=conc),
+              fill='blue',
+              alpha=0.1, outline.type = 'full',colour='gray44')+ 
+    geom_ribbon(data=subset(Aamox,  time >1 & time < 5), 
+          aes(ymin=0,ymax=conc),
+              fill='#82B446',
+              alpha=0.1, outline.type = 'full',colour='gray44')+
+  geom_point()+
+  theme_bw(base_size=9)+
+  xlab("Time (hours)") + ylab("Concentration of amoxicillin (mg/L)")+
+  theme_bw(base_size=9)+
+  geom_line() +
+  geom_function(fun=function(x) 1000/23.65*exp((-11.4/23.65)*x),col='red')+
+  labs(caption = "Pink shaded area shows the increased error associated with reduced sampling \n (time = 2 sample removed)")
+
+```
+
+Non-compartmental analyses are useful for many reasons. For example, they use relatively straightforward algebra with few assumptions about the data to calculate summary pharmacokinetic information. Most regulators will require non-compartmental analysis of data as part of regulatory submissions. There are some disadvantages that are worth being aware of. These include:
+
+* Need for rich sampling (multiple samples from each subject)
+* Use of direct observation of C~max and T~max means *true* values are missed for any particular subject
+* Increasing accuracy requires increased number of participants or samples, which can be technically chalenging and expensive
+
+Have a look at Figure \@ref(fig:traperror), where a situation is imagined that $time=2$ data point is not sampled. You can see the likely impact on the estimate of AUC from this. 

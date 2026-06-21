@@ -11,7 +11,7 @@
 
 
 
-<title>Chapter 3: Biological basis of compartmental models</title>
+<title>Biological basis of compartmental models</title>
 
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -394,16 +394,12 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Chapter 3: Biological basis of compartmental models</h1>
+<h1 class="title toc-ignore">Biological basis of compartmental models</h1>
 
 </div>
 
 
 <div style="page-break-after: always;"></div>
-<div id="introduction" class="section level1">
-<h1>Introduction</h1>
-<p>The purpose of today’s session is to build on our understanding of the concept of a ‘mathematical model’ that we learned in the first two years of the course. We will refresh the one-compartment intravenous-bolus model and extend this to an oral-absorption model. We will use the skills we have learned in to simulate data from a one-compartment oral-absorption model and you will present some data from your imagined experiment to each other.</p>
-<p>Finally, we will extend the one-compartment model to two-compartments and think about sources of variability and error in trials and how these can be accounted for in a model.</p>
 <div id="learning-outcomes" class="section level2">
 <h2>Learning outcomes</h2>
 <ul>
@@ -421,18 +417,14 @@ div.tocify {
 <li>Outline some limitations of compartmental analysis and provide examples where assuming elimination from the central compartment is inappropriate</li>
 <li>Explain how to use the methods described above and apply them to other models, for example the one-compartment IV infusion model</li>
 </ul>
-<p>This document is designed to provide you with notes of the session and be a handy resource when you come to revision. There are examples of code and the corresponding output from as we go along. I am always asked ‘what equations do I have to know for the exam’. I’d prefer you to think about what equations are worth committing to memory for your future career! However, to make things easier, I have numbered the equations in this session that I think are worthy of committing to memory, and that might be reasonable exam questions. They are in keeping, as ever, with the learning outcomes above.</p>
 <div style="page-break-after: always;"></div>
-</div>
 </div>
 <div id="the-one-compartment-iv-bolus-model" class="section level1">
 <h1>The one-compartment IV bolus model</h1>
 <div id="what-is-the-point-of-a-model" class="section level2">
 <h2>What is the point of a model?</h2>
-<p>Hopefully we are now at a stage where you can already answer this question for yourselves.</p>
-<p><strong>Task:</strong> Discuss with one of your colleagues why we might use a pharmacokinetic model</p>
 <p>It is clear that understanding data from a clinical trial is important. Pharmacokinetic data is the same as any other output from a trial. It is important to understand the data, what it means for the absorption, distribution, metabolism and excretion (ADME) of the compound AND it allows us to make suggestions for the next stage of drug development. This might include dose selection, frequency of administration or even decisions on formulation.</p>
-<p>Compartmental pharmacokinetic models simplify complex human physiology by describing the concentratin-time course of a drug with (relatively) simple mathematical equations. These mathematical equations help to quantify ADME processes through the estimation of values for parameters such as clearance and volume of distribution.</p>
+<p>Compartmental pharmacokinetic models simplify complex human physiology by describing the concentration-time course of a drug with (relatively) simple mathematical equations. These mathematical equations help to quantify ADME processes through the estimation of values for parameters such as clearance and volume of distribution.</p>
 </div>
 <div id="the-one-compartment-iv-bolus-model-1" class="section level2">
 <h2>The one-compartment IV bolus model</h2>
@@ -447,14 +439,14 @@ Figure 1: One-compartment model
 </div>
 <div id="relationship-between-drug-amount-concentration-k_e-v_d-and-cl-in-the-iv-bolus-model" class="section level2">
 <h2>Relationship between drug amount, concentration, <span class="math inline">\(k_e\)</span>, <span class="math inline">\(V_d\)</span> and <span class="math inline">\(Cl\)</span> in the IV bolus model</h2>
-<p><span class="math inline">\(k_e, V_1\)</span> and clearance (<span class="math inline">\(Cl\)</span>) are related <span class="math display">\[\begin{equation} k_e=\frac{Cl}{V_1} (\#eq:ke)\end{equation}\]</span>.</p>
-<p>This kind of model can be applied to a drug regardless of whether elimination occurs through hepatic metabolism or renal excretion (or any other means of elimination), provided that the elimination is a first-order process. You will remember from our clearance session in the first year that first-order elimination processes have a rate of elimination that is proportional to the amount of drug that is present. The relationship between drug concentration and elimination rate is<span class="math display">\[\begin{equation} \text{Elimination rate} = Cl\times Cp (\#eq:ercl)\end{equation}\]</span>
-and the relationship between elimination rate and amount of drug in the body is <span class="math display">\[\begin{equation} \text{Elimination rate} = k_e\times Ab (\#eq:erab)\end{equation}\]</span></p>
+<p><span class="math inline">\(k_e, V_1\)</span> and clearance (<span class="math inline">\(Cl\)</span>) are related <span class="math display">\[\begin{equation} k_e=\frac{Cl}{V_1} \end{equation}\]</span>.</p>
+<p>This kind of model can be applied to a drug regardless of whether elimination occurs through hepatic metabolism or renal excretion (or any other means of elimination), provided that the elimination is a first-order process. First-order elimination processes have a rate of elimination that is proportional to the amount of drug that is present. The relationship between drug concentration and elimination rate is<span class="math display">\[\begin{equation} \text{Elimination rate} = Cl\times Cp \end{equation}\]</span>
+and the relationship between elimination rate and amount of drug in the body is <span class="math display">\[\begin{equation} \text{Elimination rate} = k_e\times Ab \end{equation}\]</span></p>
 </div>
 <div id="concentration-time-equation-for-the-one-compartment-iv-bolus-model" class="section level2">
 <h2>Concentration-time equation for the one-compartment IV bolus model</h2>
-<p>The concentration <span class="math inline">\(C\)</span> at time <span class="math inline">\(t\)</span> for the one-compartment IV bolus model is <span class="math display">\[\begin{equation} C=C_0e^{-kt} (\#eq:conc)\end{equation}\]</span> or, if you prefer to use clearance and volume of distribution <span class="math display">\[\begin{equation} C=C_0e^{-\frac{Cl}{Vd}t} (\#eq:conccl)\end{equation}\]</span> <span class="math inline">\(C_0=\)</span> Drug concentration at time <span class="math inline">\(t=0\)</span>.</p>
-As an example, the time concentration profile for an intravenous dose of metoprolol is shown in Figure <span class="citation">@ref</span>(fig:metop)
+<p>The concentration <span class="math inline">\(C\)</span> at time <span class="math inline">\(t\)</span> for the one-compartment IV bolus model is <span class="math display">\[\begin{equation} C=C_0e^{-kt} \end{equation}\]</span> or, if you prefer to use clearance and volume of distribution <span class="math display">\[\begin{equation} C=C_0e^{-\frac{Cl}{Vd}t} \end{equation}\]</span> <span class="math inline">\(C_0=\)</span> Drug concentration at time <span class="math inline">\(t=0\)</span>.</p>
+As an example, the time concentration profile for an intravenous dose of metoprolol is shown in Figure <a href="#fig:metop">2</a>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:metop"></span>
 <img src="compartments_files/figure-html/metop-1.png" alt="Time-concentration profile from the one-compartment IV bolus model of a dose of metoprolol. Standard (left) and log (right) concentration axes shown" width="672" />
 <p class="caption">
@@ -464,408 +456,17 @@ Figure 2: Time-concentration profile from the one-compartment IV bolus model of 
 </div>
 <div id="calculating-volume-of-distribution-and-clearance-in-the-one-compartment-iv-bolus-model" class="section level2">
 <h2>Calculating volume of distribution and clearance in the one-compartment IV-bolus model</h2>
-<p>You will remember that <span class="math display">\[\begin{equation} V_d=\frac{D}{C_0} (\#eq:vdiv)\end{equation}\]</span> where <span class="math inline">\(D=\)</span>Dose</p>
-<p>Clearance may be calculated using <span class="math inline">\(k_e\)</span> and <span class="math inline">\(V_d\)</span> (see Equation <span class="math inline">\(\ref{eq:ke}\)</span>).</p>
+<p>You may remember that <span class="math display">\[\begin{equation} V_d=\frac{D}{C_0} \end{equation}\]</span> where <span class="math inline">\(D=\)</span>Dose</p>
+<p>Clearance may be calculated using <span class="math inline">\(k_e\)</span> and <span class="math inline">\(V_d\)</span>.</p>
 </div>
 <div id="half-life-equation" class="section level2">
 <h2>Half-life equation</h2>
 <p>The equation for half-life is also worth refreshing at this point.
-<span class="math display" id="eq:thalf">\[\begin{equation} t_{1/2}=\frac{ln(2)}{k_e}\approx\frac{0.693}{k_e}=\frac{\tag{1}l} (#eq:thalf)\end{equation}\]</span></p>
+<span class="math display">\[\begin{equation} t_{1/2}=\frac{ln(2)}{k_e}\approx\frac{0.693}{k_e}=\frac{0.693V_d}{Cl} \end{equation}\]</span></p>
 </div>
 <div id="area-under-the-curve" class="section level2">
 <h2>Area under the curve</h2>
 <p>Finally a reminder of the equation for area under the curve <span class="math display">\[\begin{equation} AUC=\frac{Dose}{Cl} (\#eq:auc1)\end{equation}\]</span></p>
-</div>
-<div id="the-maths-bit-how-to-derive-some-of-these-equations-from-first-principles" class="section level2">
-<h2>The maths bit, how to derive some of these equations from first principles</h2>
-<p>Understanding how and where equations arise is, in my view, important. It helps to shape your thinking of the model you are using and to understand the power of quantitative pharmacology. It is therefore included as a learning outcome for this module. That said, I recognise that knowing comlex derivations by rote that you will never use in real life is a largely pointless exercise. In the section below, I therefore explicitly state which I think might be reasonable exam questions and which won’t. This doesn’t mean that they <em>will definietely</em> be exam questions, I clearly can’t tell you that. But, by being explicit on what I think you could/should learn, this will hopefully provide some direction for your learning, alongside reassurance that I do not expect you to all come up to A-level mathematics standard.</p>
-<div id="half-life" class="section level3">
-<h3>Half-life</h3>
-<p>Understanding how we get to the equation for half-life is relatively straightforward (and therefore might be a reasonable exam question).</p>
-<p>From Equation <span class="math inline">\(\ref{eq:conc}\)</span> we know that at time <span class="math inline">\(t=0\)</span>, <span class="math inline">\(C=C_0\)</span>.</p>
-<p>After one half life, ie. at time <span class="math inline">\(t=t_{1/2}\)</span>, <span class="math inline">\(C=0.5C_0\)</span> and so we can state that <span class="math display">\[0.5C_0=C_0e^{-k_{e} t_{1/2}}\]</span> We can see that the <span class="math inline">\(C_0\)</span> cancel each other out, giving <span class="math display">\[0.5= e^{-k_{e} t_{1/2}} \]</span> we can take the natural log of both sides to give <span class="math display">\[ln(0.5)= -k_{e} t_{1/2}\]</span> now, a quick reminder that <span class="math inline">\(ln(0.5)=ln(\frac{1}{2})\)</span> and that <span class="math inline">\(ln(\frac{a}{b})=ln(a)-ln(b)\)</span> and <span class="math inline">\(ln(1)=0\)</span> giving <span class="math display">\[-ln(2)= -k_{e} t_{1/2}\]</span> and so with one final step we return to Equation <span class="math inline">\(\ref{eq:thalf}\)</span> <span class="math display">\[ t_{1/2}=\frac{ln(2)}{k_e} \]</span></p>
-</div>
-<div id="concentration-time-relationship" class="section level3">
-<h3>Concentration time relationship</h3>
-<p>To understand how we get to Equation <span class="math inline">\(\ref{eq:conc}\)</span>, I’m afraid you need to know a little calculus. I don’t expect you to know the following derivation for the exam.</p>
-<p>As we said above, the rate of elimination is directly proportional to the amount of drug present. Equation <span class="math inline">\(\ref{eq:erab}\)</span> is more correctly (from a mathematical perspective) written as <span class="math display">\[ \frac{dAb}{dt} = -k_eAb \]</span> which can be rearranged as <span class="math display">\[ \frac{1}{Ab} dAb= -k_edt \]</span> we can then integrate each side from zero to infinity giving <span class="math display">\[\int\frac{1}{Ab} dAb= \int-k_edt \]</span> which resolves to <span class="math display">\[ln(Ab)=-k_et+c \]</span> take the exponential of each side to give <span class="math display">\[Ab=e^{-k_et+c}=e^{-k_et}\times e^c\]</span> since <span class="math inline">\(e^c\)</span> is just another constant (lets call this one <span class="math inline">\(D\)</span>) we can write <span class="math display">\[\begin{equation} Ab=De^{-k_et} (\#eq:exp2)\end{equation}\]</span> at time <span class="math inline">\(t=0\)</span>, <span class="math inline">\(e^{-k_et}=1\)</span> and we know that at time <span class="math inline">\(t=0\)</span> the amount in the body must be the amount of drug given, or the dose so <span class="math inline">\(D=\text{Dose}\)</span>. Convenient eh!</p>
-<p>We can see that if we divide Equation <span class="math inline">\(\ref{eq:exp2}\)</span> through by the volume of our compartment (the volume of distribution) then we have an equation for concentration (<span class="math inline">\(C\)</span>) instead of total amount of drug in the body (<span class="math inline">\(Ab\)</span>) which brings us back to Equation <span class="math inline">\(\ref{eq:conc}\)</span>. You will note that <span class="math inline">\(\frac{D}{V_1}=C_0\)</span>.</p>
-</div>
-<div id="area-under-the-curve-auc_0infty" class="section level3">
-<h3>Area under the curve (<span class="math inline">\(AUC_0^\infty\)</span>)</h3>
-<p>More calculus here I am afraid. Again, I do not think it is important to learn this by heart. I include it because I think it is important to understand where equations come from.</p>
-<p>Integration will give us area under the curve <span class="math display">\[AUC = \int C_0e^{-k_{e} t}= -\frac{C_0e^{-k_{e} t}}{k_e}+C\]</span> Remember we are integrating between <span class="math inline">\(t=0\)</span> and <span class="math inline">\(t=\infty\)</span> <span class="math display">\[AUC = \int_0^\infty C_0e^{-k_{e} t}\]</span> when <span class="math inline">\(t=0\)</span>, <span class="math inline">\(e^{-k_{e} t}=1\)</span> and when <span class="math inline">\(t=\infty\)</span>, <span class="math inline">\(e^{-k_{e} t}=0\)</span> leaving us with <span class="math display">\[AUC = \int_0^\infty C_0e^{-k_{e} t}=\frac{C_0}{k_e}\]</span> since <span class="math inline">\(k_e=\frac{Cl}{V_d}\)</span> and <span class="math inline">\(C_0=\frac{Dose}{V_d}\)</span> <span class="math display">\[AUC = \frac{C_0}{k_e}=\frac{Dose}{Cl}\]</span></p>
-<div style="page-break-after: always;"></div>
-</div>
-</div>
-<div id="exercise-1" class="section level2">
-<h2>Exercise 1</h2>
-<p><strong>Task:</strong> Using the skills you have learned in the sessions so far:</p>
-<ul>
-<li>Simulate a pharmacokinetic study of an IV bolus dose of a drug
-<ul>
-<li>Start with one participant and six time points</li>
-<li>Then expand to 4 participants, can you give them all slightly different profiles, just like results from a real pharmacokinetic study?</li>
-<li>Choose a drug you know to be given intravenously and look up the pharmacokinetic parameters you need</li>
-</ul></li>
-<li>Plot the time-concentration profiles of the results</li>
-<li>Undertake a non-compartmental analysis of the simulated data
-<ul>
-<li>Do you get results consistent with your simulation?</li>
-</ul></li>
-</ul>
-<p>Remember how to use the function operator in </p>
-<pre class="r"><code>C0&lt;-20 # replace with your C0
-ke&lt;-0.16 # replace with your ka
-
-oncpt&lt;- function(t) C0*exp(-ke*t)
-
-times&lt;-c(0,1,4,6,7,8) # replace with your desired sampling time points
-
-oncpt(times) </code></pre>
-<pre><code>## [1] 20.000000 17.042876 10.545848  7.657858  6.525596  5.560746</code></pre>
-<div style="page-break-after: always;"></div>
-</div>
-<div id="exercise-1-solution" class="section level2">
-<h2>Exercise 1 solution</h2>
-<p>For ease, I will write this in code.</p>
-<pre class="r"><code># first choose drug
-# furosemide https://go.drugbank.com/drugs/DB00695 or 
-# https://sepia2.unil.ch/pharmacology/drugs/furosemide/
-
-time&lt;-c(0,1,4,5,6,8) # choose sampling time points
-Cl&lt;-9.8  # set Cl 
-V&lt;-12.0  # set V
-Dose&lt;-40 # 40 mg dose
-oncpt&lt;- function(t) (Dose/V)*exp(-(Cl/V)*t)
-conc&lt;- oncpt(time)  
-fru&lt;-data.frame(time,conc)
-fru</code></pre>
-<pre><code>##   time        conc
-## 1    0 3.333333333
-## 2    1 1.473007365
-## 3    4 0.127111088
-## 4    5 0.056170671
-## 5    6 0.024821944
-## 6    8 0.004847169</code></pre>
-<pre class="r"><code>ggplot(fru,aes(x=time,y=conc))+
-  geom_line()+
-  geom_point()+
-  theme_bw(base_size=9)+
-  ylab(&quot;Simulated plasma furosemide concentration mg/L&quot;)+
-  xlab(&quot;time (hr)&quot;)</code></pre>
-<div class="figure" style="text-align: center"><span style="display:block;" id="fig:fru"></span>
-<img src="compartments_files/figure-html/fru-1.png" alt="Simulated furosemide concentration time plot" width="576" />
-<p class="caption">
-Figure 3: Simulated furosemide concentration time plot
-</p>
-</div>
-<p>To increase the sample size to four participants, we need to provide an ID column. To give them all slightly different pharmacokinetics, we will need columns for the pharmacokinetic parameters too.</p>
-<pre class="r"><code># first choose drug
-# furosemide https://go.drugbank.com/drugs/DB00695 or
-# https://sepia2.unil.ch/pharmacology/drugs/furosemide/
-
-# Create ID column. lots of ways to do this, I have chosen a letter for each ID
-ID&lt;-rep(LETTERS[1:4],each=6) # remember, one line in the data frame for each sample time
-time&lt;-rep(c(0,1,4,5,6,8),4) # repeat sampling points for each ID
-
-# again lots of ways to create different clearance values
-set.seed(42)
-
-mCl&lt;-9.8  # set mean Cl
-Cl&lt;-
-  rep(c(mCl+rnorm(mean=0,sd=2,n=4)),each=6)
-
-mV&lt;-12.0  # set mean V
-V&lt;-
-  rep(c(mV+rnorm(mean=0,sd=3,n=4)),each=6)
-
-Dose&lt;-40 # 40 mg dose is same for each patient
-
-
-oncpt&lt;- function(t) (Dose/V)*exp(-(Cl/V)*t)
-conc&lt;- oncpt(time)  
-
-
-fru&lt;-data.frame(ID,time,conc)
-fru
-
-ggplot(fru,aes(x=time,y=conc,group=ID,col=ID))+
-  geom_line()+
-  geom_point()+
-  theme_bw(base_size=9)+
-  ylab(&quot;Simulated plasma furosemide concentration mg/L&quot;)+
-  xlab(&quot;time (hr)&quot;)</code></pre>
-<table>
-<caption><span id="tab:fruorgroup">Table 1: </span>Simulated multiple participant concentration data using one-compartment model</caption>
-<thead>
-<tr class="header">
-<th align="right">time</th>
-<th align="right">A</th>
-<th align="right">B</th>
-<th align="right">C</th>
-<th align="right">D</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="right">0</td>
-<td align="right">3.03000</td>
-<td align="right">3.42000</td>
-<td align="right">2.4200</td>
-<td align="right">3.41000</td>
-</tr>
-<tr class="even">
-<td align="right">1</td>
-<td align="right">1.17000</td>
-<td align="right">1.63000</td>
-<td align="right">1.2800</td>
-<td align="right">1.33000</td>
-</tr>
-<tr class="odd">
-<td align="right">4</td>
-<td align="right">0.06790</td>
-<td align="right">0.17600</td>
-<td align="right">0.1900</td>
-<td align="right">0.07810</td>
-</tr>
-<tr class="even">
-<td align="right">5</td>
-<td align="right">0.02630</td>
-<td align="right">0.08370</td>
-<td align="right">0.1000</td>
-<td align="right">0.03040</td>
-</tr>
-<tr class="odd">
-<td align="right">6</td>
-<td align="right">0.01020</td>
-<td align="right">0.03990</td>
-<td align="right">0.0531</td>
-<td align="right">0.01180</td>
-</tr>
-<tr class="even">
-<td align="right">8</td>
-<td align="right">0.00152</td>
-<td align="right">0.00903</td>
-<td align="right">0.0149</td>
-<td align="right">0.00179</td>
-</tr>
-</tbody>
-</table>
-<div class="figure" style="text-align: center"><span style="display:block;" id="fig:fruorgroup"></span>
-<img src="compartments_files/figure-html/fruorgroup-1.png" alt="Simulated furosemide concentration time plot for multiple participants" width="576" />
-<p class="caption">
-Figure 4: Simulated furosemide concentration time plot for multiple participants
-</p>
-</div>
-<p>Now for the non-compartmental analysis</p>
-<pre class="r"><code># remember we need a dose data frame
-ID&lt;-LETTERS[1:4]
-time&lt;-rep(0,4)
-dose&lt;-rep(40,4)
-dfru&lt;-data.frame(ID,time,dose)
-
-library(PKNCA) #just copy and paste code from the last session
-
-conc&lt;-PKNCAconc(fru, conc~time|ID) #create sampling object
-dose&lt;-PKNCAdose(dfru, dose~time|ID) #create dosing object
-
-full&lt;-PKNCAdata(conc,dose)  #combine
-results&lt;-pk.nca(full)  # analyse
-
-summary(results) #summarise the results</code></pre>
-<pre><code>## Warning: package &#39;PKNCA&#39; was built under R version 4.5.2</code></pre>
-<pre><code>## 
-## Attaching package: &#39;PKNCA&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:stats&#39;:
-## 
-##     filter</code></pre>
-<table>
-<caption><span id="tab:nca">Table 2: </span>Non compartmental analysis of PK data</caption>
-<colgroup>
-<col width="7%" />
-<col width="4%" />
-<col width="3%" />
-<col width="14%" />
-<col width="14%" />
-<col width="25%" />
-<col width="16%" />
-<col width="14%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="right">start</th>
-<th align="right">end</th>
-<th align="left">N</th>
-<th align="left">auclast</th>
-<th align="left">cmax</th>
-<th align="left">tmax</th>
-<th align="left">half.life</th>
-<th align="left">aucinf.obs</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="right">0</td>
-<td align="right">24</td>
-<td align="left">4</td>
-<td align="left">3.76 [15.3]</td>
-<td align="left">.</td>
-<td align="left">.</td>
-<td align="left">.</td>
-<td align="left">.</td>
-</tr>
-<tr class="even">
-<td align="right">0</td>
-<td align="right">Inf</td>
-<td align="left">4</td>
-<td align="left">.</td>
-<td align="left">3.04 [16.3]</td>
-<td align="left">0.000 [0.000, 0.000]</td>
-<td align="left">0.872 [0.173]</td>
-<td align="left">3.77 [15.4]</td>
-</tr>
-</tbody>
-</table>
-<p>You can use the output from Table <a href="#tab:nca">2</a> to calculate <span class="math inline">\(k_e\)</span>, <span class="math inline">\(Cl\)</span> or <span class="math inline">\(Vd\)</span>. You can also ask the PKNCA package to do this for you. This is a little more complex.</p>
-<pre class="r"><code>manual &lt;- data.frame(start=0, end=8,vz.obs=TRUE,kel.last=TRUE, cl.obs=TRUE)
-# first specify the interval and the parameters you want calculated
-# see http://billdenney.github.io/pknca/articles/Selection-of-Calculation-Intervals.html 
-# for list of available parameters
-
-
-clvd&lt;-PKNCAdata(conc,dose,intervals=manual)  #combine
-
-resultsman&lt;-pk.nca(clvd)  # analyse
-
-summary(resultsman)</code></pre>
-<table style="NAborder-bottom: 0;">
-<caption>
-<span id="tab:nca2">Table 3: </span><span id="tab:nca2">Table 4: </span>ke, Cl and Vd estimates using a non-compartmental approach
-</caption>
-<thead>
-<tr>
-<th style="text-align:right;">
-start
-</th>
-<th style="text-align:right;">
-end
-</th>
-<th style="text-align:left;">
-N
-</th>
-<th style="text-align:left;">
-kel.last
-</th>
-<th style="text-align:left;">
-cl.obs
-</th>
-<th style="text-align:left;">
-vz.obs
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:left;">
-4
-</td>
-<td style="text-align:left;">
-0.818 [18.4]
-</td>
-<td style="text-align:left;">
-10.6 [15.4]
-</td>
-<td style="text-align:left;">
-13.2 [16.4]
-</td>
-</tr>
-</tbody>
-<tfoot>
-<tr>
-<td style="padding: 0; " colspan="100%">
-<sup></sup> Parameters are presented as geometric mean and coefficient of variation
-</td>
-</tr>
-</tfoot>
-</table>
-<p>As we simulated this data, let’s compare these results to the actual clearance and volume of distribution.</p>
-<pre class="r"><code>mean(V)</code></pre>
-<pre><code>## [1] 13.28626</code></pre>
-<pre class="r"><code>mean(Cl)</code></pre>
-<pre><code>## [1] 10.70113</code></pre>
-<p>So you can see there is some error associated with the non-compartmental analysis. How do you think you could reduce this error?</p>
-<div style="page-break-after: always;"></div>
-</div>
-</div>
-<div id="simulating-variability" class="section level1">
-<h1>Simulating variability</h1>
-<p>In the example above, we simulated 4 different PK profiles using the built in function in . This function randomly samples from a normal distribution. The user (you) simply plugs in the mean (mean=) and standard deviation (sd=) values you like and tell it how many values to return (n=).</p>
-<p>You might argue that this is overly complicated. We could have simply set the four values of clearance manually. For example:</p>
-<pre class="r"><code>Cl&lt;-c(10.2,9.6,11.4,10.1)
-Cl&lt;-rep(Cl,each=6)</code></pre>
-<p>Remember with simulations we are trying to approximate reality. Hopefully you can see that this method is not likely to produce realistic results and, perhaps more importantly, is not practical if you want to simulate thousands of patients.</p>
-<pre class="r"><code>Cl&lt;-rnorm(mean=9.8, sd=2, n=4000)</code></pre>
-<p>Let’s have a look at this data.</p>
-<pre class="r"><code># basic histogram
-Clhist&lt;-data.frame(Clearance=Cl)
-ggplot(Clhist, aes(x=Clearance)) + 
-  geom_histogram(fill=&quot;#69b3a2&quot;, color=&quot;#e9ecef&quot;, alpha=0.9)+
-# explore other colours at 
-# https://www.colorhexa.com/color-names
-  theme_bw(base_size=9)</code></pre>
-<div class="figure" style="text-align: center"><span style="display:block;" id="fig:histclnorm"></span>
-<img src="compartments_files/figure-html/histclnorm-1.png" alt="Histogram of clearance values simulated using \texttt{rnorm()}" width="576" />
-<p class="caption">
-Figure 5: Histogram of clearance values simulated using
-</p>
-</div>
-<p>You can see in Figure <a href="#fig:histclnorm">5</a> that the data is normally distributed - which of course it should be because that is what we told to do!</p>
-<p>Can you think of a problem with this approach?</p>
-<p>What if we increase the variability of clearance a little…..</p>
-<pre class="r"><code>Cl&lt;-rnorm(mean=9.8, sd=5, n=4000)
-summary(Cl)</code></pre>
-<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-## -10.416   6.211   9.740   9.725  13.115  26.488</code></pre>
-<p>You can see that some of the simulated values are negative. This is impossible! This is an example where a normal distribution is not representative of reality. Can you think of an alternative?</p>
-<div id="log-normally-distributed-parameters" class="section level2">
-<h2>Log-normally distributed parameters</h2>
-<pre class="r"><code>Cl&lt;-9.8*exp(rnorm(mean=0, sd=0.3, n=4000))</code></pre>
-<p>Let’s have a look at this data.</p>
-<pre class="r"><code># basic histogram
-Clhist&lt;-data.frame(Clearance=Cl)
-ggplot(Clhist, aes(x=Clearance)) + 
-  geom_histogram(fill=&quot;#ffdab9&quot;, color=&quot;#536878&quot;, alpha=0.9)+
-  theme_bw(base_size=9)</code></pre>
-<div class="figure" style="text-align: center"><span style="display:block;" id="fig:histcllognorm"></span>
-<img src="compartments_files/figure-html/histcllognorm-1.png" alt="Histogram of clearance values simulated with log-normal distribution" width="576" />
-<p class="caption">
-Figure 6: Histogram of clearance values simulated with log-normal distribution
-</p>
-</div>
-<p>Figure <a href="#fig:histcllognorm">6</a> is far more representative of real biological/clinical data.</p>
-<p><strong>Task:</strong> Have a discussion with your colleagues and answer the following questions:</p>
-<ol style="list-style-type: decimal">
-<li>What are the sources of variability in a pharmacokinetic study?</li>
-<li>How/where in a simulation might these be represented?</li>
-</ol>
-<div style="page-break-after: always;"></div>
-</div>
-<div id="thinking-further-about-variability-in-pharmacokinetic-data" class="section level2">
-<h2>Thinking further about variability in pharmacokinetic data</h2>
-<p>The list of potential sources of error here are huge, from intrinsic and extrinsic sources of variability in an individuals pharmacokinetics, to error associated with measurements or assays in the trial.</p>
-<p>Some examples of how this variabilty is simulated includes:</p>
-<ul>
-<li>Variable organ function leads to variability in clearance</li>
-<li>Variation in body size/mass leads to varibiltiy in volume of distribution</li>
-</ul>
-<p>We can apply the same log-normal distribution to our volume of distribution term.</p>
 <div style="page-break-after: always;"></div>
 </div>
 </div>
@@ -875,7 +476,7 @@ Figure 6: Histogram of clearance values simulated with log-normal distribution
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:oneor"></span>
 <img src="oneor2.png" alt="One-compartment oral-absorption model" width="100%" />
 <p class="caption">
-Figure 7: One-compartment oral-absorption model
+Figure 3: One-compartment oral-absorption model
 </p>
 </div>
 <p>Figure <span class="citation">@ref</span>(fig:oneor) provides a schematic of this. Drug in the gastro-intestinal tract is assumed to be absorbed following the same first-order principles that are applied to elimination. <span class="math inline">\(k_a\)</span> is the absorption rate constant, <span class="math inline">\(A_{GI}\)</span> the amount of drug in the gastro-intestinal tract and <span class="math display">\[\text{Absorption rate} = k_a\times A_{GI}\]</span></p>
@@ -887,7 +488,7 @@ This is known as a bi-exponential equation, with the absorption exponential term
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:metopor"></span>
 <img src="compartments_files/figure-html/metopor-1.png" alt="Time-concentration profile from the one-compartment oral-absorptoin model of an oral dose of metoprolol" width="576" />
 <p class="caption">
-Figure 8: Time-concentration profile from the one-compartment oral-absorptoin model of an oral dose of metoprolol
+Figure 4: Time-concentration profile from the one-compartment oral-absorptoin model of an oral dose of metoprolol
 </p>
 </div>
 </div>
@@ -900,7 +501,7 @@ We can plot this on a semi-log scale and, conveniently(!), we achieve a straight
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:metopor2"></span>
 <img src="compartments_files/figure-html/metopor2-1.png" alt="One-compartment oral-absorption model of single dose metoprolol on log scale with elimination phase highlighted" width="576" />
 <p class="caption">
-Figure 9: One-compartment oral-absorption model of single dose metoprolol on log scale with elimination phase highlighted
+Figure 5: One-compartment oral-absorption model of single dose metoprolol on log scale with elimination phase highlighted
 </p>
 </div>
 </div>
@@ -913,7 +514,7 @@ We can again plot this line in the log-form and we are left with a straight line
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:metopor3"></span>
 <img src="compartments_files/figure-html/metopor3-1.png" alt="on-compartment oral-absorption model of single dose metoprolol on log scale with derivation of $k_e$ and $k_a$. The blue dotted line shows $C_{t\to elim}$ and the red dotted line shows $C_{t\to elim}-C$." width="576" />
 <p class="caption">
-Figure 10: on-compartment oral-absorption model of single dose metoprolol on log scale with derivation of <span class="math inline">\(k_e\)</span> and <span class="math inline">\(k_a\)</span>. The blue dotted line shows <span class="math inline">\(C_{t\to elim}\)</span> and the red dotted line shows <span class="math inline">\(C_{t\to elim}-C\)</span>.
+Figure 6: on-compartment oral-absorption model of single dose metoprolol on log scale with derivation of <span class="math inline">\(k_e\)</span> and <span class="math inline">\(k_a\)</span>. The blue dotted line shows <span class="math inline">\(C_{t\to elim}\)</span> and the red dotted line shows <span class="math inline">\(C_{t\to elim}-C\)</span>.
 </p>
 </div>
 </div>
@@ -927,318 +528,6 @@ Figure 10: on-compartment oral-absorption model of single dose metoprolol on log
 <p>As with volume of distribution, we cannot tease out bioavailability from clearance. We can calculate <span class="math inline">\(CL/F\)</span>. This is referred to as <em>apparent clearance</em>. The equation remains similar to Equation <span class="math inline">\(\ref{eq:auc1}\)</span> <span class="math display">\[\begin{equation} \frac{Cl}{F}=\frac{D}{AUC} (\#eq:aucor)\end{equation}\]</span></p>
 <p><span class="math inline">\(AUC\)</span> can be estimated using the trapezoid rule, or alternatively it can be calculated using <span class="math display">\[AUC=I(\frac{1}{k_e}-\frac{1}{k_a})\]</span></p>
 <p>Alternatively, apparent clearance can be calculated using <span class="math inline">\(k_e\)</span> &amp; <span class="math inline">\(V_d/F\)</span> <span class="math display">\[\frac{Cl}{F}=k_e\frac{V_d}{F}\]</span></p>
-</div>
-<div id="exercise-2" class="section level2">
-<h2>Exercise 2</h2>
-<p><strong>Task:</strong> Using the skills you have learned in the sessions so far:</p>
-<ul>
-<li>Simulate a pharmacokinetic study of an oral dose of a drug
-<ul>
-<li>Start with one participant and 6-10 time points</li>
-<li>Then expand to 4 participants, can you give them all slightly different profiles, just like results from a real pharmacokinetic study?</li>
-<li>Choose a drug you know to be given orally and look up the pharmacokinetic parameters you need. If your drug for the previous task is given orally as well as IV then why not use it again</li>
-</ul></li>
-<li>Plot the time-concentration profiles of the results</li>
-<li>Undertake a non-compartmental analysis of the simulated data
-<ul>
-<li>Do you get results consistent with your simulation?</li>
-</ul></li>
-</ul>
-<p>Remember to use the function operator in . Here is an example.</p>
-<pre class="r"><code>D&lt;-5000 #dose in micrograms
-Vdf&lt;- 250 #vd/F in L
-# this gives all concentrations in micrograms per l
-
-ke&lt;-0.16 # replace with your ka
-ka&lt;-3
- 
-  
-onoral&lt;- function(t) ((D*ka)/(Vdf*(ka-ke)))*(exp(-ke*t)-exp(-ka*t))
-
-times&lt;-c(0,1,4,6,7,8) # replace with your desired sampling time points
-
-# note that to draw a curve that teases out absorption 
-# you need sampling in the absorption phase
-# you will probably need trial and error to sort this out
-
-signif(onoral(times),2) </code></pre>
-<pre><code>## [1]  0.0 17.0 11.0  8.1  6.9  5.9</code></pre>
-<pre class="r"><code>times&lt;-c(0,0.1,0.3,1,4,6,7,8)
-
-signif(onoral(times),2) </code></pre>
-<pre><code>## [1]  0.0  5.1 12.0 17.0 11.0  8.1  6.9  5.9</code></pre>
-<div style="page-break-after: always;"></div>
-</div>
-<div id="exercise-2-solution" class="section level2">
-<h2>Exercise 2 solution</h2>
-<p>For ease, I will write this in code.</p>
-<pre class="r"><code># first choose drug
-# furosemide https://go.drugbank.com/drugs/DB00695 or
-# https://sepia2.unil.ch/pharmacology/drugs/furosemide/
-
-time&lt;-c(0,0.5,1,1.5,2,4,5,6,8) # choose sampling time points
-F&lt;-0.65
-Cl&lt;-9.8  # set Cl 
-V&lt;-12.0  # set V
-ke&lt;-Cl/V  
-# note time to peak effect 1-2 hours
-ka&lt;- 1.3 # from https://doi.org/10.1002/bdd.1874
-D&lt;-40 # 40 mg dose
-onoral&lt;- function(t) ((F*D*ka)/(V*(ka-ke)))*(exp(-ke*t)-exp(-ka*t))
-conc&lt;- signif(onoral(time),2)  
-
-
-fru&lt;-data.frame(time,conc)
-fru</code></pre>
-<pre><code>##   time   conc
-## 1  0.0 0.0000
-## 2  0.5 0.8300
-## 3  1.0 0.9900
-## 4  1.5 0.8800
-## 5  2.0 0.7100
-## 6  4.0 0.1900
-## 7  5.0 0.0890
-## 8  6.0 0.0410
-## 9  8.0 0.0083</code></pre>
-<pre class="r"><code>ggplot(fru,aes(x=time,y=conc))+
-  geom_line()+
-  geom_point()+
-  theme_bw(base_size=9)+
-  ylab(&quot;Simulated furosemide concentration mg/L&quot;)+
-  xlab(&quot;time (hr)&quot;)</code></pre>
-<div class="figure" style="text-align: center"><span style="display:block;" id="fig:fruor"></span>
-<img src="compartments_files/figure-html/fruor-1.png" alt="Simulated furosemide concentration (oral dose)" width="576" />
-<p class="caption">
-Figure 11: Simulated furosemide concentration (oral dose)
-</p>
-</div>
-<p>To increase the sample size to four participants, we need to provide an ID column. To give them all slightly different pharmacokinetics, we will need columns for the pharmacokinetic parameters too.</p>
-<pre class="r"><code>## # first choose drug
-## # furosemide https://go.drugbank.com/drugs/DB00695 or
-## # https://sepia2.unil.ch/pharmacology/drugs/furosemide/
-## 
-## # Create ID column. lots of ways to do this, I have chosen a letter for each ID
-## ID&lt;-rep(LETTERS[1:4],each=9) # remember, one line in the data frame for each time
-## time&lt;-rep(c(0,0.5,1,1.5,2,4,5,6,8),4) # repeat sampling points for each ID
-## 
-## 
-## # again lots of ways to create different clearance values
-## set.seed(42)
-## 
-## mCl&lt;-9.8  # set mean Cl
-## Cl&lt;-rep(c(mCl+rnorm(mean=0,sd=2,n=4)),each=9)
-## 
-## mV&lt;-12.0  # set mean V
-## V&lt;-rep(c(mV+rnorm(mean=0,sd=3,n=4)),each=9)
-## 
-## ke&lt;-Cl/V
-## 
-## Dose&lt;-40 # 40 mg dose is same for each patient
-## 
-## ka&lt;-rep(rnorm(mean=1.3,sd=0.2,n=4),each=9)
-## 
-## onoral&lt;- function(t) ((F*D*ka)/(V*(ka-ke)))*(exp(-ke*t)-exp(-ka*t))
-## conc&lt;- signif(onoral(time),2)
-## 
-## 
-## fru&lt;-data.frame(ID,time,conc)
-## fru
-## 
-## ggplot(fru,aes(x=time,y=conc,group=ID,col=ID))+
-##   geom_line()+
-##   geom_point()+
-##   theme_bw(base_size=9)+
-##   ylab(&quot;Simulated plasma furosemide concentration mg/L&quot;)+
-##   xlab(&quot;time (hr)&quot;)
-## </code></pre>
-<table>
-<caption><span id="tab:frugroup">Table 5: </span>Simulated multiple participant concentration data using one-compartment model</caption>
-<thead>
-<tr class="header">
-<th align="right">time</th>
-<th align="right">A</th>
-<th align="right">B</th>
-<th align="right">C</th>
-<th align="right">D</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="right">0.0</td>
-<td align="right">0.0000</td>
-<td align="right">0.000</td>
-<td align="right">0.000</td>
-<td align="right">0.0000</td>
-</tr>
-<tr class="even">
-<td align="right">0.5</td>
-<td align="right">0.8700</td>
-<td align="right">0.870</td>
-<td align="right">0.710</td>
-<td align="right">1.0000</td>
-</tr>
-<tr class="odd">
-<td align="right">1.0</td>
-<td align="right">0.9100</td>
-<td align="right">1.100</td>
-<td align="right">0.850</td>
-<td align="right">1.0000</td>
-</tr>
-<tr class="even">
-<td align="right">1.5</td>
-<td align="right">0.7200</td>
-<td align="right">0.960</td>
-<td align="right">0.770</td>
-<td align="right">0.8200</td>
-</tr>
-<tr class="odd">
-<td align="right">2.0</td>
-<td align="right">0.5200</td>
-<td align="right">0.790</td>
-<td align="right">0.630</td>
-<td align="right">0.5800</td>
-</tr>
-<tr class="even">
-<td align="right">4.0</td>
-<td align="right">0.0950</td>
-<td align="right">0.240</td>
-<td align="right">0.200</td>
-<td align="right">0.1100</td>
-</tr>
-<tr class="odd">
-<td align="right">5.0</td>
-<td align="right">0.0380</td>
-<td align="right">0.120</td>
-<td align="right">0.110</td>
-<td align="right">0.0420</td>
-</tr>
-<tr class="even">
-<td align="right">6.0</td>
-<td align="right">0.0150</td>
-<td align="right">0.059</td>
-<td align="right">0.058</td>
-<td align="right">0.0160</td>
-</tr>
-<tr class="odd">
-<td align="right">8.0</td>
-<td align="right">0.0022</td>
-<td align="right">0.014</td>
-<td align="right">0.016</td>
-<td align="right">0.0025</td>
-</tr>
-</tbody>
-</table>
-<div class="figure" style="text-align: center"><span style="display:block;" id="fig:frugroup"></span>
-<img src="compartments_files/figure-html/frugroup-1.png" alt="Simulated furosemide concentration time plot for multiple participants" width="576" />
-<p class="caption">
-Figure 12: Simulated furosemide concentration time plot for multiple participants
-</p>
-</div>
-<p>Now for the non-compartmental analysis</p>
-<pre class="r"><code>## # remember we need a dose data frame
-## ID&lt;-LETTERS[1:4]
-## time&lt;-rep(0,4)
-## dose&lt;-rep(40,4)
-## dfru&lt;-data.frame(ID,time,dose)
-## 
-## library(PKNCA) #just copy and paste code from the last session
-## 
-## conc&lt;-PKNCAconc(fru, conc~time|ID) #create sampling object
-## dose&lt;-PKNCAdose(dfru, dose~time|ID) #create dosing object
-## 
-## full&lt;-PKNCAdata(conc,dose)  #combine
-## results&lt;-pk.nca(full)  # analyse
-## 
-## summary(results) #summarise the results
-## </code></pre>
-<table>
-<caption><span id="tab:ncaoral">Table 6: </span>Non compartmental analysis of oral PK data</caption>
-<colgroup>
-<col width="7%" />
-<col width="4%" />
-<col width="3%" />
-<col width="14%" />
-<col width="15%" />
-<col width="22%" />
-<col width="16%" />
-<col width="14%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="right">start</th>
-<th align="right">end</th>
-<th align="left">N</th>
-<th align="left">auclast</th>
-<th align="left">cmax</th>
-<th align="left">tmax</th>
-<th align="left">half.life</th>
-<th align="left">aucinf.obs</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="right">0</td>
-<td align="right">24</td>
-<td align="left">4</td>
-<td align="left">2.35 [16.2]</td>
-<td align="left">.</td>
-<td align="left">.</td>
-<td align="left">.</td>
-<td align="left">.</td>
-</tr>
-<tr class="even">
-<td align="right">0</td>
-<td align="right">Inf</td>
-<td align="left">4</td>
-<td align="left">.</td>
-<td align="left">0.960 [11.3]</td>
-<td align="left">1.00 [0.500, 1.00]</td>
-<td align="left">0.880 [0.174]</td>
-<td align="left">2.36 [16.5]</td>
-</tr>
-</tbody>
-</table>
-<p>You can use the output from Table <a href="#tab:nca">2</a> to calculate <span class="math inline">\(Cl/F\)</span> and <span class="math inline">\(Vd/F\)</span>. You can also ask the PKNCA package to do this for you. The PKNCA package does not know you have given it oral data, so labels it the same as if it were from IV data. Note that <span class="math inline">\(k_a\)</span> is not calculated through non-compartmental methods, instead <span class="math inline">\(C_max\)</span> and <span class="math inline">\(T_max\)</span> are directly observed from the data. This is probably more clinically meaningful than <span class="math inline">\(k_a\)</span>.</p>
-<pre class="r"><code>## 
-## manual &lt;- data.frame(start=0, end=8,vz.obs=TRUE,cl.obs=TRUE)
-## # first specify the interval and the parameters you want calculated
-## # see http://billdenney.github.io/pknca/articles/Selection-of-Calculation-Intervals.html
-## # for list of available parameters
-## 
-## 
-## clvd&lt;-PKNCAdata(conc,dose,intervals=manual)  #combine
-## 
-## resultsman&lt;-pk.nca(clvd)  # analyse
-## 
-## summary(resultsman)</code></pre>
-<table>
-<caption><span id="tab:nca2or">Table 7: </span>Cl and Vd estimates using a non-compartmental approach</caption>
-<thead>
-<tr class="header">
-<th align="right">start</th>
-<th align="right">end</th>
-<th align="left">N</th>
-<th align="left">cl.obs</th>
-<th align="left">vz.obs</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="right">0</td>
-<td align="right">8</td>
-<td align="left">4</td>
-<td align="left">17.0 [16.5]</td>
-<td align="left">21.2 [14.7]</td>
-</tr>
-</tbody>
-</table>
-<p>As we simulated this data, let’s compare these results to the clearance and volume of distribution values we inputted into our simulation.</p>
-<pre class="r"><code>round(V/F,1)</code></pre>
-<pre><code>##  [1] 20.3 20.3 20.3 20.3 20.3 20.3 20.3 20.3 20.3 18.0 18.0 18.0 18.0 18.0 18.0
-## [16] 18.0 18.0 18.0 25.4 25.4 25.4 25.4 25.4 25.4 25.4 25.4 25.4 18.0 18.0 18.0
-## [31] 18.0 18.0 18.0 18.0 18.0 18.0</code></pre>
-<pre class="r"><code>round(mean(Cl)/F,1)</code></pre>
-<pre><code>## [1] 16.5</code></pre>
 <div style="page-break-after: always;"></div>
 </div>
 </div>
@@ -1250,7 +539,7 @@ Figure 12: Simulated furosemide concentration time plot for multiple participant
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:metop2"></span>
 <img src="compartments_files/figure-html/metop2-1.png" alt="Time-concentration profile of a drug with one-compartment (left) and two-compartment (right) characteristics shown on standard (top) and semi-log (bottom) scales" width="672" />
 <p class="caption">
-Figure 13: Time-concentration profile of a drug with one-compartment (left) and two-compartment (right) characteristics shown on standard (top) and semi-log (bottom) scales
+Figure 7: Time-concentration profile of a drug with one-compartment (left) and two-compartment (right) characteristics shown on standard (top) and semi-log (bottom) scales
 </p>
 </div>
 <p>Figure <span class="citation">@ref</span>(fig:metop2) shows the two different time-concentration profiles side by side. You can see that the two-compartment profile has a steep distribution phase followed by shallower elimination phase.</p>
@@ -1261,7 +550,7 @@ Figure 13: Time-concentration profile of a drug with one-compartment (left) and 
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:metop3"></span>
 <img src="compartments_files/figure-html/metop3-1.png" alt="Two-compartmental pharmacokinetics, with dotted lines indicating parameter derivation (semi-log plot)" width="576" />
 <p class="caption">
-Figure 14: Two-compartmental pharmacokinetics, with dotted lines indicating parameter derivation (semi-log plot)
+Figure 8: Two-compartmental pharmacokinetics, with dotted lines indicating parameter derivation (semi-log plot)
 </p>
 </div>
 <p>Figure <span class="citation">@ref</span>(fig:metop3) maps the parameters for the two compartment model. In a semi-log plot, <span class="math inline">\(\alpha\)</span> is the slope of a straight line parallel to the distribution phase with an intercept <span class="math inline">\(A+B\)</span>. <span class="math inline">\(\beta\)</span> is the slope of the straight line parallel to the elimination phase with intercept <span class="math inline">\(B\)</span>.</p>
@@ -1283,14 +572,14 @@ and the elimination (somtimes referred to as biological) half-life: <span class=
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:twocpt"></span>
 <img src="twocpt.png" alt="Two-compartment model" width="152" height="25%" />
 <p class="caption">
-Figure 15: Two-compartment model
+Figure 9: Two-compartment model
 </p>
 </div>
-<p>The two compartment model is graphically represented in Figure <span class="citation">@ref</span>(fig:twocpt). You can see that, mathematically, things are a little more complex, with three equilibrium constants. <span class="math inline">\(k_e\)</span> is now replaced by <span class="math inline">\(k_{10}\)</span> to represent constant associated with elimination from the central compartment (compartment 1 to out, 0). The second compartment has a rate associated with drug moving into it from the central compartment (<span class="math inline">\(k_{12}\)</span>) and out of it (<span class="math inline">\(k_{21}\)</span>), back to the central compartment. It is worth noting that in this model, elimination <em>only</em> occurs from the central compartment. For most drugs, where metabolism and exretion is hepatic/renal this is reasonable, as comparment 1 is usually modelled as the plasma, and of course this flows through the eliminating organs. However, some drugs undergo degradation that is independent of these organs. For example, the muscle relaxant atracurium undergoes spontaneous degradation and ester hydrolysis. These processes can occur in any tissue. For drugs like this, modelling elimination from the central compartment only may not describe time-concentration data accurately. Thankfully, this is the exception, rather than the norm.</p>
+<p>The two compartment model is graphically represented in Figure <span class="citation">@ref</span>(fig:twocpt). You can see that, mathematically, things are a little more complex, with three equilibrium constants. <span class="math inline">\(k_e\)</span> is now replaced by <span class="math inline">\(k_{10}\)</span> to represent constant associated with elimination from the central compartment (compartment 1 to out, 0). The second compartment has a rate associated with drug moving into it from the central compartment (<span class="math inline">\(k_{12}\)</span>) and out of it (<span class="math inline">\(k_{21}\)</span>), back to the central compartment. It is worth noting that in this model, elimination <em>only</em> occurs from the central compartment. For most drugs, where metabolism and excretion is hepatic/renal this is reasonable, as compartment 1 is usually modelled as the plasma, and of course this flows through the eliminating organs. However, some drugs undergo degradation that is independent of these organs. For example, the muscle relaxant atracurium undergoes spontaneous degradation and ester hydrolysis. These processes can occur in any tissue. For drugs like this, modelling elimination from the central compartment only may not describe time-concentration data accurately. Thankfully, this is the exception, rather than the norm.</p>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:twotime"></span>
 <img src="timecourse.png" alt="Representation of time ($t$)-course of two-compartment model. At the time of the dose ($t=0$), all drug is deposited in the central compartment. In the distribution phase, it begins to move into the second (peripheral) compartment, with the amount in each compartment reaching equilibrium in the elimination phase.  Note that this is a simplification as elimination from the central compartment would be happening concurrently" width="0.75\linewidth" />
 <p class="caption">
-Figure 16: Representation of time (<span class="math inline">\(t\)</span>)-course of two-compartment model. At the time of the dose (<span class="math inline">\(t=0\)</span>), all drug is deposited in the central compartment. In the distribution phase, it begins to move into the second (peripheral) compartment, with the amount in each compartment reaching equilibrium in the elimination phase. Note that this is a simplification as elimination from the central compartment would be happening concurrently
+Figure 10: Representation of time (<span class="math inline">\(t\)</span>)-course of two-compartment model. At the time of the dose (<span class="math inline">\(t=0\)</span>), all drug is deposited in the central compartment. In the distribution phase, it begins to move into the second (peripheral) compartment, with the amount in each compartment reaching equilibrium in the elimination phase. Note that this is a simplification as elimination from the central compartment would be happening concurrently
 </p>
 </div>
 <p>Figure <span class="citation">@ref</span>(fig:twotime) illustrates the dose deposition in the central compartment after which it is distributed into the peripheral (second) compartment, reaching equilibrium with the central compartment at the end of the distribution phase. Note that this figure simplifies the situation; elimination would be occurring concurrently.</p>
@@ -1320,10 +609,10 @@ Figure 16: Representation of time (<span class="math inline">\(t\)</span>)-cours
 <p>You may see some texts refer to ‘primary’ and ‘secondary’ pharmacokinetic parameters.</p>
 <p>Primary pharmacokinetic parameters are dependent upon human physiology and drug physiochemical properties. It is hopefully, therefore, intuitive to go on to state that <span class="math inline">\(V_d\)</span> and <span class="math inline">\(Cl\)</span> are primary pharmacokinetic parameters. By extension, intercompartmental clearance, <span class="math inline">\(Q\)</span>, is also a primary pharmacokinetic parameter.</p>
 <p>Secondary pharmacokinetic parameters are derived from primary pharmacokinetic parameters. <span class="math inline">\(t_{1/2}\)</span>, <span class="math inline">\(k_e\)</span>, <span class="math inline">\(k_{12}\)</span> and <span class="math inline">\(k_{21}\)</span> can all be derived from <span class="math inline">\(Cl\)</span>, <span class="math inline">\(V_n\)</span> and <span class="math inline">\(Q\)</span>, using the equations we have been through today. <span class="math inline">\(AUC\)</span> can be derived from <span class="math inline">\(Cl\)</span> and <span class="math inline">\(Dose\)</span>. <span class="math inline">\(A\)</span>, <span class="math inline">\(B\)</span>, <span class="math inline">\(alpha\)</span> and <span class="math inline">\(beta\)</span> can be similarly derived.</p>
-<p>Similarly, in pharmacokinetic modelling, you will note that modellers may choose to ‘parameterise’ (define) their model in terms of primary pharmacokinetic parameters or secondary pharmacokinetic paramters. Table <a href="#tab:params">8</a> compares these different parameterisation methods.</p>
+<p>Similarly, in pharmacokinetic modelling, you will note that modellers may choose to ‘parameterise’ (define) their model in terms of primary pharmacokinetic parameters or secondary pharmacokinetic paramters. Table <a href="#tab:params">1</a> compares these different parameterisation methods.</p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
-<span id="tab:params">Table 8: </span>Comparison of model parameterisation methods for one and two compartment models
+<span id="tab:params">Table 1: </span>Comparison of model parameterisation methods for one and two compartment models
 </caption>
 <thead>
 <tr>
@@ -1380,20 +669,6 @@ A, B, alpha, beta
 </tr>
 </tbody>
 </table>
-<div style="page-break-after: always;"></div>
-</div>
-<div id="homework" class="section level1">
-<h1>Homework</h1>
-<ol style="list-style-type: decimal">
-<li>Find the equation for a one-compartment IV infusion model<br />
-</li>
-<li>Using the example of noradrenaline, with <span class="math inline">\(Cl \approx 150 L/hr\)</span> and <span class="math inline">\(V_d \approx 8.8L\)</span>, simulate and plot concentration-time data for an infusion of <span class="math inline">\(4mg/hr\)</span> for 15 minutes
-<ol style="list-style-type: lower-alpha">
-<li>one-person</li>
-<li>four-people</li>
-</ol></li>
-</ol>
-<p><strong>Hint:</strong> Ensure your units of time are consistent</p>
 </div>
 
 

@@ -537,12 +537,4 @@ run2$OBJF-run3$OBJF
 We can see that there is no significant improvement in model fit (in fact it is worse, with an increase in OFV of 17). 
 
 
-# Homework
-
-For homework this week suggest:
-
-* Add weight as a covariate on volume in the pheno model and estimate $\theta_{WT}$
-
-* Have a look at the theophylline data set \texttt{theo\_sd}. Is there any effect of weight on the PK parameters when modelling this drug
-
 

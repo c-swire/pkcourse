@@ -1,5 +1,5 @@
 ---
-#title: "Chapter 3: Biological basis of compartmental models"
+#title: "Biological basis of compartmental models"
 #author: "Dagan Lonsdale"
 
 #output: 
@@ -15,7 +15,7 @@
 #  - \usepackage{caption}
 #  - \captionsetup{labelfont=bf,margin=12pt}
   
-title: "Chapter 3: Biological basis of compartmental models"
+title: "Biological basis of compartmental models"
 output:
   bookdown::html_document2:
     fig_caption : TRUE
@@ -46,14 +46,8 @@ library(gridExtra)
 
 ```
 \newpage
-# Introduction 
-
-The purpose of today's session is to build on our understanding of the concept of a 'mathematical model' that we learned in the first two years of the course. We will refresh the one-compartment intravenous-bolus model and extend this to an oral-absorption model. We will use the skills we have learned in \texttt{R} to simulate data from a one-compartment oral-absorption model and you will present some data from your imagined experiment to each other. 
-
-Finally, we will extend the one-compartment model to two-compartments and think about sources of variability and error in trials and how these can be accounted for in a model. 
 
 ## Learning outcomes  
-
 
 * Outline the physiological basis for the one- and two- compartment IV and one-compartment oral-absorption models
 * Explain the assumptions that are made when using compartmental models
@@ -69,27 +63,14 @@ Finally, we will extend the one-compartment model to two-compartments and think 
 * Outline some limitations of compartmental analysis and provide examples where assuming elimination from the central compartment is inappropriate
 * Explain how to use the methods described above and apply them to other models, for example the one-compartment IV infusion model
 
-
-
-
-
-
-
-
-This document is designed to provide you with notes of the session and be a handy resource when you come to revision. There are examples of code and the corresponding output from \texttt{R} as we go along. I am always asked 'what equations do I have to know for the exam'. I'd prefer you to think about what equations are worth committing to memory for your future career! However, to make things easier, I have numbered the equations in this session that I think are worthy of committing to memory, and that might be reasonable exam questions. They are in keeping, as ever, with the learning outcomes above.   
-  
 \newpage
 # The one-compartment IV bolus model  
 
 ## What is the point of a model?
-
-Hopefully we are now at a stage where you can already answer this question for yourselves.  
-
-**Task:** Discuss with one of your colleagues why we might use a pharmacokinetic model  
   
 It is clear that understanding data from a clinical trial is important. Pharmacokinetic data is the same as any other output from a trial. It is important to understand the data, what it means for the absorption, distribution, metabolism and excretion (ADME) of the compound AND it allows us to make suggestions for the next stage of drug development. This might include dose selection, frequency of administration or even decisions on formulation.  
 
-Compartmental pharmacokinetic models simplify complex human physiology by describing the concentratin-time course of a drug with (relatively) simple mathematical equations. These mathematical equations help to quantify ADME processes through the estimation of values for parameters such as clearance and volume of distribution.
+Compartmental pharmacokinetic models simplify complex human physiology by describing the concentration-time course of a drug with (relatively) simple mathematical equations. These mathematical equations help to quantify ADME processes through the estimation of values for parameters such as clearance and volume of distribution.
 
 ## The one-compartment IV bolus model 
 
@@ -103,16 +84,16 @@ Figure @ref(fig:onecpt) shows this model. This single compartment is assumed to 
 
 ## Relationship between drug amount, concentration, $k_e$, $V_d$ and $Cl$ in the IV bolus model
 
-$k_e, V_1$ and clearance ($Cl$) are related \begin{equation} k_e=\frac{Cl}{V_1} (\#eq:ke)\end{equation}.  
+$k_e, V_1$ and clearance ($Cl$) are related \begin{equation} k_e=\frac{Cl}{V_1} \end{equation}.  
 
-This kind of model can be applied to a drug regardless of whether elimination occurs through hepatic metabolism or renal excretion (or any other means of elimination), provided that the elimination is a first-order process. You will remember from our clearance session in the first year that first-order elimination processes have a rate of elimination that is proportional to the amount of drug that is present. The relationship between drug concentration and elimination rate is\begin{equation} \text{Elimination rate} = Cl\times Cp (\#eq:ercl)\end{equation}
-and the relationship between elimination rate and amount of drug in the body is \begin{equation} \text{Elimination rate} = k_e\times Ab (\#eq:erab)\end{equation}
+This kind of model can be applied to a drug regardless of whether elimination occurs through hepatic metabolism or renal excretion (or any other means of elimination), provided that the elimination is a first-order process. First-order elimination processes have a rate of elimination that is proportional to the amount of drug that is present. The relationship between drug concentration and elimination rate is\begin{equation} \text{Elimination rate} = Cl\times Cp \end{equation}
+and the relationship between elimination rate and amount of drug in the body is \begin{equation} \text{Elimination rate} = k_e\times Ab \end{equation}
 
 ## Concentration-time equation for the one-compartment IV bolus model
 
-The concentration $C$ at time $t$ for the one-compartment IV bolus model is \begin{equation} C=C_0e^{-kt} (\#eq:conc)\end{equation} or, if you prefer to use clearance and volume of distribution \begin{equation} C=C_0e^{-\frac{Cl}{Vd}t} (\#eq:conccl)\end{equation} $C_0=$ Drug concentration at time $t=0$. 
+The concentration $C$ at time $t$ for the one-compartment IV bolus model is \begin{equation} C=C_0e^{-kt} \end{equation} or, if you prefer to use clearance and volume of distribution \begin{equation} C=C_0e^{-\frac{Cl}{Vd}t} \end{equation} $C_0=$ Drug concentration at time $t=0$. 
 
-As an example, the time concentration profile for an intravenous dose of metoprolol is shown in Figure @ref(fig:metop)
+As an example, the time concentration profile for an intravenous dose of metoprolol is shown in Figure \@ref(fig:metop)
 ```{r metop, echo=F, fig.cap="Time-concentration profile from the one-compartment IV bolus model of a dose of metoprolol. Standard (left) and log (right) concentration axes shown", fig.width=7,fig.height=3,fig.align = 'center', warning=F,message=F}
 k<-0.8*60/(4.2*70)
 a<-ggplot(data.frame(x=seq(0,24,1)), aes(x))+
@@ -133,350 +114,20 @@ grid.arrange(a,b,ncol=2)
 ```
 ## Calculating volume of distribution and clearance in the one-compartment IV-bolus model
 
-You will remember that \begin{equation} V_d=\frac{D}{C_0} (\#eq:vdiv)\end{equation} where $D=$Dose
+You may remember that \begin{equation} V_d=\frac{D}{C_0} \end{equation} where $D=$Dose
 
-Clearance may be calculated using $k_e$ and $V_d$ (see Equation \ref{eq:ke}).
+Clearance may be calculated using $k_e$ and $V_d$.
 
 ## Half-life equation
 
 The equation for half-life is also worth refreshing at this point. 
-\begin{equation} t_{1/2}=\frac{ln(2)}{k_e}\approx\frac{0.693}{k_e}=\frac{0.693V_d}{Cl} (\#eq:thalf)\end{equation}
+\begin{equation} t_{1/2}=\frac{ln(2)}{k_e}\approx\frac{0.693}{k_e}=\frac{0.693V_d}{Cl} \end{equation}
 
 ## Area under the curve
 
 Finally a reminder of the equation for area under the curve \begin{equation} AUC=\frac{Dose}{Cl} (\#eq:auc1)\end{equation}
 
-## The maths bit, how to derive some of these equations from first principles
-
-Understanding how and where equations arise is, in my view, important. It helps to shape your thinking of the model you are using and to understand the power of quantitative pharmacology. It is therefore included as a learning outcome for this module. That said, I recognise that knowing comlex derivations by rote that you will never use in real life is a largely pointless exercise. In the section below, I therefore explicitly state which I think might be reasonable exam questions and which won't. This doesn't mean that they *will definietely* be exam questions, I clearly can't tell you that. But, by being explicit on what I think you could/should learn, this will hopefully provide some direction for your learning, alongside reassurance that I do not expect you to all come up to A-level mathematics standard.
-
-### Half-life    
-
-Understanding how we get to the equation for half-life is relatively straightforward (and therefore might be a reasonable exam question).
-
-From Equation \ref{eq:conc} we know that at time $t=0$, $C=C_0$. 
-
-After one half life, ie. at time $t=t_{1/2}$, $C=0.5C_0$ and so we can state that $$0.5C_0=C_0e^{-k_{e} t_{1/2}}$$ We can see that the $C_0$ cancel each other out, giving $$0.5= e^{-k_{e} t_{1/2}} $$ we can take the natural log of both sides to give $$ln(0.5)= -k_{e} t_{1/2}$$ now, a quick reminder that $ln(0.5)=ln(\frac{1}{2})$ and that $ln(\frac{a}{b})=ln(a)-ln(b)$ and $ln(1)=0$ giving $$-ln(2)= -k_{e} t_{1/2}$$ and so with one final step we return to Equation \ref{eq:thalf} $$ t_{1/2}=\frac{ln(2)}{k_e} $$
-
-### Concentration time relationship  
-
-To understand how we get to Equation \ref{eq:conc}, I'm afraid you need to know a little calculus. I don't expect you to know the following derivation for the exam. 
-
-As we said above, the rate of elimination is directly proportional to the amount of drug present. Equation \ref{eq:erab} is more correctly (from a mathematical perspective) written as $$ \frac{dAb}{dt} = -k_eAb $$ which can be rearranged as $$ \frac{1}{Ab} dAb= -k_edt $$ we can then integrate each side from zero to infinity giving $$\int\frac{1}{Ab} dAb= \int-k_edt $$ which resolves to $$ln(Ab)=-k_et+c $$ take the exponential of each side to give $$Ab=e^{-k_et+c}=e^{-k_et}\times e^c$$ since $e^c$ is just another constant (lets call this one $D$) we can write \begin{equation} Ab=De^{-k_et} (\#eq:exp2)\end{equation} at time $t=0$, $e^{-k_et}=1$ and we know that at time $t=0$ the amount in the body must be the amount of drug given, or the dose so $D=\text{Dose}$. Convenient eh! 
-
-We can see that if we divide Equation \ref{eq:exp2} through by the volume of our compartment (the volume of distribution) then we have an equation for concentration ($C$) instead of total amount of drug in the body ($Ab$) which brings us back to  Equation \ref{eq:conc}. You will note that $\frac{D}{V_1}=C_0$.
-
-### Area under the curve ($AUC_0^\infty$)  
-
-More calculus here I am afraid. Again, I do not think it is important to learn this by heart. I include it because I think it is important to understand where equations come from. 
-
-Integration will give us area under the curve $$AUC = \int C_0e^{-k_{e} t}= -\frac{C_0e^{-k_{e} t}}{k_e}+C$$ Remember we are integrating between $t=0$ and $t=\infty$ $$AUC = \int_0^\infty C_0e^{-k_{e} t}$$ when $t=0$, $e^{-k_{e} t}=1$ and when $t=\infty$, $e^{-k_{e} t}=0$ leaving us with $$AUC = \int_0^\infty C_0e^{-k_{e} t}=\frac{C_0}{k_e}$$ since $k_e=\frac{Cl}{V_d}$ and $C_0=\frac{Dose}{V_d}$ $$AUC = \frac{C_0}{k_e}=\frac{Dose}{Cl}$$
-
 \newpage
-
-## Exercise 1
-**Task:** Using the skills you have learned in the sessions so far:
-
-* Simulate a pharmacokinetic study of an IV bolus dose of a drug
-  + Start with one participant and six time points
-  + Then expand to 4 participants, can you give them all slightly different profiles, just like results from a real pharmacokinetic study?
-  + Choose a drug you know to be given intravenously and look up the pharmacokinetic parameters you need
-* Plot the time-concentration profiles of the results
-* Undertake a non-compartmental analysis of the simulated data
-  + Do you get results consistent with your simulation?
-  
-
-Remember how to use the function operator in \texttt{R}
-
-```{r, warning=F,message=F}
-C0<-20 # replace with your C0
-ke<-0.16 # replace with your ka
-
-oncpt<- function(t) C0*exp(-ke*t)
-
-times<-c(0,1,4,6,7,8) # replace with your desired sampling time points
-
-oncpt(times) 
-```
-\newpage  
-
-## Exercise 1 solution
-
-For ease, I will write this in \texttt{R} code. 
-
-```{r fru, fig.cap="Simulated furosemide concentration time plot", warning=F,message=F,fig.width=6,fig.height=3,fig.align='center'}
-# first choose drug
-# furosemide https://go.drugbank.com/drugs/DB00695 or 
-# https://sepia2.unil.ch/pharmacology/drugs/furosemide/
-
-time<-c(0,1,4,5,6,8) # choose sampling time points
-Cl<-9.8  # set Cl 
-V<-12.0  # set V
-Dose<-40 # 40 mg dose
-oncpt<- function(t) (Dose/V)*exp(-(Cl/V)*t)
-conc<- oncpt(time)  
-fru<-data.frame(time,conc)
-fru
-
-ggplot(fru,aes(x=time,y=conc))+
-  geom_line()+
-  geom_point()+
-  theme_bw(base_size=9)+
-  ylab("Simulated plasma furosemide concentration mg/L")+
-  xlab("time (hr)")
-
-```
-
-
-To increase the sample size to four participants, we need to provide an ID column. To give them all slightly different pharmacokinetics, we will need columns for the pharmacokinetic parameters too. 
-
-```{r ,eval=F}
-# first choose drug
-# furosemide https://go.drugbank.com/drugs/DB00695 or
-# https://sepia2.unil.ch/pharmacology/drugs/furosemide/
-
-# Create ID column. lots of ways to do this, I have chosen a letter for each ID
-ID<-rep(LETTERS[1:4],each=6) # remember, one line in the data frame for each sample time
-time<-rep(c(0,1,4,5,6,8),4) # repeat sampling points for each ID
-
-# again lots of ways to create different clearance values
-set.seed(42)
-
-mCl<-9.8  # set mean Cl
-Cl<-
-  rep(c(mCl+rnorm(mean=0,sd=2,n=4)),each=6)
-
-mV<-12.0  # set mean V
-V<-
-  rep(c(mV+rnorm(mean=0,sd=3,n=4)),each=6)
-
-Dose<-40 # 40 mg dose is same for each patient
-
-
-oncpt<- function(t) (Dose/V)*exp(-(Cl/V)*t)
-conc<- oncpt(time)  
-
-
-fru<-data.frame(ID,time,conc)
-fru
-
-ggplot(fru,aes(x=time,y=conc,group=ID,col=ID))+
-  geom_line()+
-  geom_point()+
-  theme_bw(base_size=9)+
-  ylab("Simulated plasma furosemide concentration mg/L")+
-  xlab("time (hr)")
-
-```
-
-```{r fruorgroup, echo=F,fig.cap="Simulated furosemide concentration time plot for multiple participants", warning=F,message=F,fig.width=6,fig.height=3,fig.align='center'}
-# first choose drug
-# furosemide https://go.drugbank.com/drugs/DB00695 
-
-# Create ID column. lots of ways to do this, I have chosen a letter for each ID
-ID<-rep(LETTERS[1:4],each=6) # remember, one line in the data frame for each sample time
-time<-rep(c(0,1,4,5,6,8),4) # repeat sampling points for each ID
-
-# again lots of ways to create different clearance values
-set.seed(42)
-
-mCl<-9.8  # set mean Cl
-Cl<-
-  rep(c(mCl+rnorm(mean=0,sd=2,n=4)),each=6)
-
-mV<-12.0  # set mean V
-V<-
-  rep(c(mV+rnorm(mean=0,sd=3,n=4)),each=6)
-
-Dose<-40 # 40 mg dose is same for each patient
-
-
-oncpt<- function(t) (Dose/V)*exp(-(Cl/V)*t)
-conc<- signif(oncpt(time),3)  
-
-
-fru<-data.frame(ID,time,conc)
-fru%>%
-    pivot_wider(names_from = ID, values_from = conc) %>% 
-    kable(booktabs = TRUE, caption = "Simulated multiple participant concentration data using one-compartment model")
-
-ggplot(fru,aes(x=time,y=conc,group=ID,col=ID))+
-  geom_line()+
-  geom_point()+
-  theme_bw(base_size=9)+
-  ylab("Simulated plasma furosemide concentration mg/L")+
-  xlab("time (hr)")
-
-```
-
-Now for the non-compartmental analysis
-
-```{r , eval=F}
-# remember we need a dose data frame
-ID<-LETTERS[1:4]
-time<-rep(0,4)
-dose<-rep(40,4)
-dfru<-data.frame(ID,time,dose)
-
-library(PKNCA) #just copy and paste code from the last session
-
-conc<-PKNCAconc(fru, conc~time|ID) #create sampling object
-dose<-PKNCAdose(dfru, dose~time|ID) #create dosing object
-
-full<-PKNCAdata(conc,dose)  #combine
-results<-pk.nca(full)  # analyse
-
-summary(results) #summarise the results
-
-```
-
-```{r nca,   echo=F,eval=T}
-# remember we need a dose data frame
-ID<-LETTERS[1:4]
-time<-rep(0,4)
-dose<-rep(40,4)
-dfru<-data.frame(ID,time,dose)
-
-library(PKNCA) #just copy and paste code from the last session
-
-conc<-PKNCAconc(fru, conc~time|ID) #create sampling object
-dose<-PKNCAdose(dfru, dose~time|ID) #create dosing object
-
-full<-PKNCAdata(conc,dose)  #combine
-results<-pk.nca(full)  # analyse
-
-summary(results) %>% 
-    kable(booktabs = TRUE, caption = "Non compartmental analysis of PK data")
-
-```
-
-
-You can use the output from Table \@ref(tab:nca) to calculate $k_e$, $Cl$ or $Vd$. You can also ask the PKNCA package to do this for you. This is a little more complex. 
-
-```{r , eval=F}
-
-manual <- data.frame(start=0, end=8,vz.obs=TRUE,kel.last=TRUE, cl.obs=TRUE)
-# first specify the interval and the parameters you want calculated
-# see http://billdenney.github.io/pknca/articles/Selection-of-Calculation-Intervals.html 
-# for list of available parameters
-
-
-clvd<-PKNCAdata(conc,dose,intervals=manual)  #combine
-
-resultsman<-pk.nca(clvd)  # analyse
-
-summary(resultsman)
-```
-```{r nca2, echo=F, eval=T}
-
-manual <- data.frame(start=0, end=8,vz.obs=TRUE,kel.last=TRUE,cl.obs=TRUE)
-# first specify the interval and the parameters you want calculated
-# see http://billdenney.github.io/pknca/articles/Selection-of-Calculation-Intervals.html for list of available parameters
-
-
-clvd<-PKNCAdata(conc,dose,intervals=manual)  #combine
-
-resultsman<-pk.nca(clvd)  # analyse
-
-summary(resultsman) %>% 
-    kable(booktabs = TRUE, caption = "ke, Cl and Vd estimates using a non-compartmental approach")%>%
-  footnote(general = "Parameters are presented as geometric mean and coefficient of variation ",general_title = "")
-```
-
-As we simulated this data, let's compare these results to the actual clearance and volume of distribution.
-```{r, eval=T}
-mean(V)
-mean(Cl)
-```
-
-So you can see there is some error associated with the non-compartmental analysis. How do you think you could reduce this error?
-
-\newpage
-# Simulating variability
-
-In the example above, we simulated 4 different PK profiles using the built in \texttt{rnorm()} function in \texttt{R}. This function randomly samples from a normal distribution. The user (you) simply plugs in the mean (mean=) and standard deviation (sd=) values you like and tell it how many values to return (n=).
-
-You might argue that this is overly complicated. We could have simply set the four values of clearance manually. For example:
-
-```{r, eval=F}
-Cl<-c(10.2,9.6,11.4,10.1)
-Cl<-rep(Cl,each=6)
-```
-
-Remember with simulations we are trying to approximate reality. Hopefully you can see that this method is not likely to produce realistic results and, perhaps more importantly, is not practical if you want to simulate thousands of patients. 
-```{r, echo=F,eval=T}
-set.seed=20
-```
-```{r, eval=T}
-Cl<-rnorm(mean=9.8, sd=2, n=4000)
-```
-
-Let's have a look at this data. 
-
-```{r histclnorm, echo=T,fig.cap="Histogram of clearance values simulated using \\texttt{rnorm()}", warning=F,message=F,fig.width=6,fig.height=3,fig.align='center',results='hold'}
-
-# basic histogram
-Clhist<-data.frame(Clearance=Cl)
-ggplot(Clhist, aes(x=Clearance)) + 
-  geom_histogram(fill="#69b3a2", color="#e9ecef", alpha=0.9)+
-# explore other colours at 
-# https://www.colorhexa.com/color-names
-  theme_bw(base_size=9)
-
-```
-
-You can see in Figure \@ref(fig:histclnorm) that the data is normally distributed - which of course it should be because that is what we told \texttt{R} to do!
-
-Can you think of a problem with this approach?
-
-What if we increase the variability of clearance a little.....
-
-```{r, eval=T}
-Cl<-rnorm(mean=9.8, sd=5, n=4000)
-summary(Cl)
-```
-
-You can see that some of the simulated values are negative. This is impossible! This is an example where a normal distribution is not representative of reality. Can you think of an alternative?
-
-## Log-normally distributed parameters
-
-```{r, eval=T}
-Cl<-9.8*exp(rnorm(mean=0, sd=0.3, n=4000))
-```
-
-Let's have a look at this data. 
-
-```{r histcllognorm, echo=T,fig.cap="Histogram of clearance values simulated with log-normal distribution", warning=F,message=F,fig.width=6,fig.height=3,fig.align='center'}
-
-# basic histogram
-Clhist<-data.frame(Clearance=Cl)
-ggplot(Clhist, aes(x=Clearance)) + 
-  geom_histogram(fill="#ffdab9", color="#536878", alpha=0.9)+
-  theme_bw(base_size=9)
-
-```
-
-Figure \@ref(fig:histcllognorm) is far more representative of real biological/clinical data. 
-
-**Task:** Have a discussion with your colleagues and answer the following questions:
-
-1. What are the sources of variability in a pharmacokinetic study? 
-2. How/where in a simulation might these be represented?    
-  
-\newpage
-## Thinking further about variability in pharmacokinetic data
-
-The list of potential sources of error here are huge, from intrinsic and extrinsic sources of variability in an individuals pharmacokinetics, to error associated with measurements or assays in the trial. 
-
-Some examples of how this variabilty is simulated includes:
-  
-* Variable organ function leads to variability in clearance
-* Variation in body size/mass leads to varibiltiy in volume of distribution
-
-We can apply the same log-normal distribution to our volume of distribution term.
-
-\newpage
-
 
 # The one-compartment oral-absorption model
 
@@ -589,241 +240,6 @@ $AUC$ can be estimated using the trapezoid rule, or alternatively it can be calc
 
 Alternatively, apparent clearance can be calculated using $k_e$ & $V_d/F$ $$\frac{Cl}{F}=k_e\frac{V_d}{F}$$
 
-## Exercise 2
-**Task:** Using the skills you have learned in the sessions so far:
-
-* Simulate a pharmacokinetic study of an oral dose of a drug
-  + Start with one participant and 6-10 time points
-  + Then expand to 4 participants, can you give them all slightly different profiles, just like results from a real pharmacokinetic study?
-  + Choose a drug you know to be given orally and look up the pharmacokinetic parameters you need. If your drug for the previous task is given orally as well as IV then why not use it again
-* Plot the time-concentration profiles of the results
-* Undertake a non-compartmental analysis of the simulated data
-  + Do you get results consistent with your simulation?
-
-Remember to use the function operator in \texttt{R}. Here is an example. 
-
-```{r, warning=F,message=F}
-D<-5000 #dose in micrograms
-Vdf<- 250 #vd/F in L
-# this gives all concentrations in micrograms per l
-
-ke<-0.16 # replace with your ka
-ka<-3
- 
-  
-onoral<- function(t) ((D*ka)/(Vdf*(ka-ke)))*(exp(-ke*t)-exp(-ka*t))
-
-times<-c(0,1,4,6,7,8) # replace with your desired sampling time points
-
-# note that to draw a curve that teases out absorption 
-# you need sampling in the absorption phase
-# you will probably need trial and error to sort this out
-
-signif(onoral(times),2) 
-
-times<-c(0,0.1,0.3,1,4,6,7,8)
-
-signif(onoral(times),2) 
-
-```
-\newpage  
-
-## Exercise 2 solution
-
-For ease, I will write this in \texttt{R} code. 
-
-```{r fruor, fig.cap="Simulated furosemide concentration (oral dose)", warning=F,message=F,fig.width=6,fig.height=3,fig.align='center'}
-# first choose drug
-# furosemide https://go.drugbank.com/drugs/DB00695 or
-# https://sepia2.unil.ch/pharmacology/drugs/furosemide/
-
-time<-c(0,0.5,1,1.5,2,4,5,6,8) # choose sampling time points
-F<-0.65
-Cl<-9.8  # set Cl 
-V<-12.0  # set V
-ke<-Cl/V  
-# note time to peak effect 1-2 hours
-ka<- 1.3 # from https://doi.org/10.1002/bdd.1874
-D<-40 # 40 mg dose
-onoral<- function(t) ((F*D*ka)/(V*(ka-ke)))*(exp(-ke*t)-exp(-ka*t))
-conc<- signif(onoral(time),2)  
-
-
-fru<-data.frame(time,conc)
-fru
-
-ggplot(fru,aes(x=time,y=conc))+
-  geom_line()+
-  geom_point()+
-  theme_bw(base_size=9)+
-  ylab("Simulated furosemide concentration mg/L")+
-  xlab("time (hr)")
-
-```
-
-
-To increase the sample size to four participants, we need to provide an ID column. To give them all slightly different pharmacokinetics, we will need columns for the pharmacokinetic parameters too. 
-
-```{r ,eval=F,include=TRUE}
-# first choose drug
-# furosemide https://go.drugbank.com/drugs/DB00695 or
-# https://sepia2.unil.ch/pharmacology/drugs/furosemide/
-
-# Create ID column. lots of ways to do this, I have chosen a letter for each ID
-ID<-rep(LETTERS[1:4],each=9) # remember, one line in the data frame for each time
-time<-rep(c(0,0.5,1,1.5,2,4,5,6,8),4) # repeat sampling points for each ID
-
-
-# again lots of ways to create different clearance values
-set.seed(42)
-
-mCl<-9.8  # set mean Cl
-Cl<-rep(c(mCl+rnorm(mean=0,sd=2,n=4)),each=9)
-
-mV<-12.0  # set mean V
-V<-rep(c(mV+rnorm(mean=0,sd=3,n=4)),each=9)
-
-ke<-Cl/V 
-
-Dose<-40 # 40 mg dose is same for each patient
-
-ka<-rep(rnorm(mean=1.3,sd=0.2,n=4),each=9)
-
-onoral<- function(t) ((F*D*ka)/(V*(ka-ke)))*(exp(-ke*t)-exp(-ka*t))
-conc<- signif(onoral(time),2) 
-
-
-fru<-data.frame(ID,time,conc)
-fru
-
-ggplot(fru,aes(x=time,y=conc,group=ID,col=ID))+
-  geom_line()+
-  geom_point()+
-  theme_bw(base_size=9)+
-  ylab("Simulated plasma furosemide concentration mg/L")+
-  xlab("time (hr)")
-
-```
-
-```{r frugroup, echo=F,fig.cap="Simulated furosemide concentration time plot for multiple participants", warning=F,message=F,fig.width=6,fig.height=3,fig.align='center'}
-# first choose drug
-# furosemide https://go.drugbank.com/drugs/DB00695 
-
-# Create ID column. lots of ways to do this, I have chosen a letter for each ID
-ID<-rep(LETTERS[1:4],each=9) # remember, one line in the data frame for each sample time
-time<-rep(c(0,0.5,1,1.5,2,4,5,6,8),4) # repeat sampling points for each ID
-
- 
-
-# again lots of ways to create different clearance values
-set.seed(42)
-
-mCl<-9.8  # set mean Cl
-Cl<-rep(c(mCl+rnorm(mean=0,sd=2,n=4)),each=9)
-
-mV<-12.0  # set mean V
-V<-rep(c(mV+rnorm(mean=0,sd=3,n=4)),each=9)
-ke<-Cl/V 
-Dose<-40 # 40 mg dose is same for each patient
-ka<-rep(rnorm(mean=1.3,sd=0.2,n=4),each=9)
-onoral<- function(t) ((F*D*ka)/(V*(ka-ke)))*(exp(-ke*t)-exp(-ka*t))
-conc<- signif(onoral(time),2) 
-
-fru<-data.frame(ID,time,conc)
-fru%>%
-    pivot_wider(names_from = ID, values_from = conc) %>% 
-    kable(booktabs = TRUE, caption = "Simulated multiple participant concentration data using one-compartment model")
-
-ggplot(fru,aes(x=time,y=conc,group=ID,col=ID))+
-  geom_line()+
-  geom_point()+
-  theme_bw(base_size=9)+
-  ylab("Simulated plasma furosemide concentration mg/L")+
-  xlab("time (hr)")
-
-```
-
-Now for the non-compartmental analysis
-
-```{r , eval=F}
-# remember we need a dose data frame
-ID<-LETTERS[1:4]
-time<-rep(0,4)
-dose<-rep(40,4)
-dfru<-data.frame(ID,time,dose)
-
-library(PKNCA) #just copy and paste code from the last session
-
-conc<-PKNCAconc(fru, conc~time|ID) #create sampling object
-dose<-PKNCAdose(dfru, dose~time|ID) #create dosing object
-
-full<-PKNCAdata(conc,dose)  #combine
-results<-pk.nca(full)  # analyse
-
-summary(results) #summarise the results
-
-```
-
-```{r ncaoral,   echo=F,eval=T}
-# remember we need a dose data frame
-ID<-LETTERS[1:4]
-time<-rep(0,4)
-dose<-rep(40,4)
-dfru<-data.frame(ID,time,dose)
-
-library(PKNCA) #just copy and paste code from the last session
-
-conc<-PKNCAconc(fru, conc~time|ID) #create sampling object
-dose<-PKNCAdose(dfru, dose~time|ID) #create dosing object
-
-full<-PKNCAdata(conc,dose)  #combine
-results<-pk.nca(full)  # analyse
-
-summary(results) %>% 
-    kable(booktabs = TRUE, caption = "Non compartmental analysis of oral PK data")
-
-```
-
-
-You can use the output from Table \@ref(tab:nca) to calculate $Cl/F$ and $Vd/F$. You can also ask the PKNCA package to do this for you. The PKNCA package does not know you have given it oral data, so labels it the same as if it were from IV data. Note that $k_a$ is not calculated through non-compartmental methods, instead $C_max$ and $T_max$ are directly observed from the data. This is probably more clinically meaningful than $k_a$.
-
-```{r , eval=F}
-
-manual <- data.frame(start=0, end=8,vz.obs=TRUE,cl.obs=TRUE)
-# first specify the interval and the parameters you want calculated
-# see http://billdenney.github.io/pknca/articles/Selection-of-Calculation-Intervals.html 
-# for list of available parameters
-
-
-clvd<-PKNCAdata(conc,dose,intervals=manual)  #combine
-
-resultsman<-pk.nca(clvd)  # analyse
-
-summary(resultsman)
-```
-```{r nca2or, echo=F, eval=T}
-
-manual <- data.frame(start=0, end=8,vz.obs=TRUE,cl.obs=TRUE)
-# first specify the interval and the parameters you want calculated
-# see http://billdenney.github.io/pknca/articles/Selection-of-Calculation-Intervals.html for list of available parameters
-
-
-clvd<-PKNCAdata(conc,dose,intervals=manual)  #combine
-
-resultsman<-pk.nca(clvd)  # analyse
-
-summary(resultsman) %>% 
-    kable(booktabs = TRUE, caption = "Cl and Vd estimates using a non-compartmental approach")
-```
-
-As we simulated this data, let's compare these results to the clearance and volume of distribution values we inputted into our simulation.
-```{r, eval=T}
-round(V/F,1)
-round(mean(Cl)/F,1)
-```
-
-
-
 \newpage
 
 # The two-compartment IV-bolus model
@@ -925,7 +341,7 @@ The equation relating $AUC$ and $Cl$ remain the same and are related to $A,B,\al
 knitr::include_graphics("twocpt.png")
 ```
 
-The two compartment model is graphically represented in Figure @ref(fig:twocpt). You can see that, mathematically, things are a little more complex, with three equilibrium constants. $k_e$ is now replaced by $k_{10}$ to represent constant associated with elimination from the central compartment (compartment 1 to out, 0). The second compartment has a rate associated with drug moving into it from the central compartment ($k_{12}$) and out of it ($k_{21}$), back to the central compartment. It is worth noting that in this model, elimination *only* occurs from the central compartment. For most drugs, where metabolism and exretion is hepatic/renal this is reasonable, as comparment 1 is usually modelled as the plasma, and of course this flows through the eliminating organs. However, some drugs undergo degradation that is independent of these organs. For example, the muscle relaxant atracurium undergoes spontaneous degradation and ester hydrolysis. These processes can occur in any tissue. For drugs like this, modelling elimination from the central compartment only may not describe time-concentration data accurately. Thankfully, this is the exception, rather than the norm.
+The two compartment model is graphically represented in Figure @ref(fig:twocpt). You can see that, mathematically, things are a little more complex, with three equilibrium constants. $k_e$ is now replaced by $k_{10}$ to represent constant associated with elimination from the central compartment (compartment 1 to out, 0). The second compartment has a rate associated with drug moving into it from the central compartment ($k_{12}$) and out of it ($k_{21}$), back to the central compartment. It is worth noting that in this model, elimination *only* occurs from the central compartment. For most drugs, where metabolism and excretion is hepatic/renal this is reasonable, as compartment 1 is usually modelled as the plasma, and of course this flows through the eliminating organs. However, some drugs undergo degradation that is independent of these organs. For example, the muscle relaxant atracurium undergoes spontaneous degradation and ester hydrolysis. These processes can occur in any tissue. For drugs like this, modelling elimination from the central compartment only may not describe time-concentration data accurately. Thankfully, this is the exception, rather than the norm.
 
 
 ```{r twotime, echo = FALSE, message=FALSE, fig.align='center', fig.cap='Representation of time ($t$)-course of two-compartment model. At the time of the dose ($t=0$), all drug is deposited in the central compartment. In the distribution phase, it begins to move into the second (peripheral) compartment, with the amount in each compartment reaching equilibrium in the elimination phase.  Note that this is a simplification as elimination from the central compartment would be happening concurrently', out.width='0.75\\linewidth'}
@@ -985,18 +401,4 @@ models%>%
   add_header_above(c(" ", "Parameterisation" = 3),bold=TRUE)%>% row_spec(0,bold=TRUE) 
 
 ```
-
-
-\newpage
-
-# Homework
-
-
-1. Find the equation for a one-compartment IV infusion model  
-2. Using the example of noradrenaline, with $Cl \approx 150 L/hr$ and $V_d \approx 8.8L$, simulate and plot concentration-time data for an infusion of $4mg/hr$ for 15 minutes    
-    a. one-person
-    b. four-people
-    
-**Hint:** Ensure your units of time are consistent
-  
 

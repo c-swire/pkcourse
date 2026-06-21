@@ -12,7 +12,7 @@
 <meta name="author" content="Dagan Lonsdale" />
 
 
-<title>Chapter 5: Model diagnostics</title>
+<title>Model diagnostics</title>
 
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -393,7 +393,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Chapter 5: Model diagnostics</h1>
+<h1 class="title toc-ignore">Model diagnostics</h1>
 <h4 class="author">Dagan Lonsdale</h4>
 
 </div>
@@ -403,11 +403,10 @@ div.tocify {
 <h1>Introduction</h1>
 <p>In this chapter, we will start to answer the questions:</p>
 and
-<p>We will start to explore the output from an model fit and think about the idea of model diagnostics, which may be numerical, graphical or even simulation based. We will start with thinking about the straightforward linear-regression model and then move on to modelling some pharmacokinetic data.</p>
+<p>We will start to explore the output from an <TT>nlmixr2</TT> model fit and think about the idea of model diagnostics, which may be numerical, graphical or even simulation based. We will start with thinking about the straightforward linear-regression model and then move on to modelling some pharmacokinetic data.</p>
 <div id="learning-outcomes" class="section level2">
 <h2>Learning outcomes</h2>
 <ul>
-<li>With the example of the linear-regression model, use model diagnostics to evaluate the model fit and assess whether the assumptions made when applying a linear regression model are reasonable</li>
 <li>Describe some standard diagnostic plots for a non-linear mixed-effects model
 <ul>
 <li>DV vs PRED/IPRED, CWRES vs TAD</li>
@@ -428,120 +427,13 @@ and
 </ul>
 </div>
 </div>
-<div id="introduction-to-model-diagnostics-using-linear-regression-as-an-example" class="section level1">
-<h1>Introduction to model diagnostics using linear regression as an example</h1>
-<p>You should be conscious that the vast majority of modelling processes require some assumptions to be made. This is as true for the simple t-test as it is for non-linear mixed-effects models. What <em>I don’t think</em> you have thought about much on this course is how to assess whether making these assumptions was the right call for your data.</p>
-<p>You will hopefully be aware that linear-regression modelling requires four assumptions to be met:</p>
-<ul>
-<li>There is a linear relationship between the outcome and predictor variables
-<ul>
-<li><em>Hopefully this doesn’t come as a shock!</em></li>
-</ul></li>
-<li>The variance of residuals is the same for any value of the predictor variable (<strong>this is known as homoscedasticity</strong>)</li>
-<li>There is <strong>independence</strong> between observations</li>
-<li>Residuals at any predictor value are normally distributed (<strong>normality</strong>)</li>
-</ul>
-<p>Let’s think about how we assess whether this is true or not <em>after</em> we have undertaken linear regression modelling.</p>
-<div id="back-to-the-carrots" class="section level2">
-<h2>Back to the carrots!</h2>
-<p>Let’s look at this with our carrot data. You will recall that we looked at the residuals by plotting them (Figure <a href="#fig:lm">1</a>).</p>
-<div class="figure" style="text-align: center"><span style="display:block;" id="fig:lm"></span>
-<img src="model_diagnostics_files/figure-html/lm-1.png" alt="Carrot data with linear regression line and residual error (dotted red lines)" width="672" />
-<p class="caption">
-Figure 1: Carrot data with linear regression line and residual error (dotted red lines)
-</p>
-</div>
-<p>We can extend this process and plot several diagnostic plots from using the residuals and ouput form the linear regression. Rather than complex code, I’m opting to use with . You can see the output from this in Figure <a href="#fig:resid">2</a>.</p>
-<div id="checking-linearity-and-homoscedasticity" class="section level3">
-<h3>Checking linearity and homoscedasticity</h3>
-<p>Figure <a href="#fig:resid">2</a>(a) shows the plot of fitted values vs residuals. Here, you can see that the residuals are spread evenly between positive and negative values and that this pattern is repeated along all observed values of carrot length (our predictor variable). If there was no linearity, we would expect some unusually large values on this plot. If there was no homoscedasticity, the spread of the data would change (larger values for certain values of carrot weight).</p>
-</div>
-<div id="checking-normality" class="section level3">
-<h3>Checking normality</h3>
-<p>For this, we use something called a Normal Q-Q plot. Figure <a href="#fig:resid">2</a>(b) shows this. I’m not going to spend long focusing on this, suffice to say that data meeting the normality assumption should have observations that run along the line of unity (<span class="math inline">\(y=x\)</span>), which they do here.</p>
-<pre class="r"><code>carrot&lt;-
-  read_csv(&quot;https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/main/carrot_data.csv&quot;)
-fit&lt;-lm(weight~length,data=carrot)
-plot(fit, which=1:2)</code></pre>
-<div class="figure"><span style="display:block;" id="fig:resid"></span>
-<img src="model_diagnostics_files/figure-html/resid-1.png" alt="linear regression model diagnostics for carrot data" width="50%" /><img src="model_diagnostics_files/figure-html/resid-2.png" alt="linear regression model diagnostics for carrot data" width="50%" />
-<p class="caption">
-Figure 2: linear regression model diagnostics for carrot data
-</p>
-</div>
-</div>
-</div>
-<div id="task-1" class="section level2">
-<h2>Task 1</h2>
-<ul>
-<li>Download the aubergine dataset from GitHub</li>
-</ul>
-<p>Run </p>
-<ul>
-<li>Fit a linear model to it
-<ul>
-<li>Have a look at the associated p-value using </li>
-</ul></li>
-<li>Plot the diagnostic plots
-<ul>
-<li>Note what you think may be wrong</li>
-</ul></li>
-<li>Then plot aubergine weight vs length
-<ul>
-<li>Does this explain the errors you found?</li>
-</ul></li>
-</ul>
-</div>
-<div id="task-1-solution" class="section level2">
-<h2>Task 1 solution</h2>
-<pre class="r"><code>aubergine&lt;-
-  read_csv(&quot;https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/main/aubergine.csv&quot;)</code></pre>
-<pre class="r"><code>fit&lt;-lm(weight~length,data=aubergine)
-summary(fit)</code></pre>
-<pre><code>## 
-## Call:
-## lm(formula = weight ~ length, data = aubergine)
-## 
-## Residuals:
-##    Min     1Q Median     3Q    Max 
-## -68.81 -54.61 -19.79  47.07 167.22 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept) -588.406     28.234  -20.84   &lt;2e-16 ***
-## length        60.568      1.945   31.15   &lt;2e-16 ***
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Residual standard error: 65.46 on 98 degrees of freedom
-## Multiple R-squared:  0.9082, Adjusted R-squared:  0.9073 
-## F-statistic: 970.1 on 1 and 98 DF,  p-value: &lt; 2.2e-16</code></pre>
-<p>You can see that if you looked just at the p-value you might consider there to be a strong, linear relationship and that linear modelling was appropriate. Now look at the diagnostic plots.</p>
-<pre class="r"><code>plot(fit, which=1:2)</code></pre>
-<div class="figure"><span style="display:block;" id="fig:aubresid"></span>
-<img src="model_diagnostics_files/figure-html/aubresid-1.png" alt="linear regression model diagnostics for aubergine data" width="50%" /><img src="model_diagnostics_files/figure-html/aubresid-2.png" alt="linear regression model diagnostics for aubergine data" width="50%" />
-<p class="caption">
-Figure 3: linear regression model diagnostics for aubergine data
-</p>
-</div>
-<p>You can see from Figure <a href="#fig:aubresid">3</a> that almost none of the assumptions hold in the modelling of these data. You can see why in the plot of aubergine length versus weight (Figure <a href="#fig:aublm">4</a>). The relationship between the variables is not linear!</p>
-<div class="figure" style="text-align: center"><span style="display:block;" id="fig:aublm"></span>
-<img src="model_diagnostics_files/figure-html/aublm-1.png" alt="Aubergine data with linear regression line and residual error (dotted red lines)" width="672" />
-<p class="caption">
-Figure 4: Aubergine data with linear regression line and residual error (dotted red lines)
-</p>
-</div>
-<p>This is a slightly artificial scenario to demonstrate how graphical diagnostics can help to tell you that there is a problem with your model. In reality here, if we had done our job properly and plotted the data <em>first</em> we would have seen that the relationship does not look linear.</p>
-<p>Now, back to PK models………..</p>
-</div>
-</div>
 <div id="introduction-to-diagnostic-plots-for-non-linear-mixed-effects-pharmacokinetic-models" class="section level1">
 <h1>Introduction to diagnostic plots for non-linear mixed-effects pharmacokinetic models</h1>
 <p>There are a wealth of diagnostic plots that can be used to think about how well a model fits data from an experiment. We will look at a few key examples.</p>
 <div id="dv-vs-pred-and-dv-vs-ipred" class="section level2">
 <h2>DV vs PRED and DV vs IPRED</h2>
 <p>The most straightforward diagnostic plot available is a plot of observations (dependent variable, DV) vs predicted concentrations from a model. There are two subsets of this type of plot. The first, DV vs PRED takes predictions based on population parameters (i.e. excluding <span class="math inline">\(\eta\)</span>’s) and the second is DV vs IPRED, which bases predictions on individual values for model parameters (including <span class="math inline">\(\eta\)</span>’s).</p>
-<p>Figure <a href="#fig:frufit">5</a> shows these diagnostic plots for the furosemide data we modeled last week. If you haven’t saved your model fit, you can download mine from Github.</p>
+<p>Figure <a href="#fig:frufit">1</a> shows these diagnostic plots for the furosemide data.</p>
 <pre class="r"><code>link &lt;- &quot;https://github.com/dlonsdal/SGUL_PK_data/blob/main/frufit.rds?raw=true&quot;
 fru.fit &lt;- readRDS(url(link, method=&quot;libcurl&quot;))
 modfit&lt;-data.frame(fru.fit)
@@ -560,15 +452,15 @@ ggplot(modfit,aes(x=IPRED,y=DV))+
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:frufit"></span>
 <img src="model_diagnostics_files/figure-html/frufit-1.png" alt="Basic diagnostic plots for furosemide one-compartment, oral-absorption model fit from Chapter 4" width="50%" /><img src="model_diagnostics_files/figure-html/frufit-2.png" alt="Basic diagnostic plots for furosemide one-compartment, oral-absorption model fit from Chapter 4" width="50%" />
 <p class="caption">
-Figure 5: Basic diagnostic plots for furosemide one-compartment, oral-absorption model fit from Chapter 4
+Figure 1: Basic diagnostic plots for furosemide one-compartment, oral-absorption model fit from Chapter 4
 </p>
 </div>
-<p>Take a look at Figure <a href="#fig:frufit">5</a>(a) first. A <em>perfect</em> model fit would have predictions that were identical to the observations from the experiment. All of the points in the scatterplot would fall in a straight line along the line of unity (<span class="math inline">\(DV=PRED\)</span>). However, as we have discussed previously, <em>real-world</em> data is never perfect, individuals have PK parameters that deviate from the population mean values and there will be un-modelled error. So, what we are really looking for in this plot is a degree of even spread of points above and below the line of unity. Any groups of data points deviating away from this line of unity might make us suspicious that there is some underlying variability not being modelled.</p>
-<p>In our example in Figure <a href="#fig:frufit">5</a>(a) we can see that there is pretty reasonable fit, with even distribution of data points. A red ‘line of best fit’ tracks fairly evenly along the line of unity. This suggests our model fit is pretty good.</p>
-<p>Figure <a href="#fig:frufit">5</a>(b) shows DV vs IPRED This is individualised predictions, taking into account that random-effect associated with an individual ($). Again, the perfect model fit has all lines along the line of unity. DV vs IPRED plots will generally always look a little better than DV vs PRED plots in this regard. However, it is unusual to get such a tight fit as we see in Figure <a href="#fig:frufit">5</a>(b) as usually there is additional unexplained variability in data. The example here looks relatively perfect because I simulated these data and I did not simulate complex variability!</p>
+<p>Take a look at Figure <a href="#fig:frufit">1</a>(a) first. A <em>perfect</em> model fit would have predictions that were identical to the observations from the experiment. All of the points in the scatterplot would fall in a straight line along the line of unity (<span class="math inline">\(DV=PRED\)</span>). However, as we have discussed previously, <em>real-world</em> data is never perfect, individuals have PK parameters that deviate from the population mean values and there will be un-modelled error. So, what we are really looking for in this plot is a degree of even spread of points above and below the line of unity. Any groups of data points deviating away from this line of unity might make us suspicious that there is some underlying variability not being modelled.</p>
+<p>In our example in Figure <a href="#fig:frufit">1</a>(a) we can see that there is pretty reasonable fit, with even distribution of data points. A red ‘line of best fit’ tracks fairly evenly along the line of unity. This suggests our model fit is pretty good.</p>
+<p>Figure <a href="#fig:frufit">1</a>(b) shows DV vs IPRED This is individualised predictions, taking into account that random-effect associated with an individual ($). Again, the perfect model fit has all lines along the line of unity. DV vs IPRED plots will generally always look a little better than DV vs PRED plots in this regard. However, it is unusual to get such a tight fit as we see in Figure <a href="#fig:frufit">1</a>(b) as usually there is additional unexplained variability in data. The example here looks relatively perfect because I simulated these data and I did not simulate complex variability!</p>
 </div>
-<div id="task-2" class="section level2">
-<h2>Task 2</h2>
+<div id="task-1" class="section level2">
+<h2>Task 1</h2>
 <p>For this task we will be using some simulated data. In this simulated experiment, 20 participants were given 1000 mg oral dose of Drug X. Seven pharmacokinetic samples were taken in the subsequent hours.</p>
 <ul>
 <li>Download simulated data</li>
@@ -617,23 +509,22 @@ ggplot(modfit,aes(x=PRED,y=DV))+
   geom_abline(intercept = 0, slope=1)+
   geom_smooth(col=&#39;red&#39;,se=F)+xlim(0,10)+ylim(0,10)</code></pre>
 </div>
-<div id="task-2-solution" class="section level2">
-<h2>Task 2 solution</h2>
-<pre><code>## [====|====|====|====|====|====|====|====|====|====] 0:00:00</code></pre>
+<div id="task-1-solution" class="section level2">
+<h2>Task 1 solution</h2>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:drugxone"></span>
 <img src="model_diagnostics_files/figure-html/drugxone-1.png" alt="Basic diagnostic plots for drug X one-compartment, oral-absorption model fit" width="50%" /><img src="model_diagnostics_files/figure-html/drugxone-2.png" alt="Basic diagnostic plots for drug X one-compartment, oral-absorption model fit" width="50%" /><img src="model_diagnostics_files/figure-html/drugxone-3.png" alt="Basic diagnostic plots for drug X one-compartment, oral-absorption model fit" width="50%" /><img src="model_diagnostics_files/figure-html/drugxone-4.png" alt="Basic diagnostic plots for drug X one-compartment, oral-absorption model fit" width="50%" />
 <p class="caption">
-Figure 6: Basic diagnostic plots for drug X one-compartment, oral-absorption model fit
+Figure 2: Basic diagnostic plots for drug X one-compartment, oral-absorption model fit
 </p>
 </div>
-<p>Figure <a href="#fig:drugxone">6</a> shows a quite inconsistent fit over the range of observed concentrations, with the model seeming to under-predict at low concentrations and over-predict at high concentrations. Let’s have a look at another diagnostic plot to help us with thinking about this problem.</p>
+<p>Figure <a href="#fig:drugxone">2</a> shows a quite inconsistent fit over the range of observed concentrations, with the model seeming to under-predict at low concentrations and over-predict at high concentrations. Let’s have a look at another diagnostic plot to help us with thinking about this problem.</p>
 </div>
 <div id="conditionally-weighted-residuals" class="section level2">
 <h2>Conditionally-weighted residuals</h2>
 <p>We can look at the idea of residuals from our non-linear mixed-effects models in the same way as we did with our linear models. We can look to see that our residuals remain even across the range of sampling times and observed concentrations.</p>
-<p>We are going to introduce a further step, normalising the residuals through a weighting step. This is important because residuals might be influenced by the magnitude of the observation (e.g. you might find a greater range of residuals around <span class="math inline">\(C_{max}\)</span> compared to around <span class="math inline">\(C_{min}\)</span>). Weighting the residuals in order to standardise them makes it easier to think about what is happening with model predictions across the full range of observations. We will use conditionally weighted residuals (), which are a fairly standard form of residual. You don’t need to know exactly how these are created, unless you decide to pursue modelling as a career of course……</p>
-<p>Additionally, this leads to a situation where the conditionally weighted residuals () should follow an approximately normal distribution with mean zero and variance 1.<span class="math display">\[CWRES\sim N(0,1)\]</span> This is helpful because we can expect 99.7% of data points to fall within <span class="math inline">\(+/- 3\)</span>. We can look for trends in this kind of plot to help with our model building process.</p>
-<p> will output through an additional command.</p>
+<p>We are going to introduce a further step, normalising the residuals through a weighting step. This is important because residuals might be influenced by the magnitude of the observation (e.g. you might find a greater range of residuals around <span class="math inline">\(C_{max}\)</span> compared to around <span class="math inline">\(C_{min}\)</span>). Weighting the residuals in order to standardise them makes it easier to think about what is happening with model predictions across the full range of observations. We will use conditionally weighted residuals (<TT>CWRES</TT>), which are a fairly standard form of residual. You don’t need to know exactly how these are created, unless you decide to pursue modelling as a career of course……</p>
+<p>Additionally, this leads to a situation where the conditionally weighted residuals (<TT>CWRES</TT>) should follow an approximately normal distribution with mean zero and variance 1.<span class="math display">\[CWRES\sim N(0,1)\]</span> This is helpful because we can expect 99.7% of data points to fall within <span class="math inline">\(+/- 3\)</span>. We can look for trends in this kind of plot to help with our model building process.</p>
+<p><TT>nlmixr2</TT> will output <TT>CWRES</TT> through an additional <TT>tableControl()</TT> command.</p>
 <pre class="r"><code>drugxfit&lt;-nlmixr2(one.cmt,drugxsim,est=&quot;saem&quot;,
        list(print=0),
        table = tableControl(cwres = TRUE))
@@ -649,17 +540,17 @@ modfit&lt;-data.frame(drugxfit)</code></pre>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:cwres"></span>
 <img src="model_diagnostics_files/figure-html/cwres-1.png" alt="Conditionally weighted residuals plotted against time from dose" width="576" />
 <p class="caption">
-Figure 7: Conditionally weighted residuals plotted against time from dose
+Figure 3: Conditionally weighted residuals plotted against time from dose
 </p>
 </div>
-<p>You can see from Figure <a href="#fig:cwres">7</a> that we are lacking in a uniform distribution of across sampling times. In fact, this U-shape that is seen in the plot can be indicative of the need for an additional compartment in the model. Perhpas you might have thought this when looking at the raw data plot.</p>
+<p>You can see from Figure <a href="#fig:cwres">3</a> that we are lacking in a uniform distribution of <TT>CWRES</TT> across sampling times. In fact, this U-shape that is seen in the <TT>CWRES</TT> plot can be indicative of the need for an additional compartment in the model. Perhpas you might have thought this when looking at the raw data plot.</p>
 </div>
-<div id="task-3" class="section level2">
-<h2>Task 3</h2>
+<div id="task-2" class="section level2">
+<h2>Task 2</h2>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:twocpt"></span>
 <img src="tworal.png" alt="Two-compartment oral-absorption model" width="60%" />
 <p class="caption">
-Figure 8: Two-compartment oral-absorption model
+Figure 4: Two-compartment oral-absorption model
 </p>
 </div>
 <ul>
@@ -669,10 +560,10 @@ Figure 8: Two-compartment oral-absorption model
 <li>Have a look at for the one- and two- compartment model fit</li>
 <li>What do you notice about this numerical value</li>
 </ul>
-<p>You will need to write a function for a two-compartment oral-absorption model. Have a look at Figure <a href="#fig:twocpt">8</a> and see if you can work out what to change from your one compartment model. Failing that, go for !</p>
+<p>You will need to write a function for a two-compartment oral-absorption model. Have a look at Figure <a href="#fig:twocpt">4</a> and see if you can work out what to change from your one compartment model. Failing that, go for <TT>Google</TT></p>
 </div>
-<div id="task-3-solution" class="section level2">
-<h2>Task 3 solution</h2>
+<div id="task-2-solution" class="section level2">
+<h2>Task 2 solution</h2>
 <p>Again, note that the model is sensitive to initial parameter estimates. Trial the ones below and compare the output to other initial parameter estimates (ini block).</p>
 <pre class="r"><code>two.cmt &lt;- function() {
   ini({ 
@@ -701,10 +592,10 @@ drugxfit2&lt;-nlmixr2(two.cmt,drugxsim,est=&quot;saem&quot;,
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:drugxtwo"></span>
 <img src="model_diagnostics_files/figure-html/drugxtwo-1.png" alt="Comparison of diagnostic plots for drug X one- and two-compartment, oral-absorption model fits" width="50%" /><img src="model_diagnostics_files/figure-html/drugxtwo-2.png" alt="Comparison of diagnostic plots for drug X one- and two-compartment, oral-absorption model fits" width="50%" /><img src="model_diagnostics_files/figure-html/drugxtwo-3.png" alt="Comparison of diagnostic plots for drug X one- and two-compartment, oral-absorption model fits" width="50%" /><img src="model_diagnostics_files/figure-html/drugxtwo-4.png" alt="Comparison of diagnostic plots for drug X one- and two-compartment, oral-absorption model fits" width="50%" />
 <p class="caption">
-Figure 9: Comparison of diagnostic plots for drug X one- and two-compartment, oral-absorption model fits
+Figure 5: Comparison of diagnostic plots for drug X one- and two-compartment, oral-absorption model fits
 </p>
 </div>
-<p>We can see from the diagnostic plots in Figure <a href="#fig:drugxtwo">9</a> that the two-compartment model provides an improved model fit. In addition to this graphical improvement, we can also use a quantitative metric of improved model fit.</p>
+<p>We can see from the diagnostic plots in Figure <a href="#fig:drugxtwo">5</a> that the two-compartment model provides an improved model fit. In addition to this graphical improvement, we can also use a quantitative metric of improved model fit.</p>
 </div>
 <div id="the-objective-function-value-ofv" class="section level2">
 <h2>The Objective Function Value (OFV)</h2>
@@ -712,12 +603,12 @@ Figure 9: Comparison of diagnostic plots for drug X one- and two-compartment, or
 <p>What is important for you to note is that the objective function can be used to compare two models. In general, a lower objective function value indicates a superior model fit.</p>
 <div id="akaike-information-criteria" class="section level3">
 <h3>Akaike information criteria</h3>
-<p>One way of determining whether the magnitude of a drop in objective function is worthy of retaining the more complex model is to use the Akaike information criteria (AIC) <span class="math display">\[AIC=(OBV_{simple}-OBV_{complex}) + 2k\]</span> where <span class="math inline">\(k\)</span> is the number of additional model parameters added to the simple model to make the complex model. A negative <span class="math inline">\(AIC\)</span> provides (some) justification for retaining the more complex model, alongside improved diagnostic plots. You can view the OFV by running . You can see that the OFV for the one-compartment model was -12.59 and for the two-compartment model was -99.71. There were two additional parameters in the two-compartment model (<span class="math inline">\(Q\)</span> and <span class="math inline">\(V_2\)</span>), so you can see we would meet the <span class="math inline">\(AIC\)</span> for keeping the more complex model here.</p>
+<p>One way of determining whether the magnitude of a drop in objective function is worthy of retaining the more complex model is to use the Akaike information criteria (AIC) <span class="math display">\[AIC=(OBV_{simple}-OBV_{complex}) + 2k\]</span> where <span class="math inline">\(k\)</span> is the number of additional model parameters added to the simple model to make the complex model. A negative <span class="math inline">\(AIC\)</span> provides (some) justification for retaining the more complex model, alongside improved diagnostic plots. You can view the OFV by running <TT>drugxfit</TT>. You can see that the OFV for the one-compartment model was -12.59 and for the two-compartment model was -99.71. There were two additional parameters in the two-compartment model (<span class="math inline">\(Q\)</span> and <span class="math inline">\(V_2\)</span>), so you can see we would meet the <span class="math inline">\(AIC\)</span> for keeping the more complex model here.</p>
 </div>
 </div>
 </div>
-<div id="homework" class="section level1">
-<h1>Homework</h1>
+<div id="further-exercises" class="section level1">
+<h1>Further exercises</h1>
 <ul>
 <li>Have a look at a visual predictive check (vpc) for our model, the code for this is below</li>
 <li>Have a snoop around online to see if you can find out what a good vpc should look like</li>

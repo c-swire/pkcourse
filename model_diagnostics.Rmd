@@ -1,5 +1,5 @@
 ---
-title: "Chapter 5: Model diagnostics"
+title: "Model diagnostics"
 author: "Dagan Lonsdale"
 
 output:
@@ -36,12 +36,10 @@ In this chapter, we will start to answer the questions:
 and
 \begin{center} \textit{How do I know if one model is better than another?} \end{center}
 
-We will start to explore the output from an \texttt{nlmixr2} model fit and think about the idea of model diagnostics, which may be numerical, graphical or even simulation based. We will start with thinking about the straightforward linear-regression model and then move on to modelling some pharmacokinetic data. 
+We will start to explore the output from an <TT>nlmixr2</TT> model fit and think about the idea of model diagnostics, which may be numerical, graphical or even simulation based. We will start with thinking about the straightforward linear-regression model and then move on to modelling some pharmacokinetic data. 
 
 ## Learning outcomes  
 
-
-* With the example of the linear-regression model, use model diagnostics to evaluate the model fit and assess whether the assumptions made when applying a linear regression model are reasonable
 * Describe some standard diagnostic plots for a non-linear mixed-effects model
   + DV vs PRED/IPRED, CWRES vs TAD
 * Explain how weighted residuals can be used to develop a model
@@ -52,122 +50,6 @@ We will start to explore the output from an \texttt{nlmixr2} model fit and think
 * Explain how the objective function value may be useful in quantitative evaluation of model fit
   + Define the Akaike Information Criteria ($AIC$) and describe how it may be used to select a superior model
 
-
-# Introduction to model diagnostics using linear regression as an example
-
-You should be conscious that the vast majority of modelling processes require some assumptions to be made. This is as true for the simple t-test as it is for non-linear mixed-effects models. What *I don't think* you have thought about much on this course is how to assess whether making these assumptions was the right call for your data. 
-
-You will hopefully be aware that linear-regression modelling requires four assumptions to be met:
-
-* There is a linear relationship between the outcome and predictor variables 
-  + *Hopefully this doesn't come as a shock!*
-* The variance of residuals is the same for any value of the predictor variable (**this is known as homoscedasticity**)
-* There is **independence** between observations
-* Residuals at any predictor value are normally distributed (**normality**)
-
-Let's think about how we assess whether this is true or not *after* we have undertaken linear regression modelling. 
-
-## Back to the carrots!
-
-Let's look at this with our carrot data. You will recall that we looked at the residuals by plotting them (Figure \@ref(fig:lm)). 
-
-
-```{r,echo = FALSE,eval=TRUE, message=FALSE}
-carrot<-read_csv("https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/main/carrot_data.csv")
-
-```
-
-
-```{r lm,echo = F,eval=T, fig.cap="Carrot data with linear regression line and residual error (dotted red lines)",fig.width=7,fig.height=3,fig.align='center',message=FALSE}
-fit<-lm(weight~length,data=carrot)
-fit$stdres<-rstandard(fit) #kept but we dont actually use
-
-
-ci<-predict(fit, interval='confidence') # create table with the 95% confidence intervals 
-carrot<-cbind(carrot,ci) # combine this with our original data
-
-ggplot(data=carrot, aes(x=length, y=weight))+
-  geom_point(size=2)+ 
-  geom_segment(aes(x=length,xend=length,y=weight,yend=fit),col='red', linetype='dotdash')+
-  geom_line(aes(y=fit), col='blue')+
-  xlab("Length (cm)")+ylab("Weight (g)")+
-  theme_bw(base_size=9)
-
-```
-
-We can extend this process and plot several diagnostic plots from using the residuals and ouput form the linear regression. Rather than complex \texttt{ggplot2} code, I'm opting to use \texttt{base R} with \texttt{plot(fit, which = 1:2)}. You can see the output from this in Figure \@ref(fig:resid).
-
-### Checking linearity and homoscedasticity 
-
-Figure \@ref(fig:resid)(a) shows the plot of fitted values vs residuals. Here, you can see that the residuals are spread evenly between positive and negative values and that this pattern is repeated along all observed values of carrot length (our predictor variable). If there was no linearity, we would expect some unusually large values on this plot. If there was no homoscedasticity, the spread of the data would change (larger values for certain values of carrot weight). 
-
-### Checking normality
-For this, we use something called a Normal Q-Q plot. Figure \@ref(fig:resid)(b) shows this. I'm not going to spend long focusing on this, suffice to say that data meeting the normality assumption should have observations that run along the line of unity ($y=x$), which they do here.   
-
-```{r resid,echo = TRUE,fig.cap='linear regression model diagnostics for carrot data', fig.subcap=c('',''),fig.ncol = 2, out.width = "50%",eval=TRUE, message=FALSE}
-
-carrot<-
-  read_csv("https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/main/carrot_data.csv")
-fit<-lm(weight~length,data=carrot)
-plot(fit, which=1:2)
-```
-
-## Task 1
-
-* Download the aubergine dataset from GitHub
-
-Run \texttt{read\_csv("https://raw.githubusercontent.com/dlonsdal/SGUL\_PK\_data/main/aubergine.csv")}
-
-* Fit a linear model to it
-  + Have a look at the associated p-value using \texttt{summary(modelfit)}
-* Plot the diagnostic plots
-  + Note what you think may be wrong
-* Then plot aubergine weight vs length
-  + Does this explain the errors you found?
-  
-
-## Task 1 solution 
-
-```{r,eval=F}
-
-aubergine<-
-  read_csv("https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/main/aubergine.csv")
-```
-```{r,echo=F,message=F,warning=FALSE, results='hide'}
-aubergine<-read_csv("https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/main/aubergine.csv")
-```
-```{r}
-fit<-lm(weight~length,data=aubergine)
-summary(fit)
-```
-
-You can see that if you looked just at the p-value you might consider there to be a strong, linear relationship and that linear modelling was appropriate. Now look at the diagnostic plots. 
-
-```{r aubresid,echo = TRUE,fig.cap='linear regression model diagnostics for aubergine data', fig.subcap=c('',''),fig.ncol = 2, out.width = "50%",eval=TRUE, message=FALSE}
-plot(fit, which=1:2)
-```
-You can see from Figure \@ref(fig:aubresid) that almost none of the assumptions hold in the modelling of these data. You can see why in the plot of aubergine length versus weight (Figure \@ref(fig:aublm)). The relationship between the variables is not linear!  
-
-```{r aublm,echo = F,eval=T, fig.cap="Aubergine data with linear regression line and residual error (dotted red lines)",fig.width=7,fig.height=3,fig.align='center',message=FALSE}
-
-
-
-ci<-predict(fit, interval='confidence') # create table with the 95% confidence intervals 
-aubergine<-cbind(aubergine,ci) # combine this with our original data
-
-ggplot(data=aubergine, aes(x=length, y=weight))+
-  geom_point(size=2)+ 
-  geom_segment(aes(x=length,xend=length,y=weight,yend=fit),col='red', linetype='dotdash')+
-  geom_line(aes(y=fit), col='blue')+
-  xlab("Length (cm)")+ylab("Weight (g)")+
-  theme_bw(base_size=9)
-
-```
-
-This is a slightly artificial scenario to demonstrate how graphical diagnostics can help to tell you that there is a problem with your model. In reality here, if we had done our job properly and plotted the data *first* we would have seen that the relationship does not look linear. 
-
-Now, back to PK models...........
-
 # Introduction to diagnostic plots for non-linear mixed-effects pharmacokinetic models
 
 There are a wealth of diagnostic plots that can be used to think about how well a model fits data from an experiment. We will look at a few key examples.
@@ -176,7 +58,7 @@ There are a wealth of diagnostic plots that can be used to think about how well 
 
 The most straightforward diagnostic plot available is a plot of observations (dependent variable, DV) vs predicted concentrations from a model. There are two subsets of this type of plot. The first, DV vs PRED takes predictions based on population parameters (i.e. excluding $\eta$'s) and the second is DV vs IPRED, which bases predictions on individual values for model parameters (including $\eta$'s).
 
-Figure \@ref(fig:frufit) shows these diagnostic plots for the furosemide data we modeled last week. If you haven't saved your model fit, you can download mine from Github.
+Figure \@ref(fig:frufit) shows these diagnostic plots for the furosemide data.
 
 
 ```{r frufit,echo=T,eval=T,fig.cap="Basic diagnostic plots for furosemide one-compartment, oral-absorption model fit from Chapter 4", fig.subcap=c('DV vs PRED','DV vs IPRED'),fig.ncol = 2, out.width = "50%", fig.align = 'center', warning=F,message=F}
@@ -208,7 +90,7 @@ In our example in Figure \@ref(fig:frufit)(a) we can see that there is pretty re
 Figure \@ref(fig:frufit)(b) shows DV vs IPRED This is individualised predictions, taking into account that random-effect associated with an individual ($\eta). Again, the perfect model fit has all lines along the line of unity. DV vs IPRED plots will generally always look a little better than DV vs PRED plots in this regard. However, it is unusual to get such a tight fit as we see in Figure \@ref(fig:frufit)(b) as usually there is additional unexplained variability in data. The example here looks relatively perfect because I simulated these data and I did not simulate complex variability!
 
 
-## Task 2
+## Task 1
 For this task we will be using some simulated data. In this simulated experiment, 20 participants were given 1000 mg oral dose of Drug X. Seven pharmacokinetic samples were taken in the subsequent hours. 
 
 * Download simulated data 
@@ -257,9 +139,9 @@ ggplot(modfit,aes(x=PRED,y=DV))+
   geom_smooth(col='red',se=F)+xlim(0,10)+ylim(0,10)
 ```
 
-## Task 2 solution
+## Task 1 solution
 
-```{r drugxone,cache=FALSE,echo=F,eval=T,fig.cap="Basic diagnostic plots for drug X one-compartment, oral-absorption model fit", fig.subcap=c('Concentration-time plot','Semi-log concentration-time plot','DV vs PRED','DV vs IPRED'),fig.ncol = 2, out.width = "50%", fig.align = 'center', warning=F,message=F}
+```{r drugxone,cache=FALSE,echo=F,results='hide',eval=T,fig.cap="Basic diagnostic plots for drug X one-compartment, oral-absorption model fit", fig.subcap=c('Concentration-time plot','Semi-log concentration-time plot','DV vs PRED','DV vs IPRED'),fig.ncol = 2, out.width = "50%", fig.align = 'center', warning=F,message=F}
 
 drugxsim<-read_csv("https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/main/drugxsim.csv")
 drugxsim$ID<-as.factor(drugxsim$ID)
@@ -320,11 +202,11 @@ Figure \@ref(fig:drugxone) shows a quite inconsistent fit over the range of obse
 ## Conditionally-weighted residuals
 We can look at the idea of residuals from our non-linear mixed-effects models in the same way as we did with our linear models. We can look to see that our residuals remain even across the range of sampling times and observed concentrations.
 
-We are going to introduce a further step, normalising the residuals through a weighting step. This is important because residuals might be influenced by the magnitude of the observation (e.g. you might find a greater range of residuals around $C_{max}$ compared to around $C_{min}$). Weighting the residuals in order to standardise them makes it easier to think about what is happening with model predictions across the full range of observations. We will use conditionally weighted residuals (\texttt{CWRES}), which are a fairly standard form of residual. You don't need to know exactly how these are created, unless you decide to pursue modelling as a career of course...... 
+We are going to introduce a further step, normalising the residuals through a weighting step. This is important because residuals might be influenced by the magnitude of the observation (e.g. you might find a greater range of residuals around $C_{max}$ compared to around $C_{min}$). Weighting the residuals in order to standardise them makes it easier to think about what is happening with model predictions across the full range of observations. We will use conditionally weighted residuals (<TT>CWRES</TT>), which are a fairly standard form of residual. You don't need to know exactly how these are created, unless you decide to pursue modelling as a career of course...... 
 
-Additionally, this leads to a situation where the conditionally weighted residuals (\texttt{CWRES}) should follow an approximately normal distribution with mean zero and variance 1.$$CWRES\sim N(0,1)$$ This is helpful because we can expect 99.7% of data points to fall within $+/- 3$. We can look for trends in this kind of plot to help with our model building process. 
+Additionally, this leads to a situation where the conditionally weighted residuals (<TT>CWRES</TT>) should follow an approximately normal distribution with mean zero and variance 1.$$CWRES\sim N(0,1)$$ This is helpful because we can expect 99.7% of data points to fall within $+/- 3$. We can look for trends in this kind of plot to help with our model building process. 
 
-\texttt{nlmixr2} will output \texttt{CWRES} through an additional \texttt{tableControl()} command.
+<TT>nlmixr2</TT> will output <TT>CWRES</TT> through an additional <TT>tableControl()</TT> command.
 
 ```{r, cache=F,warning=FALSE,message=FALSE, results='hide'}
 
@@ -344,9 +226,9 @@ ggplot(modfit,aes(x=tad,y=CWRES))+
   geom_smooth(col='red',se=F)+
   ylim(-3,3)
 ```
-You can see from Figure \@ref(fig:cwres) that we are lacking in a uniform distribution of \texttt{CWRES} across sampling times. In fact, this U-shape that is seen in the \texttt{CWRES} plot can be indicative of the need for an additional compartment in the model. Perhpas you might have thought this when looking at the raw data plot. 
+You can see from Figure \@ref(fig:cwres) that we are lacking in a uniform distribution of <TT>CWRES</TT> across sampling times. In fact, this U-shape that is seen in the <TT>CWRES</TT> plot can be indicative of the need for an additional compartment in the model. Perhpas you might have thought this when looking at the raw data plot. 
 
-## Task 3
+## Task 2
 
 ```{r twocpt, echo = FALSE, message=FALSE, fig.align='center', fig.cap='Two-compartment oral-absorption model',out.width="60%"}
 knitr::include_graphics("tworal.png")
@@ -358,10 +240,10 @@ knitr::include_graphics("tworal.png")
 * Have a look at \texttt{drugxfit\$OBJF} for the one- and two- compartment model fit
  + What do you notice about this numerical value
 
-You will need to write a function for a two-compartment oral-absorption model. Have a look at Figure \@ref(fig:twocpt) and see if you can work out what to change from your one compartment model. Failing that, go for \texttt{Google}!
+You will need to write a function for a two-compartment oral-absorption model. Have a look at Figure \@ref(fig:twocpt) and see if you can work out what to change from your one compartment model. Failing that, go for <TT>Google</TT>
 
 
-## Task 3 solution
+## Task 2 solution
 
 Again, note that the model is sensitive to initial parameter estimates. Trial the ones below and compare the output to other initial parameter estimates (ini block).
 ```{r warning=FALSE,cache=F, message=FALSE, results='hide'}
@@ -434,9 +316,9 @@ Objective function value is measure of model fit. I do not propose that you lear
 What is important for you to note is that the objective function can be used to compare two models. In general, a lower objective function value indicates a superior model fit.
 
 ### Akaike information criteria
-One way of determining whether the magnitude of a drop in objective function is worthy of retaining the more complex model is to use the Akaike information criteria (AIC) $$AIC=(OBV_{simple}-OBV_{complex}) + 2k$$ where $k$ is the number of additional model parameters added to the simple model to make the complex model. A negative $AIC$ provides (some) justification for retaining the more complex model, alongside improved diagnostic plots. You can view the OFV by running \texttt{drugxfit\$OBJF}. You can see that the OFV for the one-compartment model was `r A` and for the two-compartment model was `r B`. There were two additional parameters in the two-compartment model ($Q$ and $V_2$), so you can see we would meet the $AIC$ for keeping the more complex model here. 
+One way of determining whether the magnitude of a drop in objective function is worthy of retaining the more complex model is to use the Akaike information criteria (AIC) $$AIC=(OBV_{simple}-OBV_{complex}) + 2k$$ where $k$ is the number of additional model parameters added to the simple model to make the complex model. A negative $AIC$ provides (some) justification for retaining the more complex model, alongside improved diagnostic plots. You can view the OFV by running <TT>drugxfit</TT>. You can see that the OFV for the one-compartment model was `r A` and for the two-compartment model was `r B`. There were two additional parameters in the two-compartment model ($Q$ and $V_2$), so you can see we would meet the $AIC$ for keeping the more complex model here. 
 
-# Homework
+# Further exercises
 
 * Have a look at a visual predictive check (vpc) for our model, the code for this is below
 * Have a snoop around online to see if you can find out what a good vpc should look like

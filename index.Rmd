@@ -2,4 +2,49 @@
 title: "Welcome"
 ---
 
-To be written
+Aim of the PK training day:
+To be able run basic PK analyses in R, interpret the outputs, and describe how sepsis alters drug behaviour in ways that have implications for dosing.
+
+```{r echo=FALSE}
+library(knitr)
+
+schedule <- data.frame(
+  Time = c(
+    "10:00–10:45",
+    "10:45–11:00",
+    "11:00–12:30",
+    "12:30–13:30",
+    "13:30–15:00",
+    "15:00–15:45",
+    "15:45–17:00"
+  ),
+  Activity = c(
+    "Initial Lecture",
+    "Break",
+    "Session 1",
+    "Lunch",
+    "Session 2",
+    "Break",
+    "Session 3"
+  )
+)
+
+kable(schedule, caption = "Timetable")
+```
+
+# Set-up for the practical sessions
+
+We are planning for everyone to use RStudio via [Posit Cloud](https://posit.cloud/).
+
+This is simple to set up. Please would you register for a free account and install the required packages as outlined in [this](https://dlonsdal.github.io/SGUL_PK_data/videos/positsetup.mp4) two-minute video. 
+
+For those of you who already have RStudio, we still recommend using Posit Cloud as the nlmixr2 package can be a bit tricky to install. 
+
+# Teaching materials
+
+All the teaching materials on this webpage are adapted from materials developed by Dr Dagan Lonsdale. 
+
+These are designed to walk you through what you need to know to carry out the tasks in each session. 
+
+# Datasets for use during today's tasks
+

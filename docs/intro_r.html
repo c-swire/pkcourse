@@ -413,18 +413,14 @@ text-align: justify}
 </style>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>In this session you will be introduced to the practical side of pharmacokinetics - with a data workshop. You will be introduced to ‘<TT>R</TT>’: a language and environment for statistical computing and its parter programme ‘RStudio’, which provides a handy user interface for ‘<TT>R</TT>’.</p>
-<p>We will use ‘<TT>R</TT>’ to undertake visualisation of pharmacokinetic data using the ‘<TT>R</TT>’ package ‘<TT>ggplot2</TT>’. We will also estimate an important pharmacokinetic parameter (<span class="math inline">\(C_{max}\)</span>) associated with the time concentration profile of an IV-bolus dose of a drug.</p>
-<p>This session has been designed to progress your knowledge of pharmacokinetics and give you an introduction into the world of using code to analyse, visualise and communicate with data - skills that the drug development industry consistently tell us they need from graduates.</p>
+<p>This page walks you through an introduction to RStudio.</p>
 <div id="learning-outcomes" class="section level2">
 <h2>Learning outcomes</h2>
-<p>In today’s session, we will aim to build on the material covered in the pre-session unit on Canvas. By the end of this week you should be able to:</p>
 <ul>
-<li>Access <TT>R</TT> and <TT>RStudio</TT> onto your own computer or a University PC</li>
+<li>Access <TT>R</TT> and <TT>RStudio</TT> using Posit Cloud</li>
 <li>Understand the different windows in the <TT>RStudio</TT> desktop</li>
 <li>Make and save an <TT>R</TT> script</li>
 <li>Undertake some basic calculations using <TT>R</TT></li>
-<li>Create a directory and set the <TT>R</TT> working directory using <TT>setwd()</TT></li>
 <li>Import a .csv data file into <TT>R</TT></li>
 <li>View a data frame</li>
 <li>Describe the difference between ‘long’ and ‘wide’ data formats and which is used for pharmacokinetic modelling</li>
@@ -442,8 +438,8 @@ text-align: justify}
 </ul>
 <p>This document is designed to provide you with notes of the session and be a handy resource when you come to revision. There are examples of code and the corresponding output from <TT>R</TT> as we go along.</p>
 </div>
-<div id="accessing-r-and-rstudio-on-a-university-computer" class="section level2">
-<h2>Accessing <TT>R</TT> and <TT>RStudio</TT> on a University computer</h2>
+<div id="accessing-r-and-rstudio-on-posit-cloud" class="section level2">
+<h2>Accessing <TT>R</TT> and <TT>RStudio</TT> on Posit Cloud</h2>
 <p>The two key tools for this session will be <TT>R</TT> and <TT>RStudio</TT>. These are free, open source pieces of software. They are both available on the University computers, but you may choose to download them onto your personal laptop or home computer.</p>
 <p>‘<TT>R</TT>’ is a language and environment for statistical computing. <TT>R</TT> is very powerful but it was not designed with the ‘everyday’ user in mind. ‘<TT>RStudio</TT>’ is a user interface that makes using ‘<TT>R</TT>’ far easier. You can think of the relationship between ‘<TT>R</TT>’ and ‘<TT>RStudio</TT>’ as similar to the relationship between the lines of code (<TT>R</TT>) running your computer that you do not see behind the user interface you use - MS Windows (<TT>RStudio</TT>) or as the relationship between equipment for an experiment (<TT>R</TT>) and the laboratory that houses it (<TT>RStudio</TT>).</p>
 <p>When you are using a University computer, you need to access <TT>RStudio</TT> via the University servers.</p>
@@ -1247,12 +1243,11 @@ F
 #note that you need the &#39;.&#39; before &#39;libPaths&#39;
 
 library(tidyverse)</code></pre>
-<p><strong>Note</strong> that if you are using RStudio on the stats4 server you <em>can</em> download packages yourself by using <TT>install.packages()</TT> but this downloads the package to your personal hard drive and there is a limited amount of space on this so I recommend against doing this.</p>
 </div>
 <div id="summarising-data-with-summarise-function-using-piping-and-estimating-c_max" class="section level1">
 <h1>Summarising data with <TT>summarise()</TT> function, using piping <TT>%&gt;%</TT> and estimating <span class="math inline">\(C_{max}\)</span></h1>
 <p>We will use the <TT>summarise()</TT> function (note this is different from <TT>summary()</TT>). Stick <TT>summarise()</TT> into help in your <TT>RStudio</TT> help tab and look at the options that <TT>summarise()</TT> gives you. If you scroll down, you will see some ‘useful functions’ and, at the bottom, it gives you some examples of the function in use. You will see here that there are some funny ‘<TT>%&gt;%</TT>’ symbols. This is known as piping.</p>
-<p>Piping is a tool that allows us to undertake multiple logical steps to achieve a desired output in our text. Technically, <TT>%&gt;%</TT> is found in the <TT>magrittr()</TT> package, but when you load <TT>tidyverse()</TT> , <TT>magrittr()</TT> is automatically loaded.</p>
+<p>Piping is a tool that allows us to undertake multiple logical steps to achieve a desired output in our text.</p>
 <p>Let’s say we wanted to check the maximum concentration in our dataset made sense, to check for outliers. If we apply <TT>summarise(amox,max(conc))</TT> we are given 43.47. This is the same output as from <TT>summary()</TT>, above. What if we want to know the maximum concentration for each ID number. Well, we can do this with piping.</p>
 <pre class="r"><code>amox%&gt;%
   group_by(ID)%&gt;%
@@ -1284,7 +1279,7 @@ library(tidyverse)</code></pre>
 </div>
 <div id="plotting-data" class="section level1">
 <h1>Plotting data</h1>
-<p>OK. Now to have some fun with data visualisation. You are used to clicking with a user interface in excel or SPSS. I am going to show you how make plots with <TT>R</TT> code. Why bother? Well, you can make awesome, customisable plot code and then when you have a new data set, you just copy and paste the code, change the variables and hey presto, rapid plotting without having to point and click.</p>
+<p>OK. Now to have some fun with data visualisation. You are used to clicking with a user interface in Excel. I am going to show you how make plots with <TT>R</TT> code. Why bother? Well, you can make awesome, customisable plot code and then when you have a new data set, you just copy and paste the code, change the variables and hey presto, rapid plotting without having to point and click.</p>
 </div>
 <div id="plotting-with-ggplot2" class="section level1">
 <h1>Plotting with <TT>ggplot2</TT></h1>
