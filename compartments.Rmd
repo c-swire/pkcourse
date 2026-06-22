@@ -109,7 +109,6 @@ b<-ggplot(data.frame(x=seq(0,24,1)), aes(x))+
   annotate("text", x = 14, y = 4, parse = TRUE,
            label = "Gradient==k[e]",size=3)
 
-library(gridExtra)
 grid.arrange(a,b,ncol=2)
 ```
 ## Calculating volume of distribution and clearance in the one-compartment IV-bolus model
@@ -279,7 +278,6 @@ b2<-ggplot(data.frame(x=seq(0,24,1)), aes(x))+
   xlab("Time (hours)") + ylab("Concentration (microg/L)")+
   scale_y_log10()+
   theme_bw(base_size=9)+ scale_x_continuous(breaks=seq(0,24,4)) 
-library(gridExtra)
 grid.arrange(a,b,a2,b2,ncol=2)
 ```
 

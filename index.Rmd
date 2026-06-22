@@ -2,12 +2,15 @@
 title: "Welcome"
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.pos= "H")
+library(knitr)
+```
+
 Aim of the PK training day:
 To be able run basic PK analyses in R, interpret the outputs, and describe how sepsis alters drug behaviour in ways that have implications for dosing.
 
-```{r echo=FALSE, results='hide'}
-library(knitr)
-
+```{r echo=FALSE}
 schedule <- data.frame(
   Time = c(
     "10:00–10:45",
@@ -32,7 +35,7 @@ schedule <- data.frame(
 kable(schedule, caption = "Timetable")
 ```
 
-# Set-up for the practical sessions
+### Set-up for the practical sessions
 
 We are planning for everyone to use RStudio via [Posit Cloud](https://posit.cloud/).
 
@@ -40,11 +43,11 @@ This is simple to set up. Please would you register for a free account and insta
 
 For those of you who already have RStudio, we still recommend using Posit Cloud as the nlmixr2 package can be a bit tricky to install. 
 
-# Teaching materials
+### Teaching materials
 
 All the teaching materials on this webpage are adapted from materials developed by Dr Dagan Lonsdale. 
 
 These are designed to walk you through what you need to know to carry out the tasks in each session. 
 
-# Datasets for use during today's tasks
+### Datasets for use during today's tasks
 

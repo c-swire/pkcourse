@@ -444,9 +444,11 @@ text-align: justify}
 <li><p>Estimate Vd and Cl for Healthy dataset</p></li>
 <li><p>Estimate Vd and Cl for Sepsis dataset</p></li>
 </ul>
-<p>Extension tasks:
-* Can you put plots of Healthy and Sepsis datasets on the same Figure?
-* Can you make a table to compare <span class="math inline">\(C_{max}\)</span>, <span class="math inline">\(T_{max}\)</span> and <span class="math inline">\(AUC_{0-t}\)</span> for Healthy and Sepsis datasets?</p>
+<p>Extension tasks:</p>
+<ul>
+<li>Can you put plots of Healthy and Sepsis datasets on the same Figure?</li>
+<li>Can you make a table to compare <span class="math inline">\(C_{max}\)</span>, <span class="math inline">\(T_{max}\)</span> and <span class="math inline">\(AUC_{0-t}\)</span> for Healthy and Sepsis datasets?</li>
+</ul>
 </div>
 <div id="packages-you-need-for-this-session" class="section level1">
 <h1>Packages you need for this session</h1>
@@ -496,8 +498,7 @@ Figure 1: Participant ‘A’ oral concentration-time profile, with trapezoids i
 The two heights correspond to concentrations B and C and the base is the distance A to D (the change in time <span class="math inline">\(\Delta t\)</span>) in Figure <a href="#fig:trap">1</a>. So more fully for this example, where <em>height</em> is replaced with <em>concentration</em> <span class="math inline">\((C)\)</span>: <span class="math display">\[AUC_{0-8} = \sum_{t=0}^{t=8} \Delta t\frac{(C_1+C_2)}{2}\]</span></p>
 <p>Fortunately,<TT>R</TT> has an inbuilt function that allows us to calculate the <span class="math inline">\(AUC\)</span>. The handily named <TT>AUC()</TT> function. You need to provide it with three commands, <TT>x=…,y=…</TT> and <TT>method=“trapezoid”</TT>. It is in the <TT>DescTools</TT> library.</p>
 <p>I will show you how to calculate using the oral data.</p>
-<pre class="r"><code>library(DescTools)
-ORAL%&gt;% 
+<pre class="r"><code>ORAL%&gt;% 
   group_by(id) %&gt;% 
   summarise(AUC=AUC(time,conc,method=&#39;trapezoid&#39;))</code></pre>
 <pre><code>## # A tibble: 6 × 2
@@ -525,19 +526,18 @@ Figure 2: Participant ‘A’ IV concentration-time profile with curved line of 
 </div>
 <p>It is worth noting the trapezoid method has limitations. Most notably that it will <em>overestimate</em> <span class="math inline">\(AUC\)</span> by virtue of taking a straight line between points, when the true concentration will fall in an logarithmic (curve) fashion (Figure <a href="#fig:trapbest">2</a>). There are methods to improve this accuracy, such as the logarithmic trapezoidal method. With this method, the ‘trapezoid’ is given a curved top (like the red line in Figure <a href="#fig:trapbest">2</a>). The formula for this method is <span class="math display">\[AUC = \sum_{t=0}^{t=\tau} \frac{\Delta t}{ln(\frac{C_1}{C_2})} (C_1+C_2)\]</span></p>
 <div style="page-break-after: always;"></div>
-<div id="using-package-to-undertake-non-compartmental-analysis" class="section level3">
-<h3>Using package to undertake non-compartmental analysis</h3>
-<p>If that all seems like too much hard work and should just jolly well get on and do for us then you are right! There are a few non-compartmental analysis packages available, we will use . Remember you will need to run the first time you wish to use this package, once it has been installed you need to run .</p>
-<p>To run non-compartmental analysis using this package, we need to give some dosing data. We know that all the participants were given a dose of 1000 mg of amoxicillin at time <span class="math inline">\(t=0\)</span>. To add a new column (variable) using we use the function.</p>
+<div id="using-r-package-pknca-to-undertake-non-compartmental-analysis" class="section level3">
+<h3>Using <TT>R</TT> package <TT>PKNCA</TT> to undertake non-compartmental analysis</h3>
+<p>If that all seems like too much hard work and <TT>R</TT> should just jolly well get on and do for us then you are right! There are a few non-compartmental analysis packages available, we will use <TT>PKNCA</TT>. Remember you will need to run <TT>install.packages(“PKNCA”)</TT> the first time you wish to use this package, once it has been installed you need to run <TT>library(PKNCA)</TT>.</p>
+<p>To run non-compartmental analysis using this package, we need to give <TT>PKNCA</TT> some dosing data. We know that all the participants were given a dose of 1000 mg of amoxicillin at time <span class="math inline">\(t=0\)</span>. To add a new column (variable) using <TT>%&gt;%</TT> we use the <TT>mutate</TT> function.</p>
 <pre class="r"><code>amox&lt;- read.csv(&quot;https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/refs/heads/main/amoxicillinPK.csv&quot;) 
 
 damox&lt;-amox %&gt;%  # remember we will need to save this as a new object
   subset(time==0) %&gt;% 
   mutate(dose=1000) #this produces a new variable dose 1000</code></pre>
 <p><strong>Task:</strong> Run this line of code and have a look at the newly created ‘damox’ object</p>
-<p>Now we can call and run . First we create a sampling (or concentration) object and then a dosing object. In each function we instruct of the names of our data object and the relevant variables in it. Then we combine the two and run our non-compartmental analysis.</p>
-<pre class="r"><code>library(PKNCA)
-conc&lt;-PKNCAconc(amox, conc~time|ID) #create sampling object
+<p>Now we can call and run <TT>PKNCA</TT>. First we create a sampling (or concentration) object and then a dosing object. In each function we instruct <TT>PKNCA</TT> of the names of our data object and the relevant variables in it. Then we combine the two and run our non-compartmental analysis.</p>
+<pre class="r"><code>conc&lt;-PKNCAconc(amox, conc~time|ID) #create sampling object
 dose&lt;-PKNCAdose(damox, dose~time|ID) #create dosing object
 full&lt;-PKNCAdata(conc, dose)  #combine
 results&lt;-pk.nca(full)  # analyse

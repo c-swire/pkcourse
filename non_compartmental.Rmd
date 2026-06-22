@@ -48,6 +48,8 @@ knitr::opts_chunk$set(echo = TRUE, fig.pos= "H")
 library(tidyverse)
 library(kableExtra)
 library(PKNCA)
+library(gridExtra)
+library(DescTools)
 ```
 
 # Learning outcomes  
@@ -223,7 +225,7 @@ b<-ggplot(data=soral, aes(time,conc))+
   geom_text(x=6, y=soral$conc[10], label="C", hjust= -0.5,vjust=-0.25, size=3)+
   geom_text(x=6, y=0, label="D", hjust= -0.25, vjust = 1, size=3)
 
-library(gridExtra)
+
 grid.arrange(a,b,ncol=2)
 ```
 
@@ -235,7 +237,7 @@ Fortunately,<TT>R</TT> has an inbuilt function that allows us to calculate the $
 I will show you how to calculate using the oral data. 
 
 ```{r AUC,   message=FALSE, warning=FALSE}
-library(DescTools)
+
 ORAL%>% 
   group_by(id) %>% 
   summarise(AUC=AUC(time,conc,method='trapezoid'))
@@ -314,7 +316,7 @@ damox<-amox %>%  # remember we will need to save this as a new object
 Now we can call and run <TT>PKNCA</TT>. First we create a sampling (or concentration) object and then a dosing object. In each function we instruct <TT>PKNCA</TT> of the names of our data object and the relevant variables in it. Then we combine the two and run our non-compartmental analysis. 
 
 ```{r, results='hold', eval=FALSE}
-library(PKNCA)
+
 conc<-PKNCAconc(amox, conc~time|ID) #create sampling object
 dose<-PKNCAdose(damox, dose~time|ID) #create dosing object
 full<-PKNCAdata(conc, dose)  #combine
@@ -322,7 +324,7 @@ results<-pk.nca(full)  # analyse
 summary(results) #summarise the results
 ```
 ```{r, results='hold', echo=FALSE}
-library(PKNCA)
+
 conc<-PKNCAconc(amox, conc~time|ID) #create sampling object
 dose<-PKNCAdose(damox, dose~time|ID) #create dosing object
 full<-PKNCAdata(conc, dose)  #combine

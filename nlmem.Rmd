@@ -43,6 +43,18 @@ header-includes:
 
 ---
 
+<style>
+h1.title {
+  font-size: 48px;
+
+  text-align: center;
+}
+h4.author { 
+  text-align: center;
+}
+body {
+text-align: justify}
+</style>
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, fig.pos= "H")
@@ -51,32 +63,35 @@ library(kableExtra)
 library(gridExtra)
 library(PKNCA) 
 library(RColorBrewer)
+library(broom)
+library(nlmixr2)
 ```
 
 # Learning outcomes  
 
-* Describe what a compartmental model adds over NCA
+* Describe what a compartmental model adds over non-compartmental analysis
 * Fit a one-compartment IV bolus model in nlmixr2
-* Read a model parameter table and relate the estimates to the NCA values from Session 1
+* Read a model parameter table and relate the estimates to the values from Session 1
 
 # Tasks
 
-* Fit a one-compartment IV bolus model for the Healthy dataset
-* Fit a one-compartment IV bolus model for the Sepsis dataset
+* Fit a one-compartment IV bolus model for the 'Healthy' dataset
+* Fit a one-compartment IV bolus model for the 'Sepsis' dataset
 * Compare volume of distribution and clearance values for the two datasets
 * Compare volume of distribution and clearance values using non-compartmental and compartmental analysis
 
-Extensions:
+### Extension tasks:
+
 * Fit two-compartment models to the datasets
 * Create diagnostic plots for your models (See Additional Materials)
 
 # Introduction 
 
-'Rich' data describes where there are lots of samples for each individual at each time point. This kind of data is really easy to produce in early-phase trials, including entry-into-human studies. 
+'Rich' data are where there are lots of samples for each individual at each time point. This kind of data is really easy to produce in early-phase trials, including entry-into-human studies. 
 
-However, at later phases of drug development, including post-marketing, pharmacokinetic data are often more challenging to obtain. In addition, rigid sampling times are less easy to implement outside of the confines of a dedicated pharmacokinetic study as patients or study participants are often at clinic or study visits at irregular times and so sampling may be somewhat opportunistic. Self-administered doses are also less likely to be accurately taken at prescribed times. These factors make modelling data using the non-compartmental methods we have used so far challenging and less accurate in these scenarios.
+However, at later phases of drug development, including post-marketing, pharmacokinetic data are often more challenging to obtain. In addition, rigid sampling times are less easy to implement outside of the confines of a dedicated pharmacokinetic study as patients or study participants are often at clinic or study visits at irregular times and so sampling may be somewhat opportunistic. Self-administered doses are also less likely to be accurately taken at prescribed times. These factors make modelling data using the non-compartmental methods we have used so far challenging and less accurate.
 
-The purpose of this session, is to introduce the concept of non-linear mixed-effects modelling. This will include introduction to the modelling package <TT>nlmixr</TT>. This package is challenging to install on your own machine, <TT>install.packages('nlmixr2')</TT> may work. If you run a Windows operating system, you are likely to also need <TT>rtools</TT>. You will need to follow instructions online on how to install and download this. Installation on an Apple Mac usually requires <TT>Xcode command line tools</TT> to be downloaded. We recommend using Posit Cloud for this session. 
+The purpose of this session, is to introduce the concept of non-linear mixed-effects modelling. This will include introduction to the modelling package <TT>nlmixr</TT>. This package is challenging to install on your own machine, <TT>install.packages('nlmixr2')</TT> may work. If you run a Windows operating system, you are likely to also need <TT>rtools</TT>. You will need to follow instructions online on how to install and download this. Installation on an Apple Mac usually requires <TT>Xcode command line tools</TT> to be downloaded. We recommend using [Posit Cloud](https://posit.cloud/) for this session. 
 
 ## Advantages and disadvantages of non-linear mixed-effects models
 
@@ -94,12 +109,31 @@ The purpose of this session, is to introduce the concept of non-linear mixed-eff
 * Time consuming
 * Often requires time cleaning/organising data from multiple sources 
 
-# The one-compartment IV-bolus model
-Time concentration-time profile of the one-compartment IV-bolus model (Figure \@ref(fig:onecpt)) may be described using the equation $$C=C_0e^{(-k_et)}$$ where $k_e=\frac{Cl}{V_d}$ and $C_0=\frac{Dose}{V_d}$
+# What is the point of a model?
 
-```{r onecpt, echo = FALSE, message=FALSE, fig.align='center', fig.cap='One-compartment model',fig.height=2,out.width='0.6\\linewidth'}
+It is clear that understanding data from a clinical trial is important. Pharmacokinetic data is the same as any other output from a trial. It is important to understand the data, what it means for the absorption, distribution, metabolism and excretion (ADME) of the compound AND it allows us to make suggestions for the next stage of drug development. This might include dose selection, frequency of administration or even decisions on formulation.
+
+Compartmental pharmacokinetic models simplify complex human physiology by describing the concentration-time course of a drug with (relatively) simple mathematical equations. These mathematical equations help to quantify ADME processes through the estimation of values for parameters such as clearance and volume of distribution.
+
+## One-compartment IV bolus model
+
+In the one compartment model IV bolus model, the body is simplified and represented as a single box, into which the dose of the drug is deposited instantaneously. Drug is assumed to distribute evenly and instantaneously throughout this compartment such that the contents of the box is assumed to be the same wherever you are within it.
+
+
+```{r onecpt, echo = FALSE, message=FALSE, fig.align='center', fig.cap='One-compartment model',fig.height=2,out.width="100%"}
 knitr::include_graphics("onecpt1.png")
 ```
+
+
+This single compartment is assumed to receive the drug instantly at the time of the intravenous dose. The compartment has a volume $V_1$, which in a one-compartment model is equal to the volume of distribution ($V_d$) of the drug. The concentration in this compartment is equal to the plasma concentration ($C_p$) and the amount of drug in the compartment ($A_1$) is equal to the total amount of drug in the body ($A_b$). Elimination of the drug is usually assumed to be a first-order process with elimination rate constant $k_e$. 
+
+## Relationship between $k_e$, $V_d$ and $Cl$ in the IV bolus model
+
+$k_e, V_1$ and clearance ($Cl$) are related \begin{equation} k_e=\frac{Cl}{V_1} \end{equation}.  
+
+## Concentration-time equation for the one-compartment IV bolus model
+
+The concentration $C$ at time $t$ for the one-compartment IV bolus model is \begin{equation} C=C_0e^{-kt} \end{equation} or, if you prefer to use clearance and volume of distribution \begin{equation} C=C_0e^{-\frac{Cl}{Vd}t} \end{equation} $C_0=$ Drug concentration at time $t=0$. 
 
 Taking the log of this equation provides us with $$log(C)=log(C_0)-k_et$$ which is an equation of a straight line, i.e. of the form $$y=mx+c$$ Data from a pharmacokinetic experiment may therefore be analysed using a compartmental approach and linear regression analysis, as calculating the gradient provides $k_e$ and the intercept provides $C_0$ from which $V_d$ may be calculated. 
 
@@ -141,414 +175,12 @@ ggplot(fit$model, aes_string(x = names(fit$model)[2], y = names(fit$model)[1])) 
 ggplotRegression(lm(log(conc) ~ time, data = fru))
 ```
 
-# Rich versus sparse data 
-## Rich data example
-Let's remind ourselves of what the output from a rich sampling schedule from a pharmacokinetic trial looks like. Figure \@ref(fig:rich) shows data from a simulated experiment of an orally administered 40mg dose of furosemide. There are 10 participants, each with a sample taken at 10 different time points. The fact that there are the same number of samples is important (it is known as *balanced* data). This reduces the possibility of one individual unduly influencing an analysis of data. 
-
-```{r rich,echo=F,eval=T,fig.cap="Rich data from a simulated pharmacokinetic trial (n=10, 10 samples per participant)", fig.subcap=c('Concentration plot','Semi-log concentration plot'),fig.ncol = 2, out.width = "50%", fig.align = 'center', warning=F,message=F}
-
-N<-10
-P<-0.5
-E<-6
-
-time<-rep(c(0,0.1,0.5,0.75,1,2,3,4,5,6),N)
-Q=length(time)/N
-ID<-rep(LETTERS[1:N],each=Q) 
-
-set.seed(2)
-mCl<-9.8  
-Cl<- mCl*exp(rep(rnorm(sd=0.4,n=N),each=Q))
-mV<-12.0  
-V<-mV*exp(rep(rnorm(sd=0.1,n=N),each=Q))
-
-ke<-Cl/V 
-Dose<-40 
-mka<-1.3
-ka<- mka*exp(rep(rnorm(sd=0.1,n=N),each=Q))
-F<-0.65
-
-onoral<- function(t) ((Dose*F*ka)/(V*(ka-ke)))*(exp(-ke*t)-exp(-ka*t))
-
-conc<- signif(onoral(time),2) 
-error<-rnorm(mean=0,sd=0.2,n=length(conc))
-conc<-conc+conc*error
-conc<-ifelse(conc<=0,0.001,conc)
-fru<-data.frame(ID,time,conc)
-frud<-fru %>% subset(time==0) %>% mutate(dose=40)
-
-
-conc<-PKNCAconc(fru, conc~time|ID) #create sampling object
-dose<-PKNCAdose(frud, dose~time|ID) #create dosing object
-manual <- data.frame(start=0, end=8,vz.obs=TRUE,kel.last=TRUE, cl.obs=TRUE)
-clvd<-PKNCAdata(conc,dose,intervals=manual)  #combine
-results<-pk.nca(clvd)  # analyse
-res<-results$result
-
-v<-res %>% subset(PPTESTCD=='vz.obs')%>% summarise(v=mean(PPORRES)) %>% unlist()
-cl<-res %>% subset(PPTESTCD=='cl.obs')%>% summarise(cl=mean(PPORRES)) %>% unlist()
-rich<-ggplot(fru,aes(x=time,y=conc,group=ID,col=ID))+
-  geom_line(alpha=0.2,col='grey')+
-  geom_point()+
-  theme_bw(base_size=18)+
-  theme(legend.position="none")+
-  ylab("Plasma concentration mg/L")+
-  xlab("Time (hr)")
-rich
-rich+
-  scale_y_continuous(trans='log2', breaks=c(0.01,1))
-```
-
-We have several options in our armoury that we can use to describe these data. We could undertake a non-compartmental approach (Table \@ref(tab:nca)) and use the <TT>PKNCA</TT> package. Or, we could fit a model to the data.  
-
-
-```{r nca,   echo=F,eval=T}
-summary(results) %>% 
-    kable(booktabs = TRUE, caption = "Non compartmental analysis of oral PK data")
-```
-
-## Fitting a model
-We can use our prior knowledge to choose a model to fit to the data that aligns with our knowledge of the system (human) that the data came from. In this case we will choose the one-compartment oral-absorption model. Note that there are 3 parameters to estimate in the one-compartment oral-absorption model - $k_e$ (or $Cl$), $V_d$, and $k_a$. Importantly, there are more samples per participant than there are model parameters. This indicates that we have *rich* data to model. 
-
-```{r oneor, echo = FALSE, message=FALSE, fig.align='center', fig.cap='One-compartment oral-absorption model',fig.height=3,out.width="100%"}
-knitr::include_graphics("oneor2.png")
-```
-
-Figure \@ref(fig:oneor) shows the graphical representation of the one-compartment oral-absorption model. To remind you, the equation for this model is $$C=\frac{F.D.k_a}{V_d.(k_a-k_e)}.(e^{-k_et}-e^{-k_at}) $$ Remember, that without corresponding IV data, we cannot identify $F$. 
-
-### Analytical apprach 
-There are several ways to approach modelling these data: 
-
-* Treat all the data as if it is from a single individual, pool it together and fit a model (naive pooled approach)
-* Average the data at each time point and then fit a model (naive average approach)
-* Fit a model to each individual and then take an average of these pharmacokinetic parameters (two-stage approach)
-
-Each of these approaches provides a slightly different model fit and each has its own pro's and con's. If you would like to read more about these, I suggest taking a look at the excellent article by Ette & Williams @Ette.
-
-Figure \@ref(fig:richfit) demonstrates the time-concentration profile modeled using each of these approaches. As the data was simulated, we also know the *true* population time-concentration profile. You can see that each of the different modeling approaches provides a slightly different fit to these data. None of them are perfect, but all provide an acceptable estimation of the true profile. They could all be used to make inferences from a pharmacokinetic study of this type.
-
-```{r richfit,echo=F,eval=T,fig.cap="Concentration-time profile showing \`true\' population profile alonside a variety of approaches to modelling the rich data data", fig.subcap=c('Full plot','Focussed plot to demonstrate different profiles'),fig.ncol = 2, out.width = "50%", fig.align = 'center', warning=F,message=F}
-
-#Naive pooled approach
-npelim<-fru %>% 
-  subset(time>=2) %>% 
-  lm(log(conc)~time,data=.)
-npI<-exp(coef(npelim)[1])
-npke<--coef(npelim)[2]
-
-npab<-fru %>% 
-  subset(time<=0.75) %>% 
-  mutate(diff=(npI*exp(-npke*time))-conc) %>% 
-  lm(log(diff)~time,data=.)
-npka<--coef(npab)[2]
-
-
-#Naive pooled average approach
-npa<-fru %>%
-  group_by(time)%>%
-  mutate(mean=mean(conc)) %>% 
-  subset(time>=2) %>% 
-  lm(log(mean)~time,data=.) 
-
-npaI<-exp(coef(npa)[1])
-npake<--coef(npa)[2]
-
-npaab<-fru %>% 
-  group_by(time)%>%
-  mutate(mean=mean(conc)) %>% 
-  distinct(time,.keep_all = TRUE) %>% 
-  subset(time<=0.75) %>% 
-  mutate(diff=(npaI*exp(-npake*time))-mean) %>% 
-  lm(log(diff)~time,data=.)
-npaka<--coef(npaab)[2]
-
-# Two stage approach
-library(broom)
-
-
-
-fitted_models = fru %>% 
-  group_by(ID) %>% 
-  slice((Q-3):Q) %>% 
-  ungroup() %>% 
-  nest_by(ID) %>%
-  mutate(fit = list(lm(log(conc)~time,data = data)))%>%
-  summarise(tidy(fit)) 
-
-tsI<-fitted_models %>% 
-  group_by(term) %>% 
-  subset(term=='(Intercept)') %>% 
-  summarise(mean=exp(mean(estimate))) %>% 
-  ungroup()%>% 
-  pull(mean)
-tske<-fitted_models %>% 
-  group_by(term) %>% 
-  subset(term=='time') %>% 
-  summarise(mean=-mean(estimate)) %>% 
-  ungroup()%>% 
-  pull(mean)
-
-frutm<-fru %>% 
-  group_by(ID) %>% 
-  filter(conc==max(conc)) %>% # filter the data.frame to keep row where x is maximum
-  select(ID,time) %>%
-  rename(timin=time) %>% 
-  ungroup()
-frutm<-merge(fru,frutm,all.x=T)
-
-fitted_models = frutm %>% 
-  group_by(ID) %>% 
-  subset(time<timin) %>% 
-  mutate(diff=(npI*exp(-npke*time))-conc)%>% 
-  ungroup() %>% 
-  nest_by(ID) %>%  
-  mutate(fit = list(lm(log(diff)~time,data = data)))%>%
-  summarise(tidy(fit)) 
-tska<-fitted_models %>% 
-  group_by(term) %>% 
-  subset(term=='time') %>% 
-  summarise(mean=-mean(estimate)) %>% 
-  ungroup()%>% 
-  pull(mean)
-
-
-mke<-mCl/mV
-sim<-function(x) ((Dose*F*mka)/(mV*(mka-mke)))*(exp(-mke*x)-exp(-mka*x))
-np<- function(x) npI*(exp(-npke*x)-exp(-npka*x))
-npa<-function(x) npaI*(exp(-npake*x)-exp(-npaka*x))
-ts<-function(x) tsI*(exp(-tske*x)-exp(-tska*x))
-
-time<-seq(0,6.1,by=0.1)
-conc<-c(sim(time),np(time),npa(time),ts(time))
-time<-rep(time,4)
-data<-rep(c("True (population) PK profile","Naive pooled","Naive pooled average","Two-stage"),each=62)
-data<-factor(data,levels=c("True (population) PK profile","Naive pooled","Naive pooled average","Two-stage"))
-
-full<-data.frame(data,time,conc)
-
-richfitplot<- ggplot()+
-  geom_point(data=fru,aes(x=time,y=conc),alpha=0.6,col='grey')+
-  geom_line(data=full,aes(x=time,y=conc,lty=data,col=data,alpha=data),size=1)+
-  theme_bw(base_size=18)+
-  theme(legend.position=c(0.72,0.8),
-        legend.background = element_rect(fill = NA),
-        legend.title=element_blank(),
-        legend.text=element_text(size=14))+
-  ylab("Plasma concentration mg/L")+
-  xlab("Time (hr)")+
-  #scale_linetype_manual(values=c("solid", "twodash","dotted","dotdash"))+
-  scale_alpha_manual(name = "data", values = c(0.8,1,1,1))+
-  scale_color_brewer(palette = "Dark2")
-richfitplot
-richfitplot+
-  scale_x_continuous( limits = c(1,3))+
-  scale_y_continuous( limits = c(0.25,1.1))
-```  
-## Sparse data example
-Let's look at what happens if the sampling is sparse (fewer samples) and less strictly taken at specified time points. 
-
-
-```{r sparse,echo=F,eval=T,fig.cap="Sparse data from a simulated pharmacokinetic trial (n=40, 1-3 samples per participant)", fig.subcap=c('Concentration-time plot - lines are drawn to link some individuals to demonstrate that each individual provides few samples','Semi-log concentration-time plot'),fig.ncol = 2, out.width = "50%", fig.align = 'center', warning=F,message=F}
-
-N<-40
-set.seed(1)
-
-R<-sample(1:3,N,TRUE)
-ID<-rep(stringi::stri_rand_strings(N,3),R)
-
-
-mCl<-9.8  # set mean Cl
-Cl<- mCl*exp(rep(rnorm(sd=0.2,n=N),R))
-mV<-12.0  # set mean V
-V<-mV*exp(rep(rnorm(sd=0.2,n=N),R))
-ke<-Cl/V 
-
-
-
-timea = sample(x=c(0,0.1,0.5,0.75,1),size=sum(R)/3,TRUE)*exp(rnorm(sd=0.1,n=sum(R)/3))
-timeb = sample(c(1,2,3,4),size=sum(R)/3,TRUE)*exp(rnorm(sd=0.1,n=sum(R)/3))
-timec = sample(c(5,6),size=sum(R)/3,TRUE)*exp(rnorm(sd=0.1,n=sum(R)/3))
-
-time<-c(rbind(timea,timeb,timec))
-time<-if(length(time)==length(ID)) time else sample(x=time,size=sum(R),replace = TRUE)
-
-Dose<-40 # 40 mg dose is same for each patient
-mka<-1.3
-ka<- mka*exp(rep(rnorm(sd=0.1,n=N),R))
-F<-0.65
-onoral<-((Dose*F*ka)/(V*(ka-ke)))*(exp(-ke*time)-exp(-ka*time))
-b<-data.frame(ka,ke)
-error<-rnorm(mean=0,sd=0.2,n=length(onoral))
-#onoral<-onoral+onoral*error
-conc<- signif(onoral,2) 
-fru<-data.frame(ID,time,conc)
-fru<-arrange(fru, ID, time)
-library(RColorBrewer)
-nb.cols <- length(unique(ID))
-mycolors <- colorRampPalette(brewer.pal(8, "Dark2"))(nb.cols)
-sparse<-ggplot(fru,aes(x=time,y=conc,group=ID,col=ID))+
-  geom_point()+
-  theme_bw(base_size=18)+
-  theme(legend.position="none")+
-  ylab("Plasma concentration mg/L")+
-  xlab("Time (hr)")
-sparse+
-  geom_line(data=fru %>% 
-    filter(ID %in% sample(unique(ID),10)),alpha=0.5)
-sparse+
-  scale_y_continuous(trans='log2', breaks=c(0.01,1))
-```
-Figure \@ref(fig:sparse) shows a simulation of data that might more realistically be drawn from a later phase clinical trial. You can see that there are quite a number of participants (`r N`) but that they do not contribute many samples. The shape of the data is the same (because the underlying PK parameters used to simulate the data are the same as I used in simulating the rich example). However, here one or two participants contribute 3-samples, but the majority have just 1-2 samples. The fact that there are different numbers of samples per participant is described as *unbalanced*.  We therefore have fewer samples per participants than there are parameters to estimate in the model (sparse data). You can also see that samples were not taken at precisely the same time-points after a dose. 
-
-Figure \@ref(fig:sparsefit) shows the same analytical approaches to these data as we used before with the rich data. The two-stage approach falls down entirely because most individuals don't have enough samples to correctly determine absorption and elimination phases. The naive-pooled-average approach is equally unhelpful because samples were taken at non-uniform times so averaging out is inaccurate and leads to a poor model fit. 
-
-The naive-pooled approach still gives a pretty good fit, primarily because there are so many samples. However, whilst the average trend is good, the problem with a naive pooled approach, is that it *overestimates* variability. Since we treat all the data as if it comes from one individual, all the variability is dumped into a single residual error term at the end of the equation. $$C=\frac{F.D.k_a}{V_d.(k_a-k_e)}.(e^{-k_et}-e^{-k_at})+\epsilon$$ By lumping all of the residual error into this single error term, the naive-pooled modelling approach misses out on describing accurately the time-concentration profile of an individual. This is fine if you just care about the mean-concentration, but we often care about what is happening to the whole population (or at least most of it). 
-
-
-```{r sparsefit,echo=F,eval=T,fig.cap="Concentration-time profile showing \'true\' population profile alonside a variety of approaches to modelling sparse data",fig.width=6,fig.height=3,fig.align = 'center',warning=FALSE,message=FALSE}
-
-#Naive pooled approach
-npelim<-fru %>% 
-  subset(time>=2) %>% 
-  lm(log(conc)~time,data=.)
-npI<-exp(coef(npelim)[1])
-npke<--coef(npelim)[2]
-
-npab<-fru %>% 
-  subset(time<=0.75) %>% 
-  mutate(diff=(npI*exp(-npke*time))-conc) %>% 
-  lm(log(diff)~time,data=.)
-npka<--coef(npab)[2]
-
-
-#Naive pooled average approach
-
-
-npa<-fru %>%
-  group_by(interval = round(fru$time/4)*4) %>%
-  summarize(mean= mean(conc)) %>% 
-  subset(interval>=2)%>% 
-  lm(log(mean)~interval,data=.) 
-npaI<-exp(coef(npa)[1])
-npake<--coef(npa)[2]
-
-npaab<-fru %>% 
-  group_by(time = round(fru$time/0.5)*0.5) %>%
-  summarize(mean= mean(conc)) %>% 
-  subset(time<=3) %>% 
-  mutate(diff=(npaI*exp(-npake*time))-mean) %>% 
-  subset(diff>0) %>%
-  lm(log(diff)~time,data=.)
-npaka<--coef(npaab)[2]
-
-# Two stage approach
-library(broom)
-fitted_models = fru %>% 
-  subset(time>=2) %>% 
-  nest_by(ID) %>%
-  mutate(fit = list(lm(log(conc)~time,data = data)))%>%
-  summarise(tidy(fit)) 
-
-tsI<-fitted_models %>% 
-  group_by(term) %>% 
-  subset(term=='(Intercept)') %>% 
-  summarise(mean=exp(mean(estimate))) %>% 
-  ungroup()%>% 
-  pull(mean)
-tske<-fitted_models %>% 
-  group_by(term) %>% 
-  subset(term=='time') %>% 
-  summarise(mean=-mean(estimate,na.rm=TRUE)) %>% 
-  ungroup()%>% 
-  pull(mean)
-
-frutm<-fru %>% 
-  group_by(ID) %>% 
-  filter(conc==max(conc)) %>% # filter the data.frame to keep row where x is maximum
-  select(ID,time) %>%
-  rename(timin=time) %>% 
-  ungroup()
-frutm<-merge(fru,frutm,all.x=T)
-
-fitted_models = frutm %>% 
-  group_by(ID) %>% 
-  subset(time<=timin)%>% 
-  filter(n_distinct(conc) > 1) %>% 
-  mutate(diff=(npI*exp(-npke*time))-conc)%>% 
-  ungroup() %>%
-  subset(diff>0) %>% 
-  nest_by(ID) %>%  
-  mutate(fit = list(lm(log(diff)~time,data = data)))%>%
-  summarise(tidy(fit)) 
-
-tska<-fitted_models %>% 
-  group_by(term) %>% 
-  subset(term=='time') %>% 
-  summarise(mean=-mean(estimate,na.rm=TRUE)) %>% 
-  ungroup()%>% 
-  pull(mean)
-
-mke<-mCl/mV
-sim<-function(x) ((Dose*F*mka)/(mV*(mka-mke)))*(exp(-mke*x)-exp(-mka*x))
-np<- function(x) npI*(exp(-npke*x)-exp(-npka*x))
-npa<-function(x) npaI*(exp(-npake*x)-exp(-npaka*x))
-ts<-function(x) tsI*(exp(-tske*x)-exp(-tska*x))
-
-
-time<-seq(0,8,by=0.1)
-conc<-c(sim(time),np(time),npa(time),ts(time))
-time<-rep(seq(0,8,by=0.1),4)
-data<-rep(c("True (population) PK profile","Naive pooled","Naive pooled average","Two-stage"),each=81)
-data<-factor(data,levels=c("True (population) PK profile","Naive pooled","Naive pooled average","Two-stage"))
-
-full<-data.frame(data,time,conc)
-
-
-ggplot()+
-  geom_point(data=fru,aes(x=time,y=conc),alpha=0.6,col='grey')+
-  geom_line(data=full,aes(x=time,y=conc,lty=data,col=data,alpha=data),size=1)+
-  theme_bw(base_size=9)+
-  theme(legend.position=c(0.75,0.8),
-        legend.background = element_rect(fill = NA),
-        legend.title=element_blank(),
-        legend.text=element_text(size=10))+
-  ylab("Plasma concentration mg/L")+
-  xlab("Time (hr)")+
-  scale_linetype_manual(values=c("solid", "twodash","dotted","dotdash"))+
-  scale_alpha_manual(name = "data", values = c(0.8,1,1,1))+
-  scale_color_brewer(palette = "Dark2")
-
-
-```
-
-
-# Non-linear, mixed-effects modelling, an alternative approach
-
-Before we dip our toes into the water of population-pharmacokinetic modelling using non-linear mixed-effects techniques, we must briefly note a few definitions. 
-
-## Linear versus non-linear models
-
-Linear models are (relatively) easy to solve and calculate estimates for model parameters. Linear transformations are not always possible. When undertaking a non-linear approach, computer programs use an *iterative approach* to finding values for model parameters. With an iterative approach, a series of values for model parameters are tested to see which provide the values for model parameters that best fit the data. 
-
-The biggest difference you will notice in your introduction to non-linear modelling is that you will now be required to input an *initial estimate* for model parameters, i.e. you will have to give <TT>R</TT> a value for clearance and volume of distribution that you want it to start at in its search for its final estimate of the population value of that parameter. That's right, you give the program your best guess of what the true population value is and then the program tries to improve on it. 
-
-## Fixed-effects, random-effects and mixed-effects models
-Fixed-effects in an experiment or trial are controlled, or the same, for each individual. For example, drug dose and frequency of administration are usually fixed. They may also be variables where all possible values/levels are studied. For example, if you want to study the effect of smoking on the kinetics of a drug, you would study the drug kinetics in smokers- and non-smokers. The 'smoking' effect in your model is a fixed-effect since all levels of this factor (categorical)-variable are studied. 
-
-Random-effects in an experiment or trial are less controlled and do not include all possible levels. For example, we take a sample of participants in a trial, but we really want to know/make inferences about the population from which they are sampled. Since we do not study every single subject from the population, the participants in the study are a random effect. 
-
-Mixed-effects is the easiest to define here. It is simply a model which contains fixed- and random-effects. 
+# Population pharmacokinetic modelling
 
 ### Using a compartmental pharmacokinetic model to provide an example of what we mean
-Let's return to the one-compartment IV-bolus model once more. Let us parameterise using *primary* pharmacokinetic parameters (clearance and volume of distribution). Broadly, our model remains the same $$C=C_{0}e^{-\frac{Cl}{V}t}$$ however, we now add a further layer, by stating that our parameters are made up of a fixed (population mean) effect and a random (inter-individual variability) effect. $$Cl=\theta_{Cl}\times e^{\eta_{Cl}}$$ the modelling process then estimates $$\theta_{Cl}\textrm{ -the population mean value for clearance (a fixed effect)}$$ and makes some estimate of $$\eta_{Cl} \textrm{ -individual variability of clearance (a random-effect)}$$
+Let's return to the one-compartment IV-bolus model once more. Let us parameterise using *primary* pharmacokinetic parameters (clearance and volume of distribution). Broadly, our model remains the same $$C=C_{0}e^{-\frac{Cl}{V}t}$$ however, we now add a further layer, by stating that our parameters are made up of a fixed (population mean, $\theta$) effect and a random (inter-individual variability, $\eta$) effect. $$Cl=\theta_{Cl}\times e^{\eta_{Cl}}$$ the modelling process then estimates $$\theta_{Cl}\textrm{ -the population mean value for clearance (a fixed effect)}$$ and makes some estimate of $$\eta_{Cl} \textrm{ -individual variability of clearance (a random-effect)}$$
 
-Similarly, we model volume of distribution as $$V=\theta_{V}\times e^{\eta_{V}}$$ and by extension in the oral-absorption model $$k_a=\theta_{k_a}\times e^{\eta_{k_a}}$$
-
-### A further note on $\eta$
-
-Let's imagine an individual in a clinical trial, lets call them individual $i$, or the $i$th individual. For $i$, their value of clearance will correspond to $$Cl_i=\theta_{Cl}\times e^{\eta_i}$$ now, it should be noted that $\eta$ is assumed to follow a normal distribution with mean of zero and standard deviation $\omega_{Cl}$ The mathematical notation for this is as follows $$\eta\sim N(0,\omega_{Cl}^2)$$ you will see from this that in a non-linear mixed-effects model, we do not estimate the population mean value of $\eta$ (since it is always zero), we estimate the variance, $\omega^2$. Again, we have to tell our computer program a value to start looking for this. 
-
-You will finally note, that by choosing to model $$Cl=\theta_{Cl}\times e^{\eta_{Cl}}$$ we are modelling clearance with a log-normal distribution. We *could* choose to model it $$Cl=\theta_{Cl}+ \eta_{Cl}$$but as we have previously demonstrated, our *prior* knowledge of clearance is that it is likely to have a log-normal distribution so we should choose to model it as such. 
-
+Similarly, we model volume of distribution as $$V=\theta_{V}\times e^{\eta_{V}}$$ 
 
 # Non-linear mixed-effects modelling in <TT>R</TT>  
 
@@ -558,21 +190,27 @@ Installing <TT>nlmixr</TT> is a little complicated. You *may* be able to do it b
 
 ## Using <TT>nlmixr</TT>
 
-First you need to call <TT>library(nlmixr2)</TT> to load the package. Then you need to build your model. We will attempt to fit a one-compartment oral-absorption model to the sparse furosemide data. The data set is available on the Advanced PK GitHub and can be called in the usual way using <TT>read\_csv()</TT>.
+First you need to call <TT>library(nlmixr2)</TT> to load the package. 
+
+In this example we fit a one-compartment oral-absorption model to sparse furosemide data. 
 
 Then you need to build your model. When building the model, you specify two blocks in a standard <TT>R function()</TT>. As always, you give your function a name, I have chosen <TT>one.cmt</TT>. 
 
-The first part of the function is to set the initial estimates for your model parameters, this is known as the <TT>ini()</TT> block. Remember that we are parameterising using $k_a$, $Cl$ and $V$ in our one-compartment oral-absorption model. So we need to tell <TT>nlmixr</TT> initial values for each of these parameters *as well as* values for the random-effects ($\omega^2$) associate with each parameter. 
+### Ini block
 
-The second part of the function defines the model. The <TT>model()</TT> block. Here you describe the relationship between the fixed- and random-effects. A little more on this later. 
+The first part of the function is to set the initial estimates for your model parameters, this is known as the <TT>ini()</TT> block. We are parameterising using $k_a$, $Cl$ and $V$ in our one-compartment oral-absorption model. So we need to tell <TT>nlmixr</TT> initial values for each of these parameters *as well as* values for the random-effects associated with each parameter. 
 
-After building the model we can run a check using <TT>nlmixr(one.cmt)</TT>, which describes the model we have built. And then we fit..........
+### Model block
+
+The second part of the function defines the model. The <TT>model()</TT> block. Here you describe the relationship between the effects. 
+
+After building the model we can run a check using <TT>nlmixr(one.cmt)</TT>, which describes the model we have built. And then we fit the model to the data.
 
 ```{r nlmixr,warning=F,message=F}
 
 sparse<-
  read_csv("https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/main/sparsefru.csv")
-library(nlmixr2)
+
 
 # First make the model
 one.cmt <- function() {
@@ -615,49 +253,31 @@ kbl(signif(diag(fit$omegaR),2), caption="Random effects parameter estimates from
                            "Estimate"))%>%  kable_styling(latex_options =c("striped"))
 ```
 
-# Comparing output from the non-linear mixed-effects approach to the naive-pooled approach
+# For interest: Non-linear mixed-effects modelling explained in a bit more detail
 
-Figure \@ref(fig:nlmfit) shows the fit provided by the non-linear mixed-effects approach compared to the naive-pooled approach, which was our preferred of the other modelling approaches to sparse data from earlier in the session. You can see that the non-linear mixed-effects approach provides a superior fit to both absorption and elimination phases compared to the naive-pooled fit. Indeed, it is so close to the 'true' population value, I have had to fade the 'true' line so you can see it properly! Additionally, with the non-linear mixed-effects approach, we retain information on the inter-individual variability of model parameters.
+## Linear versus non-linear models
 
+Linear models are (relatively) easy to solve and calculate estimates for model parameters. Linear transformations are not always possible. When undertaking a non-linear approach, computer programs use an *iterative approach* to finding values for model parameters. With an iterative approach, a series of values for model parameters are tested to see which provide the values for model parameters that best fit the data. 
 
-```{r nlmfit,echo=F,eval=T,fig.cap="Concentration-time profile showing \'true\' population profile alonside a variety of approaches to modelling sparse data",fig.width=6,fig.height=3,fig.align = 'center',warning=FALSE,message=FALSE}
+The biggest difference you will notice in your introduction to non-linear modelling is that you will now be required to input an *initial estimate* for model parameters, i.e. you will have to give <TT>R</TT> a value for clearance and volume of distribution that you want it to start at in its search for its final estimate of the population value of that parameter. You give the program your best guess of what the true population value is and then the program tries to improve on it. 
 
-sim<-function(x) ((Dose*F*mka)/(mV*(mka-mke)))*(exp(-mke*x)-exp(-mka*x))
-np<- function(x) npI*(exp(-npke*x)-exp(-npka*x))
-nlmke<-(15.5/18.9)
-nlm<-function(x)((Dose*1.33)/(18.9*(1.33-nlmke)))*(exp(-nlmke*x)-exp(-1.33*x))
+## Fixed-effects, random-effects and mixed-effects models
+Fixed-effects in an experiment or trial are controlled, or the same, for each individual. For example, drug dose and frequency of administration are usually fixed. They may also be variables where all possible values/levels are studied. For example, if you want to study the effect of smoking on the kinetics of a drug, you would study the drug kinetics in smokers- and non-smokers. The 'smoking' effect in your model is a fixed-effect since all levels of this factor (categorical)-variable are studied. 
 
+Random-effects in an experiment or trial are less controlled and do not include all possible levels. For example, we take a sample of participants in a trial, but we really want to know/make inferences about the population from which they are sampled. Since we do not study every single subject from the population, the participants in the study are a random effect. 
 
-time<-seq(0,8,by=0.1)
-conc<-c(sim(time),np(time),nlm(time))
-time<-rep(seq(0,8,by=0.1),3)
-data<-rep(c("True (population) PK profile","Naive pooled","Non-linear mixed-effects"),each=81)
-data<-factor(data,levels=c("True (population) PK profile","Naive pooled","Non-linear mixed-effects"))
+Mixed-effects is simply a model which contains fixed- and random-effects. 
 
-full<-data.frame(data,time,conc)
+## A note on $\eta$
 
+Let's imagine an individual in a clinical trial, lets call them individual $i$, or the $i$th individual. For $i$, their value of clearance will correspond to $$Cl_i=\theta_{Cl}\times e^{\eta_i}$$ now, it should be noted that $\eta$ is assumed to follow a normal distribution with mean of zero and standard deviation $\omega_{Cl}$ The mathematical notation for this is as follows $$\eta\sim N(0,\omega_{Cl}^2)$$ you will see from this that in a non-linear mixed-effects model, we do not estimate the population mean value of $\eta$ (since it is always zero), we estimate the variance, $\omega^2$. Again, we have to tell our computer program a value to start looking for this. 
 
-ggplot()+
-  geom_point(data=fru,aes(x=time,y=conc),alpha=0.6,col='grey')+
-  geom_line(data=full,aes(x=time,y=conc,lty=data,col=data,alpha=data),size=1)+
-  theme_bw(base_size=9)+
-  theme(legend.position=c(0.75,0.8),
-        legend.background = element_rect(fill = NA),
-        legend.title=element_blank(),
-        legend.text=element_text(size=10))+
-  ylab("Plasma concentration mg/L")+
-  xlab("Time (hr)")+
-  scale_linetype_manual(values=c("solid", "twodash","dotdash"))+
-  scale_alpha_manual(name = "data", values = c(0.4,1,1))+
-  scale_color_brewer(palette = "Dark2")
-```
-
-# Tidying up other nuances with <TT>nlmixr</TT>
+You will finally note, that by choosing to model $$Cl=\theta_{Cl}\times e^{\eta_{Cl}}$$ we are modelling clearance with a log-normal distribution. We *could* choose to model it $$Cl=\theta_{Cl}+ \eta_{Cl}$$but as we have previously demonstrated, our *prior* knowledge of clearance is that it is likely to have a log-normal distribution so we should choose to model it as such. 
 
 ## $\mu$ referencing
 You will note in the <TT>nlmixr</TT> code that we seem to for no good reason input a '$log(value)$' for our initial parameter estimates and then place them in the exponential domain in our <TT>model()</TT> block of code. This is known as $\mu$ referencing. 
 
-Remember, we are modelling fixed and random effects for our model parameters $$Cl=\theta_{Cl}\times e^{\eta_{Cl}}$$ now, it just so happens that the estimation algorithms work a little better if all of the parameters being estimated are in the exponential domain. We have to write our model with a little mathematical fiddling to achieve this. Recall that $$e^a\times e^b=e^{a+b}\qquad  \textrm{AND}\qquad  e^{log(c)}=c$$ so instead of inputting $$Cl=\theta_{Cl}\times e^{\eta_{Cl}}$$ into our model we instead input $$Cl= e^{log(\theta_{Cl})+\eta_{Cl}}$$ you will have seen in Table \@ref(tab:nlmixfix) that <TT>nlmixr} estimates $log(\theta)$ and then automatically back-transforms the final parameter estimates to the standard domain.
+Remember, we are modelling fixed and random effects for our model parameters $$Cl=\theta_{Cl}\times e^{\eta_{Cl}}$$ now, it just so happens that the estimation algorithms work a little better if all of the parameters being estimated are in the exponential domain. We have to write our model with a little mathematical fiddling to achieve this. Recall that $$e^a\times e^b=e^{a+b}\qquad  \textrm{AND}\qquad  e^{log(c)}=c$$ so instead of inputting $$Cl=\theta_{Cl}\times e^{\eta_{Cl}}$$ into our model we instead input $$Cl= e^{log(\theta_{Cl})+\eta_{Cl}}$$ you will have seen in Table \@ref(tab:nlmixfix) that <TT>nlmixr</TT> estimates $log(\theta)$ and then automatically back-transforms the final parameter estimates to the standard domain.
 
 ## Residual variability
 In our non-linear mixed-effects model, we are more sophisticated about how we model variability, applying $\eta's$ to the model parameters $$Cl=\theta_{Cl}\times e^{\eta_{Cl}}$$ but these random-effects will not explain all of the deviation of the observed data. There will still be some left over, residual, error. So we add a residual error component to our model. 

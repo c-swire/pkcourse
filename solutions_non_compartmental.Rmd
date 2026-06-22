@@ -1,12 +1,11 @@
 ---
-title: "Introduction to non-compartmental analysis using '<TT>R</TT>'"
+title: "Introduction to non-compartmental analysis using R"
 output:
   bookdown::html_document2:
     fig_caption : TRUE
     number_sections: no
     toc: yes
     toc_float: yes
-
 header-includes:
   - \usepackage{colortbl}
   - \usepackage{multirow}
@@ -43,11 +42,13 @@ body {
 text-align: justify}
 </style>
 
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, fig.pos= "H")
 library(tidyverse)
 library(kableExtra)
+library(PKNCA)
+library(gridExtra)
+library(DescTools)
 ```
 
 
@@ -69,32 +70,34 @@ By the end of this session you should be able to:
 # Tasks
 
 * Make a concentration-time plot for the 'Healthy' dataset
+
 * Make a concentration-time plot for 'Sepsis' dataset
 
-* Calculate $C_{max}$, $T_{max}$ and $AUC_{0-t}$ for Healthy dataset
-* Calculate $C_{max}$, $T_{max}$ and $AUC_{0-t}$ for Sepsis dataset
+* Calculate $C_{max}$, $T_{max}$ and $AUC_{0-t}$ for 'Healthy' dataset
 
-* Estimate Vd and Cl for Healthy dataset
-* Estimate Vd and Cl for Sepsis dataset
+* Calculate $C_{max}$, $T_{max}$ and $AUC_{0-t}$ for 'Sepsis' dataset
 
-Extension tasks:
-* Can you put plots of Healthy and Sepsis datasets on the same Figure?
-* Can you make a table to compare $C_{max}$, $T_{max}$ and $AUC_{0-t}$ for Healthy and Sepsis datasets?
+* Estimate $Vd$ and $Cl$ for Healthy dataset
+
+* Estimate $Vd$ and $Cl$ for Sepsis dataset
+
+### Extension tasks:
+
+* Plot Healthy and Sepsis datasets on the same Figure
+
+* Make a table to compare $C_{max}$, $T_{max}$ and $AUC_{0-t}$ for 'Healthy' and 'Sepsis' datasets
 
 # Packages you need for this session
 
-Link your path using the following line of code and then call <TT>library(tidyverse)</TT>.
-
 ```{r, eval=FALSE}
-.libPaths( c( .libPaths(),
-              "/homes/dlonsdale-pharmacokinetics/sghms/bms/shares/Advanced-Pharmacokinetics/4.4.2/library") )
-#note that you need the '.' before 'libPaths'
 library(tidyverse)
+library(PKNCA)
+library(DescTools)
 ```
 
 # Teaching data for this session
 
-For this session we will be using PK data for an anti-epileptic drug. 6 participants were given an IV dose and then one week later they were given an oral dose. Drug concentrations were measured.
+This workbook uses PK data for an anti-epileptic drug. 6 participants were given an IV dose and then one week later they were given an oral dose. Drug concentrations were measured.
 
 If you want to access these datasets yourself you can copy the code below. 
 
@@ -126,7 +129,7 @@ ggplot(data=IV,aes(x=time, y=conc,col=id) )+
 
 # Estimating $C_{max}$
 
-Remember that $C_{max}$ is observed from our data. We find the max value per participant and report it. We actually did this in the last session. 
+$C_{max}$ is observed from our data. We find the max value per participant and report it. 
 
 **How to:** 
 
@@ -173,8 +176,6 @@ FULL %>%
 
 This is a little more tricky. We need to get <TT>R</TT> to find $C_{max}$ and then keep the associated value for time.
 
-Try a Google search for this. Something like 'using group by to get the value corresponding to the max value of another column'.
-
 **How to:** Estimate $T_{max}$ for the IV and oral data
 
 ```{r tmax_solution,   message=FALSE, warning=FALSE}
@@ -195,7 +196,7 @@ FULL %>%
 
 # Estimating the area under the curve ($AUC_{0-t}$)
 
-$AUC_{0-t}$ is the area under the time concentration curve from $time=0$ to $time=t$ ($t$ will usually be the time of the last observed sample but it doesnt have to be). In non-compartmental analysis, this is often estimated using a method that breaks up the time concentration data into small chunks, estimates the area under each chunk and adds them together. The most straightforward way of doing this is using the trapezoid method. 
+$AUC_{0-t}$ is the area under the time concentration curve from $time=0$ to $time=t$ ($t$ will usually be the time of the last observed sample but it doesn't have to be). In non-compartmental analysis, this is often estimated using a method that breaks up the time concentration data into small chunks, estimates the area under each chunk and adds them together. The most straightforward way of doing this is using the trapezoid method. 
 
 ```{r trap, echo=F, fig.cap="Participant 'A' oral concentration-time profile, with trapezoids indicated in colour", fig.width=7,fig.height=2.5,fig.align = 'center', warning=F,message=F}
 
@@ -222,7 +223,7 @@ b<-ggplot(data=soral, aes(time,conc))+
   geom_text(x=6, y=soral$conc[10], label="C", hjust= -0.5,vjust=-0.25, size=3)+
   geom_text(x=6, y=0, label="D", hjust= -0.25, vjust = 1, size=3)
 
-library(gridExtra)
+
 grid.arrange(a,b,ncol=2)
 ```
 
@@ -234,7 +235,7 @@ Fortunately,<TT>R</TT> has an inbuilt function that allows us to calculate the $
 Here is how to calculate using the oral data:
 
 ```{r AUC,   message=FALSE, warning=FALSE}
-library(DescTools)
+
 ORAL%>% 
   group_by(id) %>% 
   summarise(AUC=AUC(time,conc,method='trapezoid'))
@@ -294,11 +295,11 @@ It is worth noting the trapezoid method has limitations. Most notably that it wi
 
 \newpage 
 
-# Using \texttt{R} package \texttt{PKNCA} to undertake non-compartmental analysis  
+### Using <TT>R</TT> package <TT>PKNCA</TT> to undertake non-compartmental analysis  
 
-If that all seems like too much hard work and \texttt{R} should just jolly well get on and do for us then you are right! There are a few non-compartmental analysis packages available, we will use \texttt{PKNCA}. Remember you will need to run \texttt{install.packages("PKNCA")} the first time you wish to use this package, once it has been installed you need to run \texttt{library(PKNCA)}. 
+If that all seems like too much hard work and <TT>R</TT> should just jolly well get on and do for us then you are right! There are a few non-compartmental analysis packages available, we will use <TT>PKNCA</TT>. Remember you will need to run <TT>install.packages("PKNCA")</TT> the first time you wish to use this package, once it has been installed you need to run <TT>library(PKNCA)</TT>. 
 
-To run non-compartmental analysis using this package, we need to give \texttt{PKNCA} some dosing data. We know that all the participants were given a dose of 1000 mg of amoxicillin at time $t=0$. To add a new column (variable) using \texttt{\%>\%} we use the \texttt{mutate} function.  
+To run non-compartmental analysis using this package, we need to give <TT>PKNCA</TT> some dosing data. We know that all the participants were given a dose of 1000 mg of amoxicillin at time $t=0$. To add a new column (variable) using <TT>\%>\%</TT> we use the <TT>mutate</TT> function.  
 
 ```{r, results='hold'}
 amox<- read.csv("https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/refs/heads/main/amoxicillinPK.csv") 
@@ -308,12 +309,10 @@ damox<-amox %>%  # remember we will need to save this as a new object
   mutate(dose=1000) #this produces a new variable dose 1000
 ```
 
-**Task:** Run this line of code and have a look at the newly created 'damox' object 
-
-Now we can call and run \texttt{PKNCA}. First we create a sampling (or concentration) object and then a dosing object. In each function we instruct \texttt{PKNCA} of the names of our data object and the relevant variables in it. Then we combine the two and run our non-compartmental analysis. 
+Now we can call and run <TT>PKNCA</TT>. First we create a sampling (or concentration) object and then a dosing object. In each function we instruct <TT>PKNCA</TT> of the names of our data object and the relevant variables in it. Then we combine the two and run our non-compartmental analysis.  
 
 ```{r, results='hold', eval=FALSE}
-library(PKNCA)
+
 conc<-PKNCAconc(amox, conc~time|ID) #create sampling object
 dose<-PKNCAdose(damox, dose~time|ID) #create dosing object
 full<-PKNCAdata(conc, dose)  #combine
@@ -321,7 +320,7 @@ results<-pk.nca(full)  # analyse
 summary(results) #summarise the results
 ```
 ```{r, results='hold', echo=FALSE}
-library(PKNCA)
+
 conc<-PKNCAconc(amox, conc~time|ID) #create sampling object
 dose<-PKNCAdose(damox, dose~time|ID) #create dosing object
 full<-PKNCAdata(conc, dose)  #combine
@@ -332,7 +331,7 @@ knitr::kable(summary(results), "latex",booktabs = TRUE, caption='PKNCA output')%
 ```
 
 
-**Task:** Look at the value for $AUC$ produced here and compare it to the one earlier. What do you notice? Why do you think there is a discrepancy?
+Look at the value for $AUC$ produced here and compare it to the one earlier. What do you notice? Why do you think there is a discrepancy?
 
 The answer is that by default, PKNCA uses logarithmic trapezoid method to calculate $AUC$. If you want to set this to linear logarithmic method you can set this as an option. Note that it also uses the 'geometric' rather than arithmetic mean.  
 

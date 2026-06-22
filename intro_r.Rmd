@@ -267,10 +267,6 @@ Piping is a tool that allows us to undertake multiple logical steps to achieve a
 
 Let's say we wanted to check the maximum concentration in our dataset made sense, to check for outliers. If we apply <TT>summarise(amox,max(conc))</TT> we are given `r summarise(amox,max(conc))`. This is the same output as from <TT>summary()</TT>, above. What if we want to know the maximum concentration for each ID number. Well, we can do this with piping.
 
-```{r, echo=FALSE}
-library(tidyverse)
-```
-
 ```{r, results='hold', message==FALSE, warning=FALSE}
 amox%>%
   group_by(ID)%>%

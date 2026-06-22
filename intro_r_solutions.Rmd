@@ -36,6 +36,9 @@ text-align: justify}
 knitr::opts_chunk$set(echo = TRUE, fig.pos= "H")
 library(tidyverse)
 library(kableExtra)
+
+amox<- read.csv("https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/main/amoxicillin.csv")
+
 ```
 **Tasks:** 
 

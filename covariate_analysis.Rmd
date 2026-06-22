@@ -1,5 +1,5 @@
 ---
-title: "Chapter 6: Covariate analysis"
+title: "Covariate analysis"
 author: "Dagan Lonsdale"
 
 output:
@@ -198,7 +198,7 @@ ggplot(subset(pheno,EVID==0), aes(x=TIME, y=DV))+
   theme_bw(base_size=9)
 ```
 
-```{r, eval=T,cache=F, message=F,warning=FALSE,results='hide'}
+```{r, eval=T,cache=F, message=F,warning=FALSE}
 one.cmt <- function() {
   ini({ 
     tcl <- log(0.01) 
@@ -367,7 +367,7 @@ Hopefully you can see from Figure \@ref(fig:covwt) that there appears to be some
 
 We know from our summary statistics that the median weight for individuals in our data set is `r mw` kg, and that this is a set of neonatal data. We should therefore choose `r mw` kg as our reference weight. 
 
-```{r, eval=T,cache=F, message=F,warning=FALSE,results='hide'}
+```{r, eval=T,cache=F, message=F,warning=FALSE}
 mw<- pheno %>% 
   group_by(ID) %>% 
   slice(1) %>% 

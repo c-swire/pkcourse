@@ -9,20 +9,12 @@ navbar:
       menu:
       - text: "Workbook"
         href: intro_r.html
-      - text: "Solutions"
+      - text: "Solutions to extension exercises"
         href: intro_r_solutions.html
-    - text: "Non-compartmental analysis"
-      menu:
-      - text: "Workbook"
-        href: non_compartmental.html
-      - text: "Solutions"
-        href: solutions_non_compartmental.html
-    - text: "Introduction to compartmental analysis"
-      menu:
-      - text: "Compartments"
-        href: compartments.html
-      - text: "Non-linear mixed effects modelling"
-        href: nlmem.html
+    - text: "Session 1"
+      href: solutions_non_compartmental.html
+    - text: "Session 2"
+      href: nlmem.html
     - text: "Additional materials"
       menu:
       - text: "Model diagnostics"

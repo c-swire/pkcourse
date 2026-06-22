@@ -109,7 +109,7 @@ To help you with this task, you may find the following code helpful. **Note:** T
 ```{r, eval=F,cache=F,message=F,warning=F}
 drugxsim<-
   read_csv("https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/main/drugxsim.csv")
-library(nlmixr2)
+
 one.cmt <- function() {
   ini({ 
     tka <-log(0.5) 
@@ -141,7 +141,7 @@ ggplot(modfit,aes(x=PRED,y=DV))+
 
 ## Task 1 solution
 
-```{r drugxone,cache=FALSE,echo=F,results='hide',eval=T,fig.cap="Basic diagnostic plots for drug X one-compartment, oral-absorption model fit", fig.subcap=c('Concentration-time plot','Semi-log concentration-time plot','DV vs PRED','DV vs IPRED'),fig.ncol = 2, out.width = "50%", fig.align = 'center', warning=F,message=F}
+```{r drugxone,cache=FALSE,echo=F,eval=T,fig.cap="Basic diagnostic plots for drug X one-compartment, oral-absorption model fit", fig.subcap=c('Concentration-time plot','Semi-log concentration-time plot','DV vs PRED','DV vs IPRED'),fig.ncol = 2, out.width = "50%", fig.align = 'center', warning=F,message=F}
 
 drugxsim<-read_csv("https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/main/drugxsim.csv")
 drugxsim$ID<-as.factor(drugxsim$ID)
@@ -163,7 +163,6 @@ ggplot(subset(drugxsim,EVID==0),aes(x=TIME,y=DV,group=ID,col=ID))+
   scale_y_continuous(trans='log2', breaks=c(0.001,0.1, 2))
 
 
-library(nlmixr2)
 one.cmt <- function() {
   ini({ 
     tka <-log(0.5) 
@@ -208,7 +207,7 @@ Additionally, this leads to a situation where the conditionally weighted residua
 
 <TT>nlmixr2</TT> will output <TT>CWRES</TT> through an additional <TT>tableControl()</TT> command.
 
-```{r, cache=F,warning=FALSE,message=FALSE, results='hide'}
+```{r, cache=F,warning=FALSE,message=FALS}
 
 drugxfit<-nlmixr2(one.cmt,drugxsim,est="saem",
        list(print=0),
@@ -246,7 +245,7 @@ You will need to write a function for a two-compartment oral-absorption model. H
 ## Task 2 solution
 
 Again, note that the model is sensitive to initial parameter estimates. Trial the ones below and compare the output to other initial parameter estimates (ini block).
-```{r warning=FALSE,cache=F, message=FALSE, results='hide'}
+```{r warning=FALSE,cache=F, message=FALSE}
 
 two.cmt <- function() {
   ini({ 
