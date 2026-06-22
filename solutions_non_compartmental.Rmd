@@ -294,7 +294,7 @@ It is worth noting the trapezoid method has limitations. Most notably that it wi
 
 \newpage 
 
-### Using \texttt{R} package \texttt{PKNCA} to undertake non-compartmental analysis  
+# Using \texttt{R} package \texttt{PKNCA} to undertake non-compartmental analysis  
 
 If that all seems like too much hard work and \texttt{R} should just jolly well get on and do for us then you are right! There are a few non-compartmental analysis packages available, we will use \texttt{PKNCA}. Remember you will need to run \texttt{install.packages("PKNCA")} the first time you wish to use this package, once it has been installed you need to run \texttt{library(PKNCA)}. 
 
@@ -361,13 +361,13 @@ PKNCA.set.summary(
 #not run but code present in case someone asks how to do arithmetic mean
 ```
 
-## Estimating clearance
+# Estimating clearance
 
 Remember that clearance can be calculated as $$CL = \frac{Dose}{AUC}$$
 
 \newpage
 
-## Limitations of non-compartmental analysis
+# Limitations of non-compartmental analysis
 
 ```{r traperror, echo=F, fig.cap="Participant A amoxicillin concentration-time profile showing impact of reduced sampliing on AUC calculation", fig.width=4.5,fig.height=2.5,fig.align = 'center'}
 

@@ -77,6 +77,7 @@ By the end of this session you should be able to:
 * Estimate Vd and Cl for Sepsis dataset
 
 Extension tasks:
+
 * Can you put plots of Healthy and Sepsis datasets on the same Figure?
 * Can you make a table to compare $C_{max}$, $T_{max}$ and $AUC_{0-t}$ for Healthy and Sepsis datasets?
 
@@ -294,11 +295,11 @@ It is worth noting the trapezoid method has limitations. Most notably that it wi
 
 \newpage 
 
-### Using \texttt{R} package \texttt{PKNCA} to undertake non-compartmental analysis  
+### Using <TT>R</TT> package <TT>PKNCA</TT> to undertake non-compartmental analysis  
 
-If that all seems like too much hard work and \texttt{R} should just jolly well get on and do for us then you are right! There are a few non-compartmental analysis packages available, we will use \texttt{PKNCA}. Remember you will need to run \texttt{install.packages("PKNCA")} the first time you wish to use this package, once it has been installed you need to run \texttt{library(PKNCA)}. 
+If that all seems like too much hard work and <TT>R</TT> should just jolly well get on and do for us then you are right! There are a few non-compartmental analysis packages available, we will use <TT>PKNCA</TT>. Remember you will need to run <TT>install.packages("PKNCA")</TT> the first time you wish to use this package, once it has been installed you need to run <TT>library(PKNCA)</TT>. 
 
-To run non-compartmental analysis using this package, we need to give \texttt{PKNCA} some dosing data. We know that all the participants were given a dose of 1000 mg of amoxicillin at time $t=0$. To add a new column (variable) using \texttt{\%>\%} we use the \texttt{mutate} function.  
+To run non-compartmental analysis using this package, we need to give <TT>PKNCA</TT> some dosing data. We know that all the participants were given a dose of 1000 mg of amoxicillin at time $t=0$. To add a new column (variable) using <TT>\%>\%</TT> we use the <TT>mutate</TT> function.  
 
 ```{r, results='hold'}
 amox<- read.csv("https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/refs/heads/main/amoxicillinPK.csv") 
@@ -310,7 +311,7 @@ damox<-amox %>%  # remember we will need to save this as a new object
 
 **Task:** Run this line of code and have a look at the newly created 'damox' object 
 
-Now we can call and run \texttt{PKNCA}. First we create a sampling (or concentration) object and then a dosing object. In each function we instruct \texttt{PKNCA} of the names of our data object and the relevant variables in it. Then we combine the two and run our non-compartmental analysis. 
+Now we can call and run <TT>PKNCA</TT>. First we create a sampling (or concentration) object and then a dosing object. In each function we instruct <TT>PKNCA</TT> of the names of our data object and the relevant variables in it. Then we combine the two and run our non-compartmental analysis. 
 
 ```{r, results='hold', eval=FALSE}
 library(PKNCA)
