@@ -1,0 +1,116 @@
+---
+#title: "Chapter 4: Non-linear mixed effects models"
+#author: "Dagan Lonsdale"
+#bibliography: chapter4.bib
+#csl: aa.csl
+
+#output:
+#  bookdown::html_document2:
+#    fig_caption : TRUE
+#    number_sections: no
+#    toc: yes
+#    toc_float: yes
+#    latex_engine: xelatex
+#    highlight: tango
+#    extra_dependencies: "subfig"
+#header-includes:
+#  - \usepackage{float}
+#  - \floatplacement{table}{H}
+#  - \usepackage{booktabs}
+#  - \usepackage{caption}
+#  - \captionsetup{labelfont=bf,margin=12pt}
+#urlcolor: blue
+
+title: "Non-linear mixed effects models - more information"
+output:
+  bookdown::html_document2:
+    fig_caption : TRUE
+    number_sections: no
+    toc: yes
+    toc_float: yes
+
+header-includes:
+  - \usepackage{colortbl}
+  - \usepackage{multirow}
+  - \usepackage{float}
+  - \floatplacement{figure}{H}
+  - \floatplacement{table}{H}
+  - \usepackage{booktabs}
+  - \usepackage{caption}
+  - \captionsetup{labelfont=bf,margin=12pt} 
+  - \newcommand{\blandscape}{\begin{landscape}}
+  - \newcommand{\elandscape}{\end{landscape}}
+
+---
+
+<style>
+h1.title {
+  font-size: 48px;
+
+  text-align: center;
+}
+h1 {
+  font-size: 24px;
+}
+h2 {
+  font-size: 20px;
+}
+h3 {
+  font-size: 16px;
+}
+
+h4.author { 
+  text-align: center;
+}
+body {
+text-align: justify}
+</style>
+
+# Linear versus non-linear models
+
+Linear models are (relatively) easy to solve and calculate estimates for model parameters. Linear transformations are not always possible. When undertaking a non-linear approach, computer programs use an *iterative approach* to finding values for model parameters. With an iterative approach, a series of values for model parameters are tested to see which provide the values for model parameters that best fit the data. 
+
+The biggest difference you will notice in your introduction to non-linear modelling is that you will now be required to input an *initial estimate* for model parameters, i.e. you will have to give <TT>R</TT> a value for clearance and volume of distribution that you want it to start at in its search for its final estimate of the population value of that parameter. You give the program your best guess of what the true population value is and then the program tries to improve on it. 
+
+# Fixed-effects, random-effects and mixed-effects models
+Fixed-effects in an experiment or trial are controlled, or the same, for each individual. For example, drug dose and frequency of administration are usually fixed. They may also be variables where all possible values/levels are studied. For example, if you want to study the effect of smoking on the kinetics of a drug, you would study the drug kinetics in smokers- and non-smokers. The 'smoking' effect in your model is a fixed-effect since all levels of this factor (categorical)-variable are studied. 
+
+Random-effects in an experiment or trial are less controlled and do not include all possible levels. For example, we take a sample of participants in a trial, but we really want to know/make inferences about the population from which they are sampled. Since we do not study every single subject from the population, the participants in the study are a random effect. 
+
+Mixed-effects is simply a model which contains fixed- and random-effects. 
+
+# A note on $\eta$
+
+Let's imagine an individual in a clinical trial, lets call them individual $i$, or the $i$th individual. For $i$, their value of clearance will correspond to $$Cl_i=\theta_{Cl}\times e^{\eta_i}$$ now, it should be noted that $\eta$ is assumed to follow a normal distribution with mean of zero and standard deviation $\omega_{Cl}$ The mathematical notation for this is as follows $$\eta\sim N(0,\omega_{Cl}^2)$$ you will see from this that in a non-linear mixed-effects model, we do not estimate the population mean value of $\eta$ (since it is always zero), we estimate the variance, $\omega^2$. Again, we have to tell our computer program a value to start looking for this. 
+
+You will finally note, that by choosing to model $$Cl=\theta_{Cl}\times e^{\eta_{Cl}}$$ we are modelling clearance with a log-normal distribution. We *could* choose to model it $$Cl=\theta_{Cl}+ \eta_{Cl}$$but as we have previously demonstrated, our *prior* knowledge of clearance is that it is likely to have a log-normal distribution so we should choose to model it as such. 
+
+# $\mu$ referencing
+You will note in the <TT>nlmixr</TT> code that we seem to for no good reason input a '$log(value)$' for our initial parameter estimates and then place them in the exponential domain in our <TT>model()</TT> block of code. This is known as $\mu$ referencing. 
+
+Remember, we are modelling fixed and random effects for our model parameters $$Cl=\theta_{Cl}\times e^{\eta_{Cl}}$$ now, it just so happens that the estimation algorithms work a little better if all of the parameters being estimated are in the exponential domain. We have to write our model with a little mathematical fiddling to achieve this. $$e^a\times e^b=e^{a+b}\qquad  \textrm{AND}\qquad  e^{log(c)}=c$$ so instead of inputting $$Cl=\theta_{Cl}\times e^{\eta_{Cl}}$$ into our model we instead input $$Cl= e^{log(\theta_{Cl})+\eta_{Cl}}$$ <TT>nlmixr</TT> estimates $log(\theta)$ and then automatically back-transforms the final parameter estimates to the standard domain.
+
+# Residual variability
+In our non-linear mixed-effects model, we are more sophisticated about how we model variability, applying $\eta's$ to the model parameters $$Cl=\theta_{Cl}\times e^{\eta_{Cl}}$$ but these random-effects will not explain all of the deviation of the observed data. There will still be some left over, residual, error. So we add a residual error component to our model. 
+
+This is done in the <TT>linCmt() $\sim$ add(add.sd)</TT> line of code. Here we tell <TT>nlmixr</TT> that we wish our residual error to be modelled in an additive fashion, i.e. $$C=\frac{F.D.k_a}{V_d.(k_a-k_e)}.(e^{-k_et}-e^{-k_at})+\epsilon$$ again, we assume this residual error follows a normal distribution with mean $0$ and variance $\sigma^2$ $$\epsilon\sim N(0,\sigma^2)$$ and you will have noticed that we give <TT>nlmixr</TT> a starting value for $\sigma$. 
+
+# Components of a mixed-effects pharmacokinetic model
+We have above described two key parts of a pharmacokinetic model. The **structural** model and the **statistical** model. 
+
+## The structural model
+
+The structural model is the underlying equation that describes the mean population trend. In short, this is the compartmental model you have chosen to model the data with. In the example above this was the one-compartment oral-absorption model. $$C=\frac{F.D.k_a}{V_d.(k_a-k_e)}.(e^{-k_et}-e^{-k_at})$$
+
+## The statistical model
+
+The statistical model is how we have chosen to model the parameter- and residual- variability.
+
+Parameter variability you will recall referred to the $\eta$ terms, for example $$Cl=\theta_{Cl}\times e^{\eta_{Cl}}$$ where $$\eta\sim N(0,\omega_{Cl}^2)$$
+
+And our residual error model was the additive $+\epsilon$ where $$\epsilon\sim N(0,\sigma^2)$$
+
+Later in the course we will add a further component - the **covariate model**.
+
+
+

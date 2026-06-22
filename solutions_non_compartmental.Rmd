@@ -73,9 +73,9 @@ By the end of this session you should be able to:
 
 * Make a concentration-time plot for 'Sepsis' dataset
 
-* Calculate $C_{max}$, $T_{max}$ and $AUC_{0-t}$ for the 'Healthy' dataset
+* Estimate $C_{max}$, $T_{max}$ and $AUC_{0-t}$ for the 'Healthy' dataset
 
-* Calculate $C_{max}$, $T_{max}$ and $AUC_{0-t}$ for the 'Sepsis' dataset
+* Estimate $C_{max}$, $T_{max}$ and $AUC_{0-t}$ for the 'Sepsis' dataset
 
 * Estimate $Vd$ and $Cl$ for the 'Healthy' dataset
 
