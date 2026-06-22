@@ -19,6 +19,29 @@ header-includes:
 urlcolor: blue
 ---
 
+<style>
+h1.title {
+  font-size: 48px;
+
+  text-align: center;
+}
+h1 {
+  font-size: 24px;
+}
+h2 {
+  font-size: 20px;
+}
+h3 {
+  font-size: 16px;
+}
+
+h4.author { 
+  text-align: center;
+}
+body {
+text-align: justify}
+</style>
+
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(kableExtra)
