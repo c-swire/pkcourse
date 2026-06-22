@@ -419,62 +419,53 @@ h4.author {
 body {
 text-align: justify}
 </style>
-<div id="introduction" class="section level1">
-<h1>Introduction</h1>
-<p>In this session, we will build on our knowledge of coding and use ‘<TT>R</TT>’ to estimate some basic pharmacokinetic parameters using what is known as non-compartmental techniques.</p>
-</div>
 <div id="learning-outcomes" class="section level1">
 <h1>Learning outcomes</h1>
-<p>By the end of this week you should be able to:</p>
+<p>By the end of this session you should be able to:</p>
 <ul>
-<li>Use <TT>R</TT> to undertake basic, descriptive (non-compartmental) analysis of some pharmacokinetic data to estimate
+<li><p>Interpret a concentration-time plot</p></li>
+<li><p>Use <TT>R</TT> to undertake basic, descriptive (non-compartmental) analysis of some pharmacokinetic data to estimate</p>
 <ul>
 <li><span class="math inline">\(C_{max}\)</span></li>
 <li><span class="math inline">\(T_{max}\)</span></li>
 <li><span class="math inline">\(AUC_{0-t}\)</span></li>
-<li>Bioavailability (<span class="math inline">\(F\)</span>)</li>
 </ul></li>
-<li>Describe the linear trapezoidal method of estimating <span class="math inline">\(AUC\)</span>
-<ul>
-<li>State one disadvantage of this method</li>
-<li>Explain an alternative method that avoids this disadvantage</li>
-</ul></li>
+<li><p>Describe the relationship between clearance, dose and <span class="math inline">\(AUC\)</span></p></li>
+<li><p>List some benefits and limitations of non-compartmental PK analysis</p></li>
 </ul>
 </div>
-<div id="accessing-r-and-rstudio-on-a-university-computer" class="section level1">
-<h1>Accessing <TT>R</TT> and <TT>RStudio</TT> on a University computer</h1>
-<p>The two key tools for this session will be <TT>R</TT> and <TT>RStudio</TT>. These are free, open source pieces of software. They are both available on the University computers, but you may choose to download them onto your personal laptop or home computer.</p>
-<p>When you are using a University computer, you need to access <TT>RStudio</TT> via the University servers.</p>
-<p>The link for this is <a href="https://stats3.sgul.ac.uk/rstudio">here</a>. I suggest you save this as a ‘favourite’.</p>
-<p>Some reminders from last time:</p>
-<div id="setting-the-working-directory" class="section level2">
-<h2>Setting the working directory</h2>
-<p>Last session, I recommended that you make a folder on your personal (H:) drive to contain all your work for this module. You will need to remember (or check) what you called it.</p>
-<p>You can <TT>setwd()</TT> using your mouse and clicking on ‘session’ and ‘set working directory’. Alternatively (and more rapidly), you can use <TT>R</TT> code and the <TT>setwd()</TT> function.</p>
-<p><br></p>
-<pre class="r"><code>setwd()
-setwd(&quot;INSERT YOUR FILE PATH HERE&quot;)
-# or if on the server setwd(&quot;~/your_file_name/sub_folder_if_used/&quot;) </code></pre>
-<div id="packages-you-need-for-this-session" class="section level3">
-<h3>Packages you need for this session</h3>
+<div id="tasks" class="section level1">
+<h1>Tasks</h1>
+<ul>
+<li><p>Make a concentration-time plot for the ‘Healthy’ dataset</p></li>
+<li><p>Make a concentration-time plot for ‘Sepsis’ dataset</p></li>
+<li><p>Calculate <span class="math inline">\(C_{max}\)</span>, <span class="math inline">\(T_{max}\)</span> and <span class="math inline">\(AUC_{0-t}\)</span> for Healthy dataset</p></li>
+<li><p>Calculate <span class="math inline">\(C_{max}\)</span>, <span class="math inline">\(T_{max}\)</span> and <span class="math inline">\(AUC_{0-t}\)</span> for Sepsis dataset</p></li>
+<li><p>Estimate Vd and Cl for Healthy dataset</p></li>
+<li><p>Estimate Vd and Cl for Sepsis dataset</p></li>
+</ul>
+<p>Extension tasks:
+* Can you put plots of Healthy and Sepsis datasets on the same Figure?
+* Can you make a table to compare <span class="math inline">\(C_{max}\)</span>, <span class="math inline">\(T_{max}\)</span> and <span class="math inline">\(AUC_{0-t}\)</span> for Healthy and Sepsis datasets?</p>
+</div>
+<div id="packages-you-need-for-this-session" class="section level1">
+<h1>Packages you need for this session</h1>
 <p>Link your path using the following line of code and then call <TT>library(tidyverse)</TT>.</p>
 <pre class="r"><code>.libPaths( c( .libPaths(),
-&quot;/homes/dlonsdale-pharmacokinetics/sghms/bms/shares/Advanced-Pharmacokinetics/4.4.2/library&quot;) )
+              &quot;/homes/dlonsdale-pharmacokinetics/sghms/bms/shares/Advanced-Pharmacokinetics/4.4.2/library&quot;) )
 #note that you need the &#39;.&#39; before &#39;libPaths&#39;
 library(tidyverse)</code></pre>
 </div>
-</div>
-</div>
-<div id="accessing-data-for-this-session" class="section level1">
-<h1>Accessing data for this session</h1>
-<p>For this session we will be using PK data for an anti-epileptic. 6 participants were given an IV dose and then one week later they were given an oral dose. Drug concentrations were measured.</p>
-<p>You can download the data for this session directly from GitHub. There are two files. Copy and paste my code.</p>
+<div id="teaching-data-for-this-session" class="section level1">
+<h1>Teaching data for this session</h1>
+<p>For this session we will be using PK data for an anti-epileptic drug. 6 participants were given an IV dose and then one week later they were given an oral dose. Drug concentrations were measured.</p>
+<p>If you want to access these datasets yourself you can copy the code below.</p>
 <pre class="r"><code>IV&lt;-read.csv(&quot;https://raw.githubusercontent.com/dlonsdal/non_compartmental/main/docs/PK_IV.csv&quot;)
 
 
 ORAL&lt;-read.csv(&quot;https://raw.githubusercontent.com/dlonsdal/non_compartmental/main/docs/PK_oral.csv&quot;)</code></pre>
-<p><strong>Task:</strong> Plot the data for the IV and oral data.</p>
-<p><em>Hint: Review the <a href="https://dlonsdal.github.io/intro_r_solutions/">notes</a> from the last session and use some <TT>ggplot()</TT> code</em></p>
+<p><strong>How to:</strong> Plot the data for the IV and oral data.</p>
+<p><em>Hint: More detailed notes on putting together plots are included in the Introduction to R page</em></p>
 <pre class="r"><code>ggplot(data=IV,aes(x=time, y=conc,col=id) )+
   geom_line()+
   geom_point()+
@@ -486,12 +477,11 @@ ORAL&lt;-read.csv(&quot;https://raw.githubusercontent.com/dlonsdal/non_compartme
 <div id="estimating-c_max" class="section level1">
 <h1>Estimating <span class="math inline">\(C_{max}\)</span></h1>
 <p>Remember that <span class="math inline">\(C_{max}\)</span> is observed from our data. We find the max value per participant and report it. We actually did this in the last session.</p>
-<p><strong>Tasks:</strong></p>
+<p><strong>How to:</strong></p>
 <ul>
 <li>Estimate <span class="math inline">\(C_{max}\)</span> for the IV and oral data</li>
 <li>Estimate the mean <span class="math inline">\(C_{max}\)</span> for the IV and oral data</li>
 </ul>
-<p><em>Advanced: Output both IV and oral data together in one table</em></p>
 <pre class="r"><code>IV%&gt;%
   group_by(id)%&gt;%
   summarise(cmax=max(conc))</code></pre>
@@ -573,7 +563,7 @@ FULL %&gt;%
 <h1>Estimating <span class="math inline">\(T_{max}\)</span></h1>
 <p>This is a little more tricky. We need to get <TT>R</TT> to find <span class="math inline">\(C_{max}\)</span> and then keep the associated value for time.</p>
 <p>Try a Google search for this. Something like ‘using group by to get the value corresponding to the max value of another column’.</p>
-<p><strong>Task:</strong> Estimate <span class="math inline">\(T_{max}\)</span> for the IV and oral data</p>
+<p><strong>How to:</strong> Estimate <span class="math inline">\(T_{max}\)</span> for the IV and oral data</p>
 <pre class="r"><code>ORAL %&gt;% 
   group_by(id) %&gt;% 
   summarise(cmax=max(conc),
@@ -612,7 +602,7 @@ Figure 1: Participant ‘A’ oral concentration-time profile, with trapezoids i
 <p>To calculate the area under the curve of the trapezoid ABCD in Figure <a href="#fig:trap">1</a> we use the equation for the area of a trapezoid. <span class="math display">\[Area = \frac{1}{2}*(height_{1,AB}+height_{2,CD})*base_{AD}\]</span>
 The two heights correspond to concentrations B and C and the base is the distance A to D (the change in time <span class="math inline">\(\Delta t\)</span>) in Figure <a href="#fig:trap">1</a>. So more fully for this example, where <em>height</em> is replaced with <em>concentration</em> <span class="math inline">\((C)\)</span>: <span class="math display">\[AUC_{0-8} = \sum_{t=0}^{t=8} \Delta t\frac{(C_1+C_2)}{2}\]</span></p>
 <p>Fortunately,<TT>R</TT> has an inbuilt function that allows us to calculate the <span class="math inline">\(AUC\)</span>. The handily named <TT>AUC()</TT> function. You need to provide it with three commands, <TT>x=…,y=…</TT> and <TT>method=“trapezoid”</TT>. It is in the <TT>DescTools</TT> library.</p>
-<p>I will show you how to calculate using the oral data.</p>
+<p>Here is how to calculate using the oral data:</p>
 <pre class="r"><code>library(DescTools)
 ORAL%&gt;% 
   group_by(id) %&gt;% 
@@ -626,7 +616,7 @@ ORAL%&gt;%
 ## 4 D      139.
 ## 5 E      129.
 ## 6 F      136.</code></pre>
-<p><strong>Tasks:</strong></p>
+<p><strong>How to:</strong></p>
 <ul>
 <li>Calculate <span class="math inline">\(AUC\)</span> for the IV data</li>
 <li>Calculate mean <span class="math inline">\(AUC\)</span> for each dataset</li>
@@ -675,6 +665,57 @@ Figure 2: Participant ‘A’ IV concentration-time profile with curved line of 
 </p>
 </div>
 <p>It is worth noting the trapezoid method has limitations. Most notably that it will <em>overestimate</em> <span class="math inline">\(AUC\)</span> by virtue of taking a straight line between points, when the true concentration will fall in an logarithmic (curve) fashion (Figure <a href="#fig:trapbest">2</a>). There are methods to improve this accuracy, such as the logarithmic trapezoidal method. With this method, the ‘trapezoid’ is given a curved top (like the red line in Figure <a href="#fig:trapbest">2</a>). The formula for this method is <span class="math display">\[AUC = \sum_{t=0}^{t=\tau} \frac{\Delta t}{ln(\frac{C_1}{C_2})} (C_1+C_2)\]</span></p>
+<div style="page-break-after: always;"></div>
+<div id="using-package-to-undertake-non-compartmental-analysis" class="section level3">
+<h3>Using package to undertake non-compartmental analysis</h3>
+<p>If that all seems like too much hard work and should just jolly well get on and do for us then you are right! There are a few non-compartmental analysis packages available, we will use . Remember you will need to run the first time you wish to use this package, once it has been installed you need to run .</p>
+<p>To run non-compartmental analysis using this package, we need to give some dosing data. We know that all the participants were given a dose of 1000 mg of amoxicillin at time <span class="math inline">\(t=0\)</span>. To add a new column (variable) using we use the function.</p>
+<pre class="r"><code>amox&lt;- read.csv(&quot;https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/refs/heads/main/amoxicillinPK.csv&quot;) 
+
+damox&lt;-amox %&gt;%  # remember we will need to save this as a new object
+  subset(time==0) %&gt;% 
+  mutate(dose=1000) #this produces a new variable dose 1000</code></pre>
+<p><strong>Task:</strong> Run this line of code and have a look at the newly created ‘damox’ object</p>
+<p>Now we can call and run . First we create a sampling (or concentration) object and then a dosing object. In each function we instruct of the names of our data object and the relevant variables in it. Then we combine the two and run our non-compartmental analysis.</p>
+<pre class="r"><code>library(PKNCA)
+conc&lt;-PKNCAconc(amox, conc~time|ID) #create sampling object
+dose&lt;-PKNCAdose(damox, dose~time|ID) #create dosing object
+full&lt;-PKNCAdata(conc, dose)  #combine
+results&lt;-pk.nca(full)  # analyse
+summary(results) #summarise the results</code></pre>
+<pre><code>## Warning: package &#39;PKNCA&#39; was built under R version 4.5.2</code></pre>
+<pre><code>## 
+## Attaching package: &#39;PKNCA&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:stats&#39;:
+## 
+##     filter</code></pre>
+<p><strong>Task:</strong> Look at the value for <span class="math inline">\(AUC\)</span> produced here and compare it to the one earlier. What do you notice? Why do you think there is a discrepancy?</p>
+<p>The answer is that by default, PKNCA uses logarithmic trapezoid method to calculate <span class="math inline">\(AUC\)</span>. If you want to set this to linear logarithmic method you can set this as an option. Note that it also uses the ‘geometric’ rather than arithmetic mean.</p>
+<pre class="r"><code>full&lt;-PKNCAdata(conc, dose,options=list(auc.method=&quot;linear&quot;)) 
+results&lt;-pk.nca(full)  
+summary(results)</code></pre>
+</div>
+</div>
+<div id="estimating-clearance" class="section level2">
+<h2>Estimating clearance</h2>
+<p>Remember that clearance can be calculated as <span class="math display">\[CL = \frac{Dose}{AUC}\]</span></p>
+<div style="page-break-after: always;"></div>
+</div>
+<div id="limitations-of-non-compartmental-analysis" class="section level2">
+<h2>Limitations of non-compartmental analysis</h2>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:traperror"></span>
+<img src="solutions_non_compartmental_files/figure-html/traperror-1.png" alt="Participant A amoxicillin concentration-time profile showing impact of reduced sampliing on AUC calculation" width="432" />
+<p class="caption">
+Figure 3: Participant A amoxicillin concentration-time profile showing impact of reduced sampliing on AUC calculation
+</p>
+</div>
+<p>Non-compartmental analyses are useful for many reasons. For example, they use relatively straightforward algebra with few assumptions about the data to calculate summary pharmacokinetic information. Most regulators will require non-compartmental analysis of data as part of regulatory submissions. There are some disadvantages that are worth being aware of. These include:</p>
+<ul>
+<li>Need for rich sampling (multiple samples from each subject)</li>
+<li>Use of direct observation of C~max and T~max means <em>true</em> values are missed for any particular subject</li>
+<li>Increasing accuracy requires increased number of participants or samples, which can be technically chalenging and expensive</li>
+</ul>
+<p>Have a look at Figure <a href="#fig:traperror">3</a>, where a situation is imagined that <span class="math inline">\(time=2\)</span> data point is not sampled. You can see the likely impact on the estimate of AUC from this.</p>
 </div>
 </div>
 
