@@ -65,13 +65,14 @@ library(PKNCA)
 library(RColorBrewer)
 library(broom)
 library(nlmixr2)
+library(nlmixr2data)
 ```
 
 # Learning outcomes  
 
-* Describe what a compartmental model adds over non-compartmental analysis
-* Fit a one-compartment IV bolus model in nlmixr2
-* Read a model parameter table and relate the estimates to the values from Session 1
+* List advantages and disadvantages of compartmental analysis
+* Describe the difference between a fixed effect and a random effect in a population pharmacokinetic model
+* Interpret the key parameter estimates from a fitted model (clearance and volume of distribution)
 
 # Tasks
 
@@ -80,10 +81,16 @@ library(nlmixr2)
 * Compare volume of distribution and clearance values for the two datasets
 * Compare volume of distribution and clearance values using non-compartmental and compartmental analysis
 
-### Extension tasks:
+### Extension tasks
 
 * Fit two-compartment models to the datasets
 * Create diagnostic plots for your models (See Additional Materials)
+
+## Datasets for tasks
+
+## Dataset used in workbook example
+
+
 
 # Introduction 
 
@@ -100,7 +107,7 @@ The purpose of this session, is to introduce the concept of non-linear mixed-eff
 * Enables modelling of sparse data, useful in later phase studies
 * Allows more complex identification of covariate effects (for example organ function)
 * Alternative sampling and modelling may allow for populations to be studied that are not straightforward to study in traditional phase-0/1 design (for example children, or drugs in pregnancy)
-* Allows complex simulations which can inform subsequent study design
+* Allows complex simulations which can inform subsequent study design and drug dosing
 
 **Disadvantages of non-linear mixed-effects approach**
 
@@ -177,7 +184,18 @@ ggplotRegression(lm(log(conc) ~ time, data = fru))
 
 # Population pharmacokinetic modelling
 
+## What is mixed effects modelling?
+
+In a population pharmacokinetic model, we assume that each individual's pharmacokinetic parameters (e.g. clearance) are made up of two components.
+
+The fixed effect represents the typical value across the population. For example, the typical clearance of Drug A in healthy volunteers. This is what we usually report as the headline result of a population pharmacokinetic analysis.
+
+The random effect represents how much any given individual deviates from that typical value. Not everyone has the same clearance. Some patients clear the drug faster, some slower. The random effect captures this between-subject variability. We cannot predict it perfectly, but we can estimate how large it is.
+
+A mixed-effects model contains both components. 
+
 ### Using a compartmental pharmacokinetic model to provide an example of what we mean
+
 Let's return to the one-compartment IV-bolus model once more. Let us parameterise using *primary* pharmacokinetic parameters (clearance and volume of distribution). Broadly, our model remains the same $$C=C_{0}e^{-\frac{Cl}{V}t}$$ however, we now add a further layer, by stating that our parameters are made up of a fixed (population mean, $\theta$) effect and a random (inter-individual variability, $\eta$) effect. $$Cl=\theta_{Cl}\times e^{\eta_{Cl}}$$ the modelling process then estimates $$\theta_{Cl}\textrm{ -the population mean value for clearance (a fixed effect)}$$ and makes some estimate of $$\eta_{Cl} \textrm{ -individual variability of clearance (a random-effect)}$$
 
 Similarly, we model volume of distribution as $$V=\theta_{V}\times e^{\eta_{V}}$$ 
@@ -186,19 +204,35 @@ Similarly, we model volume of distribution as $$V=\theta_{V}\times e^{\eta_{V}}$
 
 Non-linear mixed-effects modelling is computationally complex and requires knowledge of statistics, pharmacological models and how to use computer code. We are going to enter into the world of population pharmacokinetic modelling by using the package <TT>nlmixr</TT>. 
 
-Installing <TT>nlmixr</TT> is a little complicated. You *may* be able to do it by simply calling <TT>install.packages(nlmixr2)</TT> or <TT>install.packages(nlmixr2, type="source")</TT>. However it is more likely that you will first need to install [<TT>Rtools</TT>](https://cran.rstudio.com/bin/windows/Rtools/) (if you use a windows machine) or [<TT>Xcode Command Line Tools</TT>](https://www.freecodecamp.org/news/install-xcode-command-line-tools/) (if you are on an Apple Mac). These programs and the <TT>nlmixr</TT> package take up a considerable amount of memory. The install on an Apple Mac can be particularly painful. It is unlikely that I will be able to support all of you to install this on your machines yourself so you will need to try to troubleshoot your own install issues if you choose to install on your own machine. 
-
 ## Using <TT>nlmixr</TT>
 
 First you need to call <TT>library(nlmixr2)</TT> to load the package. 
 
-In this example we fit a one-compartment oral-absorption model to sparse furosemide data. 
+In this example we fit a one-compartment oral-absorption model to sparse data after an oral dose of furosemide is taken. 
+
+```{r fruhead,warning=F,message=F}
+sparse<-
+ read_csv("https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/main/sparsefru.csv")
+
+kbl(head(sparse), booktabs = TRUE, caption = "First few rows of the furosemide dataset") %>%
+  kable_styling(latex_options = c("striped"))
+
+```
+
+<TT>nlmixr2</TT> requires data to be structured and labelled in a particular way. 
+
+* ID = patient ID
+* TIME = time (since administration of dose)
+* DV = dependent variable (drug concentration)
+* AMT = amount (dose)
+* EVID = event identifier (tells <TT>nlmixr2</TT> whether that row represents an observation or dose event)
+* CMT = compartment (1 = depot compartment, 2 = central compartment).
 
 Then you need to build your model. When building the model, you specify two blocks in a standard <TT>R function()</TT>. As always, you give your function a name, I have chosen <TT>one.cmt</TT>. 
 
 ### Ini block
 
-The first part of the function is to set the initial estimates for your model parameters, this is known as the <TT>ini()</TT> block. We are parameterising using $k_a$, $Cl$ and $V$ in our one-compartment oral-absorption model. So we need to tell <TT>nlmixr</TT> initial values for each of these parameters *as well as* values for the random-effects associated with each parameter. 
+The first part of the function is to set the initial estimates for your model parameters, this is known as the <TT>ini()</TT> block. We are parameterising using $k_a$, $Cl$ and $V$ in our one-compartment oral-absorption model. So we need to tell <TT>nlmixr</TT> initial values for each of these parameters *as well as* values for the random effects associated with each parameter. 
 
 ### Model block
 
@@ -218,7 +252,7 @@ one.cmt <- function() {
     tka <-log(1.3) # set the initial estimates for each parameter, note that ka will not be required for IV datasets
     tcl <- log(8) 
     tv <- log(20)
-    eta.ka~0.1 # interindividual variabilities
+    eta.ka~0.1 # inter-individual variabilities
     eta.cl ~ 0.1
     eta.v ~ 0.1
     add.sd <- 0.01 # residual variability

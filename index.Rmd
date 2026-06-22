@@ -7,8 +7,29 @@ knitr::opts_chunk$set(echo = TRUE, fig.pos= "H")
 library(knitr)
 ```
 
-Aim of the PK training day:
-To be able run basic PK analyses in R, interpret the outputs, and describe how sepsis alters drug behaviour in ways that have implications for dosing.
+## Aims of the training day
+
+Pharmacokinetic analysis allows us to characterise drug exposure in clinical populations, including the variability in exposure between patients — and to understand what drives that variability. This kind of analysis underpins model-informed  dosing, an approach that is increasingly used in clinical practice to optimise drug exposure for individual patients or patient groups.
+
+By the end of today, you should have a clearer understanding of the basic principles of pharmacokinetics and an appreciation of what pharmacokinetic analysis can offer. We do not expect that you will routinely build these models yourself, but working through the process is a good way to understand what the numbers mean and what questions this kind of analysis can answer.
+
+We won't reach simulation today, but it is worth knowing where this leads: a well-fitted model can be used to explore dosing strategies, identify patients at risk of under- or over-exposure, and inform the design of future studies.
+
+### Clinical scenario
+
+All three sessions will use the same dataset. Patients with and without sepsis have received a 100 mg intravenous bolus of Drug A, a renally-cleared antibiotic.
+
+Sepsis alters human physiology in ways that are relevant to pharmacokinetics (e.g through enhanced renal clearance) and this may substantially affect drug exposure. 
+
+In Sessions 1 and 2 you will analyse the 'healthy' and 'sepsis' populations separately, building familiarity with the data and methods. In Session 3 you will combine the datasets and ask whether sepsis status explains between-patient variability in Drug A's pharmacokinetics.
+
+### Planned sessions
+
+We may adapt this based on how we progress, but we are planning to cover:
+
+* Session 1: Describing Drug A exposure using non-compartmental analysis
+* Session 2: Describing Drug A exposure using a compartmental model
+* Session 3: Explaining variability in Drug A exposure
 
 ```{r echo=FALSE}
 schedule <- data.frame(
@@ -35,13 +56,13 @@ schedule <- data.frame(
 kable(schedule, caption = "Timetable")
 ```
 
-### Set-up for the practical sessions
+## Set-up for the practical sessions
 
 We are planning for everyone to use RStudio via [Posit Cloud](https://posit.cloud/).
 
 This is simple to set up. Please would you register for a free account and install the required packages as outlined in [this](https://dlonsdal.github.io/SGUL_PK_data/videos/positsetup.mp4) two-minute video. 
 
-For those of you who already have RStudio, we still recommend using Posit Cloud as the nlmixr2 package can be a bit tricky to install. 
+For those of you who already have RStudio, we still recommend using Posit Cloud as the <TT>nlmixr2<\TT> package can be a bit tricky to install. 
 
 ### Teaching materials
 
@@ -49,5 +70,5 @@ All the teaching materials on this webpage are adapted from materials developed 
 
 These are designed to walk you through what you need to know to carry out the tasks in each session. 
 
-### Datasets for use during today's tasks
+## Datasets for use during today's tasks
 

@@ -298,9 +298,48 @@ $(document).ready(function () {
 </div>
 
 
-<p>Aim of the PK training day: To be able run basic PK analyses in R,
-interpret the outputs, and describe how sepsis alters drug behaviour in
-ways that have implications for dosing.</p>
+<div id="aims-of-the-training-day" class="section level2">
+<h2>Aims of the training day</h2>
+<p>Pharmacokinetic analysis allows us to characterise drug exposure in
+clinical populations, including the variability in exposure between
+patients — and to understand what drives that variability. This kind of
+analysis underpins model-informed dosing, an approach that is
+increasingly used in clinical practice to optimise drug exposure for
+individual patients or patient groups.</p>
+<p>By the end of today, you should have a clearer understanding of the
+basic principles of pharmacokinetics and an appreciation of what
+pharmacokinetic analysis can offer. We do not expect that you will
+routinely build these models yourself, but working through the process
+is a good way to understand what the numbers mean and what questions
+this kind of analysis can answer.</p>
+<p>We won’t reach simulation today, but it is worth knowing where this
+leads: a well-fitted model can be used to explore dosing strategies,
+identify patients at risk of under- or over-exposure, and inform the
+design of future studies.</p>
+<div id="clinical-scenario" class="section level3">
+<h3>Clinical scenario</h3>
+<p>All three sessions will use the same dataset. Patients with and
+without sepsis have received a 100 mg intravenous bolus of Drug A, a
+renally-cleared antibiotic.</p>
+<p>Sepsis alters human physiology in ways that are relevant to
+pharmacokinetics (e.g through enhanced renal clearance) and this may
+substantially affect drug exposure.</p>
+<p>In Sessions 1 and 2 you will analyse the ‘healthy’ and ‘sepsis’
+populations separately, building familiarity with the data and methods.
+In Session 3 you will combine the datasets and ask whether sepsis status
+explains between-patient variability in Drug A’s pharmacokinetics.</p>
+</div>
+<div id="planned-sessions" class="section level3">
+<h3>Planned sessions</h3>
+<p>We may adapt this based on how we progress, but we are planning to
+cover:</p>
+<ul>
+<li>Session 1: Describing Drug A exposure using non-compartmental
+analysis</li>
+<li>Session 2: Describing Drug A exposure using a compartmental
+model</li>
+<li>Session 3: Explaining variability in Drug A exposure</li>
+</ul>
 <table>
 <caption>Timetable</caption>
 <thead>
@@ -340,8 +379,10 @@ ways that have implications for dosing.</p>
 </tr>
 </tbody>
 </table>
-<div id="set-up-for-the-practical-sessions" class="section level3">
-<h3>Set-up for the practical sessions</h3>
+</div>
+</div>
+<div id="set-up-for-the-practical-sessions" class="section level2">
+<h2>Set-up for the practical sessions</h2>
 <p>We are planning for everyone to use RStudio via <a
 href="https://posit.cloud/">Posit Cloud</a>.</p>
 <p>This is simple to set up. Please would you register for a free
@@ -349,8 +390,8 @@ account and install the required packages as outlined in <a
 href="https://dlonsdal.github.io/SGUL_PK_data/videos/positsetup.mp4">this</a>
 two-minute video.</p>
 <p>For those of you who already have RStudio, we still recommend using
-Posit Cloud as the nlmixr2 package can be a bit tricky to install.</p>
-</div>
+Posit Cloud as the <TT>nlmixr2&lt;&gt; package can be a bit tricky to
+install.</p>
 <div id="teaching-materials" class="section level3">
 <h3>Teaching materials</h3>
 <p>All the teaching materials on this webpage are adapted from materials
@@ -358,8 +399,9 @@ developed by Dr Dagan Lonsdale.</p>
 <p>These are designed to walk you through what you need to know to carry
 out the tasks in each session.</p>
 </div>
-<div id="datasets-for-use-during-todays-tasks" class="section level3">
-<h3>Datasets for use during today’s tasks</h3>
+</div>
+<div id="datasets-for-use-during-todays-tasks" class="section level2">
+<h2>Datasets for use during today’s tasks</h2>
 </div>
 
 

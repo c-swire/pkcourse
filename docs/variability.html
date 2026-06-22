@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Dagan Lonsdale" />
+
+
+<title>Introduction to covariate modelling</title>
+
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">PK course</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Introduction to R
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="intro_r.html">Workbook</a>
+    </li>
+    <li>
+      <a href="intro_r_solutions.html">Solutions to extension exercises</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="solutions_non_compartmental.html">Session 1</a>
+</li>
+<li>
+  <a href="nlmem.html">Session 2</a>
+</li>
+<li>
+  <a href="variability.html">Session 3</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Introduction to covariate modelling</h1>
+<h4 class="author">Dagan Lonsdale</h4>
+
+</div>
+
+
+<div id="learning-objectives" class="section level1">
+<h1>Learning objectives</h1>
+<ul>
+<li>Explain what a covariate is and give an example of how patient characteristics might influence a pharmacokinetic parameter</li>
+<li>Interpret the results of a covariate analysis and describe what the findings mean for Drug A’s pharmacokinetics in patients with sepsis</li>
+<li>Describe how a population pharmacokinetic model could be used to inform dosing decisions for individual patients or patient groups</li>
+</ul>
+</div>
+<div id="tasks" class="section level1">
+<h1>Tasks</h1>
+<ul>
+<li>Fit a one-compartment IV bolus model for the combined dataset</li>
+<li>Test for covariate effect of weight on volume of distribution</li>
+<li>Test for covariate effect of sepsis on clearance</li>
+</ul>
+<div id="extension-tasks" class="section level2">
+<h2>Extension tasks</h2>
+<ul>
+<li>Plot a visual predictive check for</li>
+</ul>
+</div>
+</div>
+<div id="definition-of-a-covariate" class="section level1">
+<h1>Definition of a covariate</h1>
+<p>In statistical terms a variable is something that can be quantified in some way - e.g. measured or counted.</p>
+<p>A covariate is a variable that changes (varies) with (co) the outcome of interest. In modeling covariates are variables additional to the core predictor variable in the model (e.g. dose) that may be used to help model the outcome variable (e.g. concentration). An example might be that weight would be expected to affect volume of distribution for many drugs and so it might be reasonable to include a weight effect on the volume of distribution parameter in a pharmacokinetic model.</p>
+</div>
+<div id="common-types-of-covariate" class="section level1">
+<h1>Common types of covariate</h1>
+<p>Hopefully it will not come as a surprise to you that covariates may be described as:</p>
+<ul>
+<li>Continuous variable
+<ul>
+<li>Taking any possible (real) value (even within a range of values)</li>
+<li>Examples might include serum creatinine, weight or age</li>
+</ul></li>
+<li>Discrete variable
+<ul>
+<li>Countable numeric</li>
+<li>For example integer values like number of doses</li>
+</ul></li>
+<li>Categorical variable
+<ul>
+<li>Data that is placed in a number of discrete (uncountable) categories</li>
+<li>There are sub-types of categorical variable that it is useful to know:
+<ul>
+<li>Binary (e.g. sex)</li>
+<li>Ordered (e.g. grade of renal injury 1, 2, 3 with increasing severity)</li>
+<li>Un-ordered (e.g. ethnicity)</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+<div id="why-bother-to-include-covariates-in-a-model" class="section level1">
+<h1>Why bother to include covariates in a model?</h1>
+<p>We have discussed how non-linear mixed-effects models allow us to describe inter-individual differences in pharmacokinetic parameters - these are our <span class="math inline">\(\eta\)</span> terms.</p>
+<p>As an extension of this, it would be nice to try and understand and explain some of this variability so that we can:</p>
+<ul>
+<li>Explain it biologically, rather than just mathematically</li>
+<li>Use this information to make decisions about our drugs
+<ul>
+<li>For example if we find that renal function is linked with clearance of a drug, we might recommend different doses for those with kidney disease</li>
+</ul></li>
+</ul>
+</div>
+<div id="choosing-covariates-to-include-in-a-model" class="section level1">
+<h1>Choosing covariates to include in a model</h1>
+<p>The choice of what covariates one should include in a model is complex.</p>
+<p>Broadly (and briefly) modelers may take an approach to test the effect of all variables in a data set on all parameters in the model. A process of testing each covariate can be automated by programs like and . In such a process, each varibble is tested in turn in a step-wise fashion. If inclusion of a variable provides an improved model fit, it is retained in the model as a covariate and the program then moves on to test the next variable. This is known as step-wise covariate modelling (SCM). This can be a time-consuming (and processor hungry) process.</p>
+<p>Alternatively, knowledge about the drug’s pharmacology (prior information) may be used by the modeler to choose specific variables to test as part of the model building process. For example, in the knowledge that a drug is renally excreted, it would be prudent to test the effect of some measure of kidney function (for example serum creatinine or estimated glomerular filtration rate) on drug clearance.</p>
+<p>There are some tools that can help us. For example we can plot pharmacokinetic parameters (or <span class="math inline">\(\eta\)</span>) against potential covariates to look for trends/relationships to then text in our mode.</p>
+</div>
+<div id="assessing-whether-adding-a-covariate-improves-a-models-fit" class="section level1">
+<h1>Assessing whether adding a covariate improves a model’s fit</h1>
+<p>There are a wealth of diagnostic plots that can be used to think about how well a model fits data from an experiment. We will look at a few key examples.</p>
+<div id="dv-vs-pred-and-dv-vs-ipred" class="section level2">
+<h2>DV vs PRED and DV vs IPRED</h2>
+<p>The most straightforward diagnostic plot available is a plot of observations (dependent variable, DV) vs predicted concentrations from a model. There are two subsets of this type of plot. The first, DV vs PRED takes predictions based on population parameters (i.e. excluding <span class="math inline">\(\eta\)</span>’s) and the second is DV vs IPRED, which bases predictions on individual values for model parameters (including <span class="math inline">\(\eta\)</span>’s).</p>
+<p>Figure <a href="#fig:frufit">1</a> shows these diagnostic plots for the furosemide data.</p>
+<pre class="r"><code>link &lt;- &quot;https://github.com/dlonsdal/SGUL_PK_data/blob/main/frufit.rds?raw=true&quot;
+fru.fit &lt;- readRDS(url(link, method=&quot;libcurl&quot;))
+modfit&lt;-data.frame(fru.fit)
+ggplot(modfit,aes(x=PRED,y=DV))+
+  geom_point()+
+  theme_bw(base_size=18)+
+  geom_abline(intercept = 0, slope=1)+
+  geom_smooth(col=&#39;red&#39;,se=F)+
+  xlim(0,1.25)+ylim(0,1.25)
+ggplot(modfit,aes(x=IPRED,y=DV))+
+  geom_point()+
+  theme_bw(base_size=18)+
+  geom_abline(intercept = 0, slope=1)+
+  geom_smooth(col=&#39;red&#39;,se=F)+
+  xlim(0,1.25)+ylim(0,1.25)</code></pre>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:frufit"></span>
+<img src="variability_files/figure-html/frufit-1.png" alt="Basic diagnostic plots for furosemide one-compartment, oral-absorption model fit from Chapter 4" width="50%" /><img src="variability_files/figure-html/frufit-2.png" alt="Basic diagnostic plots for furosemide one-compartment, oral-absorption model fit from Chapter 4" width="50%" />
+<p class="caption">
+Figure 1: Basic diagnostic plots for furosemide one-compartment, oral-absorption model fit from Chapter 4
+</p>
+</div>
+<p>Take a look at Figure <a href="#fig:frufit">1</a>(a) first. A <em>perfect</em> model fit would have predictions that were identical to the observations from the experiment. All of the points in the scatterplot would fall in a straight line along the line of unity (<span class="math inline">\(DV=PRED\)</span>). However, as we have discussed previously, <em>real-world</em> data is never perfect, individuals have PK parameters that deviate from the population mean values and there will be un-modelled error. So, what we are really looking for in this plot is a degree of even spread of points above and below the line of unity. Any groups of data points deviating away from this line of unity might make us suspicious that there is some underlying variability not being modelled.</p>
+<p>In our example in Figure <a href="#fig:frufit">1</a>(a) we can see that there is pretty reasonable fit, with even distribution of data points. A red ‘line of best fit’ tracks fairly evenly along the line of unity. This suggests our model fit is pretty good.</p>
+<p>Figure <a href="#fig:frufit">1</a>(b) shows DV vs IPRED.
+This is individualised predictions, taking into account that random-effect associated with an individual ($). Again, the perfect model fit has all lines along the line of unity. DV vs IPRED plots will generally always look a little better than DV vs PRED plots in this regard. However, it is unusual to get such a tight fit as we see in Figure <a href="#fig:frufit">1</a>(b) as usually there is additional unexplained variability in data. The example here looks relatively perfect because I simulated these data and I did not simulate complex variability!</p>
+</div>
+<div id="conditionally-weighted-residuals" class="section level2">
+<h2>Conditionally-weighted residuals</h2>
+<p>We can look at the idea of residuals from our non-linear mixed-effects models in the same way as we did with our linear models. We can look to see that our residuals remain even across the range of sampling times and observed concentrations.</p>
+<p>We are going to introduce a further step, normalising the residuals through a weighting step. This is important because residuals might be influenced by the magnitude of the observation (e.g. you might find a greater range of residuals around <span class="math inline">\(C_{max}\)</span> compared to around <span class="math inline">\(C_{min}\)</span>). Weighting the residuals in order to standardise them makes it easier to think about what is happening with model predictions across the full range of observations. We will use conditionally weighted residuals (<TT>CWRES</TT>), which are a fairly standard form of residual. You don’t need to know exactly how these are created, unless you decide to pursue modelling as a career of course……</p>
+<p>Additionally, this leads to a situation where the conditionally weighted residuals (<TT>CWRES</TT>) should follow an approximately normal distribution with mean zero and variance 1.<span class="math display">\[CWRES\sim N(0,1)\]</span> This is helpful because we can expect 99.7% of data points to fall within <span class="math inline">\(+/- 3\)</span>. We can look for trends in this kind of plot to help with our model building process.</p>
+<p><TT>nlmixr2</TT> will output <TT>CWRES</TT> through an additional <TT>tableControl()</TT> command.</p>
+<pre class="r"><code>one.cmt &lt;- function() {
+  ini({ 
+    tcl &lt;- log(0.01) 
+    tv &lt;- log(1)
+    eta.cl ~ 0.1
+    eta.v ~ 0.1
+    add.sd &lt;- 0.1
+  })
+  model({
+    cl &lt;- exp(tcl + eta.cl)
+    v &lt;- exp(tv + eta.v)
+    linCmt() ~ add(add.sd)
+  })
+}
+
+drugxsim&lt;-read_csv(&quot;https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/main/drugxsim.csv&quot;)
+
+drugxfit&lt;-nlmixr2(one.cmt,drugxsim,est=&quot;saem&quot;,
+       list(print=0),
+       table = tableControl(cwres = TRUE))</code></pre>
+<pre><code>## [====|====|====|====|====|====|====|====|====|====] 0:00:00</code></pre>
+<pre class="r"><code>modfit&lt;-data.frame(drugxfit)</code></pre>
+<pre class="r"><code>ggplot(modfit,aes(x=tad,y=CWRES))+
+  geom_point()+
+  theme_bw(base_size=9)+
+  xlab(&#39;Time after dose (h)&#39;)+
+  geom_abline(intercept = 0, slope=0)+
+  geom_smooth(col=&#39;red&#39;,se=F)+
+  ylim(-3,3)</code></pre>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:cwres"></span>
+<img src="variability_files/figure-html/cwres-1.png" alt="Conditionally weighted residuals plotted against time from dose" width="576" />
+<p class="caption">
+Figure 2: Conditionally weighted residuals plotted against time from dose
+</p>
+</div>
+<p>You can see from Figure <a href="#fig:cwres">2</a> that we are lacking in a uniform distribution of <TT>CWRES</TT> across sampling times. In fact, this U-shape that is seen in the <TT>CWRES</TT> plot can be indicative of the need for an additional compartment in the model.</p>
+</div>
+<div id="the-objective-function-value-ofv" class="section level2">
+<h2>The Objective Function Value (OFV)</h2>
+<p>Objective function value is measure of model fit. I do not propose that you learn in-depth how it is calculated or what its mathematics are.</p>
+<p>What is important for you to note is that the objective function can be used to compare two models. In general, a lower objective function value indicates a superior model fit.</p>
+</div>
+</div>
+<div id="phenobarbital-data" class="section level1">
+<h1>Phenobarbital data</h1>
+<p>Let’s dive straight in to some practical work and look at the phenobarbital data that comes with the package.</p>
+<p>These data were published in 1985(!) and come from some clinical data on neonates given the drug, which has been used as a sedative and general anaesthetic (although is less frequently used now). Neonates were given a loading dose IV injection followed by a maintenance 12 hourly IV dose.</p>
+<p>For those interested, the reference is:</p>
+<p>Grasela and Donn (1985), Neonatal population pharmacokinetics of phenobarbital derived from routine clinical data, Developmental Pharmacology and Therapeutics, 8, 374-383.</p>
+<div id="how-to" class="section level3">
+<h3>How to:</h3>
+<ul>
+<li>Explore the data with some summary tables and plots
+<ul>
+<li>Assess potential covariates in the data?</li>
+</ul></li>
+<li>Fit a one-compartment model to these data and report the pharmacokinetic parameters</li>
+<li>Make some goodness-of-fit plots</li>
+</ul>
+<pre class="r"><code>pheno&lt;-pheno_sd
+head(pheno)</code></pre>
+<pre><code>##   ID TIME  AMT  WT APGR   DV MDV EVID
+## 1  1  0.0 25.0 1.4    7  0.0   1    1
+## 2  1  2.0  0.0 1.4    7 17.3   0    0
+## 3  1 12.5  3.5 1.4    7  0.0   1    1
+## 4  1 24.5  3.5 1.4    7  0.0   1    1
+## 5  1 37.0  3.5 1.4    7  0.0   1    1
+## 6  1 48.0  3.5 1.4    7  0.0   1    1</code></pre>
+<pre class="r"><code>summary(pheno)</code></pre>
+<pre><code>##        ID             TIME             AMT               WT      
+##  Min.   : 1.00   Min.   :  0.00   Min.   : 0.000   Min.   :0.60  
+##  1st Qu.:13.00   1st Qu.: 19.23   1st Qu.: 2.300   1st Qu.:1.10  
+##  Median :25.00   Median : 59.30   Median : 3.000   Median :1.30  
+##  Mean   :28.24   Mean   : 63.70   Mean   : 5.281   Mean   :1.49  
+##  3rd Qu.:44.00   3rd Qu.: 96.42   3rd Qu.: 4.400   3rd Qu.:1.70  
+##  Max.   :59.00   Max.   :389.80   Max.   :70.000   Max.   :3.60  
+##       APGR              DV              MDV              EVID       
+##  Min.   : 1.000   Min.   : 0.000   Min.   :0.0000   Min.   :0.0000  
+##  1st Qu.: 5.000   1st Qu.: 0.000   1st Qu.:1.0000   1st Qu.:1.0000  
+##  Median : 7.000   Median : 0.000   Median :1.0000   Median :1.0000  
+##  Mean   : 6.394   Mean   : 5.328   Mean   :0.7917   Mean   :0.7917  
+##  3rd Qu.: 8.000   3rd Qu.: 0.000   3rd Qu.:1.0000   3rd Qu.:1.0000  
+##  Max.   :10.000   Max.   :67.900   Max.   :1.0000   Max.   :1.0000</code></pre>
+<p>OK, so we can see we’ve got an ID variable, WT which is hopefully easy to interpret as weight and APGR which is APGAR score (a measure of how unwell a neonate is when they are born).</p>
+<p>The other variables are hopefully recognisable as default variables.</p>
+<p>Let’s see if we can have a little more of a sophisticated summary.</p>
+<pre class="r"><code>pheno %&gt;% 
+  group_by(ID) %&gt;% 
+  slice(1) %&gt;% 
+  ungroup() %&gt;% 
+  select(&quot;WT&quot;, &quot;APGR&quot;) %&gt;% 
+  tbl_summary() %&gt;% 
+  as_kable_extra(booktabs=TRUE, caption=&quot;Summary of weight and APGR characteristics&quot;)%&gt;%
+  kable_styling(latex_options =c(&quot;striped&quot;))</code></pre>
+<table style="NAborder-bottom: 0; margin-left: auto; margin-right: auto;" class="table">
+<caption>
+<span id="tab:load">Table 1: </span>Summary of weight and APGR characteristics
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Characteristic
+</th>
+<th style="text-align:center;">
+N = 59
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+WT
+</td>
+<td style="text-align:center;">
+1.30 (1.10, 1.70)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+APGR
+</td>
+<td style="text-align:center;">
+7 (5, 8)
+</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td style="padding: 0; " colspan="100%">
+<sup>1</sup> Median (Q1, Q3)
+</td>
+</tr>
+</tfoot>
+</table>
+<p>Table <a href="#tab:load">1</a> provides summary of the two covariates.</p>
+<pre class="r"><code>pheno$ID&lt;-as.factor(pheno$ID)
+ggplot(subset(pheno,EVID==0), aes(x=TIME, y=DV))+
+  geom_point(size=0.5)+
+  theme_bw(base_size=9)</code></pre>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:pheno3"></span>
+<img src="variability_files/figure-html/pheno3-1.png" alt="Final phenobarbital concentration-time plots" width="480" />
+<p class="caption">
+Figure 3: Final phenobarbital concentration-time plots
+</p>
+</div>
+<pre class="r"><code>one.cmt &lt;- function() {
+  ini({ 
+    tcl &lt;- log(0.01) 
+    tv &lt;- log(1)
+    eta.cl ~ 0.1
+    eta.v ~ 0.1
+    add.sd &lt;- 0.1
+  })
+  model({
+    cl &lt;- exp(tcl + eta.cl)
+    v &lt;- exp(tv + eta.v)
+    linCmt() ~ add(add.sd)
+  })
+}
+#nlmixr2(one.cmt)
+run1&lt;-nlmixr2(one.cmt,pheno,est=&quot;saem&quot;, 
+              list(print=0),table = tableControl(cwres = TRUE, keep=&#39;WT&#39;))</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:nlmixfix">Table 2: </span>Fixed effect parameter estimates from pheno analysis
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+Est.
+</th>
+<th style="text-align:left;">
+SE
+</th>
+<th style="text-align:left;">
+%RSE
+</th>
+<th style="text-align:left;">
+Back-transformed(95%CI)
+</th>
+<th style="text-align:left;">
+BSV(CV%)
+</th>
+<th style="text-align:left;">
+Shrink(SD)%
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+tcl
+</td>
+<td style="text-align:left;">
+-5.18
+</td>
+<td style="text-align:left;">
+0.0884
+</td>
+<td style="text-align:left;">
+1.71
+</td>
+<td style="text-align:left;">
+0.00563 (0.00473, 0.0067)
+</td>
+<td style="text-align:left;">
+51.2
+</td>
+<td style="text-align:left;">
+30.0%=
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tv
+</td>
+<td style="text-align:left;">
+0.366
+</td>
+<td style="text-align:left;">
+0.0607
+</td>
+<td style="text-align:left;">
+16.6
+</td>
+<td style="text-align:left;">
+1.44 (1.28, 1.62)
+</td>
+<td style="text-align:left;">
+46.9
+</td>
+<td style="text-align:left;">
+2.90%&lt;
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+add.sd
+</td>
+<td style="text-align:left;">
+2.79
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2.79
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+</tbody>
+</table>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:nlmixran">Table 3: </span>Random effects parameter estimates
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Estimate
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+eta.cl
+</td>
+<td style="text-align:right;">
+0.48
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+eta.v
+</td>
+<td style="text-align:right;">
+0.45
+</td>
+</tr>
+</tbody>
+</table>
+<p>You can see in Table <a href="#tab:nlmixran">3</a> that there is quite a bit of inter-individual variability.</p>
+<p>For completeness, we should plot our diagnostic plots.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:phenofit"></span>
+<img src="variability_files/figure-html/phenofit-1.png" alt="Basic diagnostic plots forone-compartment  model fit of pheno data" width="33%" /><img src="variability_files/figure-html/phenofit-2.png" alt="Basic diagnostic plots forone-compartment  model fit of pheno data" width="33%" /><img src="variability_files/figure-html/phenofit-3.png" alt="Basic diagnostic plots forone-compartment  model fit of pheno data" width="33%" />
+<p class="caption">
+Figure 4: Basic diagnostic plots forone-compartment model fit of pheno data
+</p>
+</div>
+</div>
+<div id="testing-a-continuous-covariate" class="section level2">
+<h2>Testing a continuous covariate</h2>
+<p>We know from our summary statistics that the median weight for individuals in our data set is 1.3 kg, and that this is a set of neonatal data. We should therefore choose 1.3 kg as our reference weight.</p>
+<pre class="r"><code>pheno$rWT&lt;-log(pheno$WT/mw)
+run2.mod &lt;- function() {
+  ini({ 
+    tcl &lt;- log(0.007) 
+    tv &lt;- log(1.4)
+    tw &lt;- 1
+    eta.cl ~ 0.1
+    eta.v ~ 0.1
+    add.sd &lt;- 0.1
+  })
+  model({
+    cl &lt;- exp(tcl + eta.cl +rWT*tw)
+    v &lt;- exp(tv + eta.v)
+    linCmt() ~ add(add.sd)
+  })
+}
+
+#nlmixr2(one.cmt)
+run2&lt;-nlmixr2(run2.mod,pheno,est=&quot;saem&quot;,
+              list(print=0),table = tableControl(cwres = TRUE))</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:nlmixfix2">Table 4: </span>Fixed effect parameter estimates from pheno analysis run 2
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+Est.
+</th>
+<th style="text-align:left;">
+SE
+</th>
+<th style="text-align:left;">
+%RSE
+</th>
+<th style="text-align:left;">
+Back-transformed(95%CI)
+</th>
+<th style="text-align:left;">
+BSV(CV%)
+</th>
+<th style="text-align:left;">
+Shrink(SD)%
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+tcl
+</td>
+<td style="text-align:left;">
+-5.14
+</td>
+<td style="text-align:left;">
+0.0483
+</td>
+<td style="text-align:left;">
+0.939
+</td>
+<td style="text-align:left;">
+0.00585 (0.00532, 0.00643)
+</td>
+<td style="text-align:left;">
+18.5
+</td>
+<td style="text-align:left;">
+47.2%&gt;
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tv
+</td>
+<td style="text-align:left;">
+0.348
+</td>
+<td style="text-align:left;">
+0.0555
+</td>
+<td style="text-align:left;">
+15.9
+</td>
+<td style="text-align:left;">
+1.42 (1.27, 1.58)
+</td>
+<td style="text-align:left;">
+42.4
+</td>
+<td style="text-align:left;">
+2.74%&lt;
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tw
+</td>
+<td style="text-align:left;">
+1.22
+</td>
+<td style="text-align:left;">
+0.123
+</td>
+<td style="text-align:left;">
+10.1
+</td>
+<td style="text-align:left;">
+1.22 (0.974, 1.46)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+add.sd
+</td>
+<td style="text-align:left;">
+2.8
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2.8
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+</tbody>
+</table>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:nlmixran2">Table 5: </span>Random effects parameter estimates run 2
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Estimate
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+eta.cl
+</td>
+<td style="text-align:right;">
+0.18
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+eta.v
+</td>
+<td style="text-align:right;">
+0.41
+</td>
+</tr>
+</tbody>
+</table>
+<p>Compare the parameter estimates from Table <a href="#tab:nlmixfix">2</a> &amp; <a href="#tab:nlmixran">3</a> and Table <a href="#tab:nlmixfix2">4</a> &amp; <a href="#tab:nlmixran2">5</a>.</p>
+<p>Repeat the goodness-of-fit plots.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:phenofit2"></span>
+<img src="variability_files/figure-html/phenofit2-1.png" alt="Basic diagnostic plots forone-compartment  model fit of pheno data with weight on clearance as a covariate" width="33%" /><img src="variability_files/figure-html/phenofit2-2.png" alt="Basic diagnostic plots forone-compartment  model fit of pheno data with weight on clearance as a covariate" width="33%" /><img src="variability_files/figure-html/phenofit2-3.png" alt="Basic diagnostic plots forone-compartment  model fit of pheno data with weight on clearance as a covariate" width="33%" />
+<p class="caption">
+Figure 5: Basic diagnostic plots forone-compartment model fit of pheno data with weight on clearance as a covariate
+</p>
+</div>
+<p>The PRED vs DV plot shows improved model fit with run2 (Figure <a href="#fig:phenofit2">5</a> (a)). Although there is still some room for improvement.</p>
+<div id="using-the-objective-function-value-to-test-for-improvement-in-model-fit" class="section level3">
+<h3>Using the Objective Function Value to test for improvement in model fit</h3>
+<p>If you add one parameter to your model and compare the objective function with and without that parameter, a drop in objective function value &gt;3.84 suggests a statistically significant (p&lt;0.05) improvement in model fit.</p>
+<p>Have a look at the objective function for the two model runs.</p>
+<pre class="r"><code>run1$OBJF
+run2$OBJF</code></pre>
+<pre><code>## [1] 726.5</code></pre>
+<pre><code>## [1] 673.6</code></pre>
+<p>With a drop in OFV of 52.9, we can be confident that adding weight as a covariate on clearance significantly improves model fit.</p>
+</div>
+</div>
+</div>
+<div id="modelling-categorical-covariates" class="section level1">
+<h1>Modelling categorical covariates</h1>
+<p>Easiest example of modelling a categorical covariate is where you have two categories - a common example of this might be smoking/non-smoking or perhaps takes an enzyme inducer/doesn’t take an enzyme inducer. In a data set, this should be coded with ‘0’ (doesn’t have e.g. non-smoking) or ‘1’.</p>
+<p>The model for the covariate may then be (with smoking as an example :<span class="math display">\[CL_i=CL_{\theta}(1+ SM\times{\theta_{smoke}}) \]</span> As <span class="math inline">\(SM\)</span> is smoker (1=yes, 0=no), you can see that for a non-smoker <span class="math inline">\(CL_i\)</span> = <span class="math inline">\(CL_{\theta}\)</span> (since <span class="math inline">\(SM=0\)</span>, <span class="math inline">\(SM\times{\theta_{smoke}} = 0\)</span> for a non-smoker)</p>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -58,14 +58,14 @@ By the end of this session you should be able to:
 
 * Interpret a concentration-time plot
   
-* Use  <TT>R</TT> to undertake basic, descriptive (non-compartmental) analysis of some pharmacokinetic data to estimate
+* Use  <TT>R</TT> to undertake basic, descriptive (non-compartmental) analysis of pharmacokinetic data to estimate
     + $C_{max}$
     + $T_{max}$
     + $AUC_{0-t}$
 
 * Describe the relationship between clearance, dose and $AUC$
 
-* List some benefits and limitations of non-compartmental PK analysis    
+* List benefits and limitations of non-compartmental PK analysis    
 
 # Tasks
 
@@ -73,17 +73,17 @@ By the end of this session you should be able to:
 
 * Make a concentration-time plot for 'Sepsis' dataset
 
-* Calculate $C_{max}$, $T_{max}$ and $AUC_{0-t}$ for 'Healthy' dataset
+* Calculate $C_{max}$, $T_{max}$ and $AUC_{0-t}$ for the 'Healthy' dataset
 
-* Calculate $C_{max}$, $T_{max}$ and $AUC_{0-t}$ for 'Sepsis' dataset
+* Calculate $C_{max}$, $T_{max}$ and $AUC_{0-t}$ for the 'Sepsis' dataset
 
-* Estimate $Vd$ and $Cl$ for Healthy dataset
+* Estimate $Vd$ and $Cl$ for the 'Healthy' dataset
 
-* Estimate $Vd$ and $Cl$ for Sepsis dataset
+* Estimate $Vd$ and $Cl$ for the 'Sepsis' dataset
 
 ### Extension tasks:
 
-* Plot Healthy and Sepsis datasets on the same Figure
+* Plot 'Healthy' and 'Sepsis' datasets on the same Figure
 
 * Make a table to compare $C_{max}$, $T_{max}$ and $AUC_{0-t}$ for 'Healthy' and 'Sepsis' datasets
 
@@ -110,7 +110,22 @@ ORAL<-read.csv("https://raw.githubusercontent.com/dlonsdal/non_compartmental/mai
 
 ```
 
-**How to:** Plot the data for the IV and oral data.
+The first six lines of the IV dataset are shown here.
+
+``` {r ivhead, eval=FALSE}
+
+head(IV)
+
+```
+
+Columns in these datasets are:
+
+* id = patient ID
+* time = time after dose administered
+* study = whether IV or ORAL study
+* conc = drug concentration
+
+**How to:** Plot the data for the IV data.
 
 _Hint: More detailed notes on putting together plots are included in the Introduction to R page_
 
@@ -159,7 +174,7 @@ ORAL %>%
   ungroup() %>% 
   summarise(mean(cmax))
 
-FULL<-rbind(IV,ORAL)
+FULL<-rbind(IV,ORAL) # to combine the two datasets
 FULL %>% 
   group_by(id,study) %>% 
   summarise(max(conc))
@@ -230,7 +245,7 @@ grid.arrange(a,b,ncol=2)
 To calculate the area under the curve of the trapezoid ABCD in Figure \@ref(fig:trap) we use the equation for the area of a trapezoid. $$Area = \frac{1}{2}*(height_{1,AB}+height_{2,CD})*base_{AD}$$
 The two heights correspond to concentrations B and C and the base is the distance A to D (the change in time $\Delta t$) in Figure \@ref(fig:trap). So more fully for this example, where *height* is replaced with *concentration* $(C)$: $$AUC_{0-8} = \sum_{t=0}^{t=8} \Delta t\frac{(C_1+C_2)}{2}$$ 
 
-Fortunately,<TT>R</TT> has an inbuilt function that allows us to calculate the $AUC$. The handily named <TT>AUC()</TT> function. You need to provide it with three commands, <TT>x=...,y=...</TT> and <TT>method="trapezoid"</TT>. It is in the <TT>DescTools</TT> library.
+Fortunately, <TT>R</TT> has an inbuilt function that allows us to calculate the $AUC$. The handily named <TT>AUC()</TT> function. You need to provide it with three commands, <TT>x=...,y=...</TT> and <TT>method="trapezoid"</TT>. It is in the <TT>DescTools</TT> library.
 
 Here is how to calculate using the oral data:
 
@@ -295,7 +310,7 @@ It is worth noting the trapezoid method has limitations. Most notably that it wi
 
 \newpage 
 
-### Using <TT>R</TT> package <TT>PKNCA</TT> to undertake non-compartmental analysis  
+# Using <TT>R</TT> package <TT>PKNCA</TT> to undertake non-compartmental analysis  
 
 If that all seems like too much hard work and <TT>R</TT> should just jolly well get on and do for us then you are right! There are a few non-compartmental analysis packages available, we will use <TT>PKNCA</TT>. Remember you will need to run <TT>install.packages("PKNCA")</TT> the first time you wish to use this package, once it has been installed you need to run <TT>library(PKNCA)</TT>. 
 
@@ -311,7 +326,7 @@ damox<-amox %>%  # remember we will need to save this as a new object
 
 Now we can call and run <TT>PKNCA</TT>. First we create a sampling (or concentration) object and then a dosing object. In each function we instruct <TT>PKNCA</TT> of the names of our data object and the relevant variables in it. Then we combine the two and run our non-compartmental analysis.  
 
-```{r, results='hold', eval=FALSE}
+```{r, eval=FALSE}
 
 conc<-PKNCAconc(amox, conc~time|ID) #create sampling object
 dose<-PKNCAdose(damox, dose~time|ID) #create dosing object
@@ -319,7 +334,7 @@ full<-PKNCAdata(conc, dose)  #combine
 results<-pk.nca(full)  # analyse
 summary(results) #summarise the results
 ```
-```{r, results='hold', echo=FALSE}
+```{r, echo=FALSE}
 
 conc<-PKNCAconc(amox, conc~time|ID) #create sampling object
 dose<-PKNCAdose(damox, dose~time|ID) #create dosing object
@@ -331,44 +346,17 @@ knitr::kable(summary(results), "latex",booktabs = TRUE, caption='PKNCA output')%
 ```
 
 
-Look at the value for $AUC$ produced here and compare it to the one earlier. What do you notice? Why do you think there is a discrepancy?
-
-The answer is that by default, PKNCA uses logarithmic trapezoid method to calculate $AUC$. If you want to set this to linear logarithmic method you can set this as an option. Note that it also uses the 'geometric' rather than arithmetic mean.  
-
-
-```{r, results='hold',eval=F}
-full<-PKNCAdata(conc, dose,options=list(auc.method="linear")) 
-results<-pk.nca(full)  
-summary(results)
-```
-```{r, results='hold',echo=F, eval=T}
-full<-PKNCAdata(conc, dose,options=list(auc.method="linear"))  #combine
-results<-pk.nca(full)  # analyse
-knitr::kable(summary(results), "latex",booktabs = TRUE, caption='PKNCA output, linear logarithmic AUC method')%>%
-  kable_styling(latex_options = "striped")
-```
-
-```{r,echo = FALSE,eval=FALSE}
-PKNCA.set.summary(
-      name="half.life",
-      description="arithmetic mean and standard deviation",
-      point=business.mean,
-      spread=business.sd,
-      rounding=list(signif=3)
-    )
-
-#not run but code present in case someone asks how to do arithmetic mean
-```
+Look at the value for $AUC$ produced here and compare it to the one earlier. There is a discrepancy because by default, PKNCA uses logarithmic trapezoid method to calculate $AUC$. 
 
 # Estimating clearance
 
-Remember that clearance can be calculated as $$CL = \frac{Dose}{AUC}$$
+Clearance can be calculated as $$CL = \frac{Dose}{AUC}$$
 
 \newpage
 
 # Limitations of non-compartmental analysis
 
-```{r traperror, echo=F, fig.cap="Participant A amoxicillin concentration-time profile showing impact of reduced sampliing on AUC calculation", fig.width=4.5,fig.height=2.5,fig.align = 'center'}
+```{r traperror, echo=F, fig.cap="Participant A amoxicillin concentration-time profile showing impact of reduced sampling on AUC calculation", fig.width=4.5,fig.height=2.5,fig.align = 'center'}
 
 Aamox<-amox%>%
         subset(ID=='A')
@@ -396,10 +384,12 @@ ggplot(data=Aamox, aes(time,conc))+
 
 ```
 
-Non-compartmental analyses are useful for many reasons. For example, they use relatively straightforward algebra with few assumptions about the data to calculate summary pharmacokinetic information. Most regulators will require non-compartmental analysis of data as part of regulatory submissions. There are some disadvantages that are worth being aware of. These include:
+Non-compartmental analyses are useful for many reasons. For example, they use relatively straightforward algebra with few assumptions about the data to calculate summary pharmacokinetic information. Most regulators will require non-compartmental analysis of data as part of regulatory submissions. 
+
+There are some disadvantages that are worth being aware of. These include:
 
 * Need for rich sampling (multiple samples from each subject)
-* Use of direct observation of C~max and T~max means *true* values are missed for any particular subject
+* Use of direct observation of C_{max}$ and T_{max}$ means *true* values are missed for any particular subject
 * Increasing accuracy requires increased number of participants or samples, which can be technically chalenging and expensive
 
 Have a look at Figure \@ref(fig:traperror), where a situation is imagined that $time=2$ data point is not sampled. You can see the likely impact on the estimate of AUC from this. 

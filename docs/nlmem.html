@@ -343,20 +343,8 @@ div.tocify {
 <li>
   <a href="nlmem.html">Session 2</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-    Additional materials
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="model_diagnostics.html">Model diagnostics</a>
-    </li>
-    <li>
-      <a href="covariate_analysis.html">Covariate analysis</a>
-    </li>
-  </ul>
+<li>
+  <a href="variability.html">Session 3</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -390,9 +378,9 @@ text-align: justify}
 <div id="learning-outcomes" class="section level1">
 <h1>Learning outcomes</h1>
 <ul>
-<li>Describe what a compartmental model adds over non-compartmental analysis</li>
-<li>Fit a one-compartment IV bolus model in nlmixr2</li>
-<li>Read a model parameter table and relate the estimates to the values from Session 1</li>
+<li>List advantages and disadvantages of compartmental analysis</li>
+<li>Describe the difference between a fixed effect and a random effect in a population pharmacokinetic model</li>
+<li>Interpret the key parameter estimates from a fitted model (clearance and volume of distribution)</li>
 </ul>
 </div>
 <div id="tasks" class="section level1">
@@ -404,11 +392,17 @@ text-align: justify}
 <li>Compare volume of distribution and clearance values using non-compartmental and compartmental analysis</li>
 </ul>
 <div id="extension-tasks" class="section level3">
-<h3>Extension tasks:</h3>
+<h3>Extension tasks</h3>
 <ul>
 <li>Fit two-compartment models to the datasets</li>
 <li>Create diagnostic plots for your models (See Additional Materials)</li>
 </ul>
+</div>
+<div id="datasets-for-tasks" class="section level2">
+<h2>Datasets for tasks</h2>
+</div>
+<div id="dataset-used-in-workbook-example" class="section level2">
+<h2>Dataset used in workbook example</h2>
 </div>
 </div>
 <div id="introduction" class="section level1">
@@ -423,7 +417,7 @@ text-align: justify}
 <li>Enables modelling of sparse data, useful in later phase studies</li>
 <li>Allows more complex identification of covariate effects (for example organ function)</li>
 <li>Alternative sampling and modelling may allow for populations to be studied that are not straightforward to study in traditional phase-0/1 design (for example children, or drugs in pregnancy)</li>
-<li>Allows complex simulations which can inform subsequent study design</li>
+<li>Allows complex simulations which can inform subsequent study design and drug dosing</li>
 </ul>
 <p><strong>Disadvantages of non-linear mixed-effects approach</strong></p>
 <ul>
@@ -468,24 +462,193 @@ Figure 2: PK data from an individual
 </div>
 <div id="population-pharmacokinetic-modelling" class="section level1">
 <h1>Population pharmacokinetic modelling</h1>
+<div id="what-is-mixed-effects-modelling" class="section level2">
+<h2>What is mixed effects modelling?</h2>
+<p>In a population pharmacokinetic model, we assume that each individual’s pharmacokinetic parameters (e.g. clearance) are made up of two components.</p>
+<p>The fixed effect represents the typical value across the population. For example, the typical clearance of Drug A in healthy volunteers. This is what we usually report as the headline result of a population pharmacokinetic analysis.</p>
+<p>The random effect represents how much any given individual deviates from that typical value. Not everyone has the same clearance. Some patients clear the drug faster, some slower. The random effect captures this between-subject variability. We cannot predict it perfectly, but we can estimate how large it is.</p>
+<p>A mixed-effects model contains both components.</p>
 <div id="using-a-compartmental-pharmacokinetic-model-to-provide-an-example-of-what-we-mean" class="section level3">
 <h3>Using a compartmental pharmacokinetic model to provide an example of what we mean</h3>
 <p>Let’s return to the one-compartment IV-bolus model once more. Let us parameterise using <em>primary</em> pharmacokinetic parameters (clearance and volume of distribution). Broadly, our model remains the same <span class="math display">\[C=C_{0}e^{-\frac{Cl}{V}t}\]</span> however, we now add a further layer, by stating that our parameters are made up of a fixed (population mean, <span class="math inline">\(\theta\)</span>) effect and a random (inter-individual variability, <span class="math inline">\(\eta\)</span>) effect. <span class="math display">\[Cl=\theta_{Cl}\times e^{\eta_{Cl}}\]</span> the modelling process then estimates <span class="math display">\[\theta_{Cl}\textrm{ -the population mean value for clearance (a fixed effect)}\]</span> and makes some estimate of <span class="math display">\[\eta_{Cl} \textrm{ -individual variability of clearance (a random-effect)}\]</span></p>
 <p>Similarly, we model volume of distribution as <span class="math display">\[V=\theta_{V}\times e^{\eta_{V}}\]</span></p>
 </div>
 </div>
+</div>
 <div id="non-linear-mixed-effects-modelling-in-r" class="section level1">
 <h1>Non-linear mixed-effects modelling in <TT>R</TT></h1>
 <p>Non-linear mixed-effects modelling is computationally complex and requires knowledge of statistics, pharmacological models and how to use computer code. We are going to enter into the world of population pharmacokinetic modelling by using the package <TT>nlmixr</TT>.</p>
-<p>Installing <TT>nlmixr</TT> is a little complicated. You <em>may</em> be able to do it by simply calling <TT>install.packages(nlmixr2)</TT> or <TT>install.packages(nlmixr2, type=“source”)</TT>. However it is more likely that you will first need to install <a href="https://cran.rstudio.com/bin/windows/Rtools/"><TT>Rtools</TT></a> (if you use a windows machine) or <a href="https://www.freecodecamp.org/news/install-xcode-command-line-tools/"><TT>Xcode Command Line Tools</TT></a> (if you are on an Apple Mac). These programs and the <TT>nlmixr</TT> package take up a considerable amount of memory. The install on an Apple Mac can be particularly painful. It is unlikely that I will be able to support all of you to install this on your machines yourself so you will need to try to troubleshoot your own install issues if you choose to install on your own machine.</p>
 <div id="using-nlmixr" class="section level2">
 <h2>Using <TT>nlmixr</TT></h2>
 <p>First you need to call <TT>library(nlmixr2)</TT> to load the package.</p>
-<p>In this example we fit a one-compartment oral-absorption model to sparse furosemide data.</p>
+<p>In this example we fit a one-compartment oral-absorption model to sparse data after an oral dose of furosemide is taken.</p>
+<pre class="r"><code>sparse&lt;-
+ read_csv(&quot;https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/main/sparsefru.csv&quot;)
+
+kbl(head(sparse), booktabs = TRUE, caption = &quot;First few rows of the furosemide dataset&quot;) %&gt;%
+  kable_styling(latex_options = c(&quot;striped&quot;))</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:fruhead">Table 1: </span>First few rows of the furosemide dataset
+</caption>
+<thead>
+<tr>
+<th style="text-align:right;">
+ID
+</th>
+<th style="text-align:right;">
+TIME
+</th>
+<th style="text-align:right;">
+DV
+</th>
+<th style="text-align:right;">
+AMT
+</th>
+<th style="text-align:right;">
+EVID
+</th>
+<th style="text-align:right;">
+CMT
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:right;">
+101
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1.2596046
+</td>
+<td style="text-align:right;">
+0.700
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:right;">
+101
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0.1019965
+</td>
+<td style="text-align:right;">
+0.300
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+4.9873495
+</td>
+<td style="text-align:right;">
+0.045
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:right;">
+101
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+</tbody>
+</table>
+<p><TT>nlmixr2</TT> requires data to be structured and labelled in a particular way.</p>
+<ul>
+<li>ID = patient ID</li>
+<li>TIME = time (since administration of dose)</li>
+<li>DV = dependent variable (drug concentration)</li>
+<li>AMT = amount (dose)</li>
+<li>EVID = event identifier (tells <TT>nlmixr2</TT> whether that row represents an observation or dose event)</li>
+<li>CMT = compartment (1 = depot compartment, 2 = central compartment).</li>
+</ul>
 <p>Then you need to build your model. When building the model, you specify two blocks in a standard <TT>R function()</TT>. As always, you give your function a name, I have chosen <TT>one.cmt</TT>.</p>
 <div id="ini-block" class="section level3">
 <h3>Ini block</h3>
-<p>The first part of the function is to set the initial estimates for your model parameters, this is known as the <TT>ini()</TT> block. We are parameterising using <span class="math inline">\(k_a\)</span>, <span class="math inline">\(Cl\)</span> and <span class="math inline">\(V\)</span> in our one-compartment oral-absorption model. So we need to tell <TT>nlmixr</TT> initial values for each of these parameters <em>as well as</em> values for the random-effects associated with each parameter.</p>
+<p>The first part of the function is to set the initial estimates for your model parameters, this is known as the <TT>ini()</TT> block. We are parameterising using <span class="math inline">\(k_a\)</span>, <span class="math inline">\(Cl\)</span> and <span class="math inline">\(V\)</span> in our one-compartment oral-absorption model. So we need to tell <TT>nlmixr</TT> initial values for each of these parameters <em>as well as</em> values for the random effects associated with each parameter.</p>
 </div>
 <div id="model-block" class="section level3">
 <h3>Model block</h3>
@@ -501,7 +664,7 @@ one.cmt &lt;- function() {
     tka &lt;-log(1.3) # set the initial estimates for each parameter, note that ka will not be required for IV datasets
     tcl &lt;- log(8) 
     tv &lt;- log(20)
-    eta.ka~0.1 # interindividual variabilities
+    eta.ka~0.1 # inter-individual variabilities
     eta.cl ~ 0.1
     eta.v ~ 0.1
     add.sd &lt;- 0.01 # residual variability
@@ -525,10 +688,10 @@ linCmt() &amp; \sim add({add.sd})
 <pre class="r"><code># Fit the data using this model
 fit&lt;-nlmixr2(one.cmt,sparse,est=&quot;saem&quot;, list(print=0))</code></pre>
 <pre><code>## [====|====|====|====|====|====|====|====|====|====] 0:00:00</code></pre>
-You can run <TT>print(fit)</TT> and you will get an enormous amount of output from your model. Tables <a href="#tab:nlmixfix">1</a> &amp; <a href="#tab:nlmixran">2</a> show the fixed and random parameter estimates, along with confidence intervals. Don’t worry about the other output for now.
+You can run <TT>print(fit)</TT> and you will get an enormous amount of output from your model. Tables <a href="#tab:nlmixfix">2</a> &amp; <a href="#tab:nlmixran">3</a> show the fixed and random parameter estimates, along with confidence intervals. Don’t worry about the other output for now.
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
-<span id="tab:nlmixfix">Table 1: </span>Fixed effect parameter estimates from Pop-PK analysis of sparse furosemide data
+<span id="tab:nlmixfix">Table 2: </span>Fixed effect parameter estimates from Pop-PK analysis of sparse furosemide data
 </caption>
 <thead>
 <tr>
@@ -633,7 +796,7 @@ add.sd
 </table>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
-<span id="tab:nlmixran">Table 2: </span>Random effects parameter estimates from Pop-PK analysis of sparse furosemide data
+<span id="tab:nlmixran">Table 3: </span>Random effects parameter estimates from Pop-PK analysis of sparse furosemide data
 </caption>
 <thead>
 <tr>
@@ -695,7 +858,7 @@ eta.v
 <div id="mu-referencing" class="section level2">
 <h2><span class="math inline">\(\mu\)</span> referencing</h2>
 <p>You will note in the <TT>nlmixr</TT> code that we seem to for no good reason input a ‘<span class="math inline">\(log(value)\)</span>’ for our initial parameter estimates and then place them in the exponential domain in our <TT>model()</TT> block of code. This is known as <span class="math inline">\(\mu\)</span> referencing.</p>
-<p>Remember, we are modelling fixed and random effects for our model parameters <span class="math display">\[Cl=\theta_{Cl}\times e^{\eta_{Cl}}\]</span> now, it just so happens that the estimation algorithms work a little better if all of the parameters being estimated are in the exponential domain. We have to write our model with a little mathematical fiddling to achieve this. Recall that <span class="math display">\[e^a\times e^b=e^{a+b}\qquad  \textrm{AND}\qquad  e^{log(c)}=c\]</span> so instead of inputting <span class="math display">\[Cl=\theta_{Cl}\times e^{\eta_{Cl}}\]</span> into our model we instead input <span class="math display">\[Cl= e^{log(\theta_{Cl})+\eta_{Cl}}\]</span> you will have seen in Table <a href="#tab:nlmixfix">1</a> that <TT>nlmixr</TT> estimates <span class="math inline">\(log(\theta)\)</span> and then automatically back-transforms the final parameter estimates to the standard domain.</p>
+<p>Remember, we are modelling fixed and random effects for our model parameters <span class="math display">\[Cl=\theta_{Cl}\times e^{\eta_{Cl}}\]</span> now, it just so happens that the estimation algorithms work a little better if all of the parameters being estimated are in the exponential domain. We have to write our model with a little mathematical fiddling to achieve this. Recall that <span class="math display">\[e^a\times e^b=e^{a+b}\qquad  \textrm{AND}\qquad  e^{log(c)}=c\]</span> so instead of inputting <span class="math display">\[Cl=\theta_{Cl}\times e^{\eta_{Cl}}\]</span> into our model we instead input <span class="math display">\[Cl= e^{log(\theta_{Cl})+\eta_{Cl}}\]</span> you will have seen in Table <a href="#tab:nlmixfix">2</a> that <TT>nlmixr</TT> estimates <span class="math inline">\(log(\theta)\)</span> and then automatically back-transforms the final parameter estimates to the standard domain.</p>
 </div>
 <div id="residual-variability" class="section level2">
 <h2>Residual variability</h2>

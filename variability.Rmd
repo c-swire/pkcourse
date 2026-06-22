@@ -1,0 +1,391 @@
+---
+title: "Introduction to covariate modelling"
+author: "Dagan Lonsdale"
+
+output:
+  bookdown::html_document2:
+    fig_caption : TRUE
+    number_sections: no
+    toc: yes
+    toc_float: yes
+    
+header-includes:
+  - \usepackage{float}
+  - \floatplacement{figure}{H}
+  - \floatplacement{table}{H}
+  - \usepackage{booktabs}
+  - \usepackage{caption}
+  - \captionsetup{labelfont=bf,margin=12pt}
+urlcolor: blue
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(kableExtra)
+library(gridExtra)
+library(PKNCA) 
+library(RColorBrewer)
+library(flextable)
+library(nlmixr2)
+library(gtsummary)
+```
+
+# Learning objectives
+
+* Explain what a covariate is and give an example of how patient characteristics might influence a pharmacokinetic parameter
+* Interpret the results of a covariate analysis and describe what the findings mean for Drug A's pharmacokinetics in patients with sepsis
+* Describe how a population pharmacokinetic model could be used to inform dosing decisions for individual patients or patient groups
+
+# Tasks
+
+* Fit a one-compartment IV bolus model for the combined dataset
+* Test for covariate effect of weight on volume of distribution
+* Test for covariate effect of sepsis on clearance
+
+## Extension tasks
+
+* Plot a visual predictive check for 
+
+# Definition of a covariate
+
+In statistical terms a variable is something that can be quantified in some way - e.g. measured or counted. 
+
+A covariate is a variable that changes (varies) with (co) the outcome of interest. In modeling covariates are variables additional to the core predictor variable in the model (e.g. dose) that may be used to help model the outcome variable (e.g. concentration). An example might be that weight would be expected to affect volume of distribution for many drugs and so it might be reasonable to include a weight effect on the volume of distribution parameter in a pharmacokinetic model.  
+
+# Common types of covariate
+
+Hopefully it will not come as a surprise to you that covariates may be described as:
+
+* Continuous variable
+  + Taking any possible (real) value (even within a range of values)
+  + Examples might include serum creatinine, weight or age
+* Discrete variable
+  + Countable numeric
+  + For example integer values like number of doses
+* Categorical variable
+  + Data that is placed in a number of discrete (uncountable) categories
+  + There are sub-types of categorical variable that it is useful to know:
+    - Binary (e.g. sex)
+    - Ordered (e.g. grade of renal injury 1, 2, 3 with increasing severity)
+    - Un-ordered (e.g. ethnicity)
+
+# Why bother to include covariates in a model?
+
+We have discussed how non-linear mixed-effects models allow us to describe inter-individual differences in pharmacokinetic parameters - these are our $\eta$ terms. 
+
+As an extension of this, it would be nice to try and understand and explain some of this variability so that we can:
+
+* Explain it biologically, rather than just mathematically 
+* Use this information to make decisions about our drugs
+  + For example if we find that renal function is linked with clearance of a drug, we might recommend different doses for those with kidney disease
+
+# Choosing covariates to include in a model
+
+The choice of what covariates one should include in a model is complex. 
+
+Broadly (and briefly) modelers may take an approach to test the effect of all variables in a data set on all parameters in the model. A process of testing each covariate can be automated by programs like \texttt{nlmixr2} and \texttt{NONMEM}. In such a process, each varibble is tested in turn in a step-wise fashion. If inclusion of a variable provides an improved model fit, it is retained in the model as a covariate and the program then moves on to test the next variable. This is known as step-wise covariate modelling (SCM). This can be a time-consuming (and processor hungry) process. 
+
+Alternatively, knowledge about the drug's pharmacology (prior information) may be used by the modeler to choose specific variables to test as part of the model building process. For example, in the knowledge that a drug is renally excreted, it would be prudent to test the effect of some measure of kidney function (for example serum creatinine or estimated glomerular filtration rate) on drug clearance. 
+
+There are some tools that can help us. For example we can plot pharmacokinetic parameters (or $\eta$) against potential covariates to look for trends/relationships to then text in our mode. 
+
+# Assessing whether adding a covariate improves a model's fit
+
+There are a wealth of diagnostic plots that can be used to think about how well a model fits data from an experiment. We will look at a few key examples.
+
+## DV vs PRED and DV vs IPRED
+
+The most straightforward diagnostic plot available is a plot of observations (dependent variable, DV) vs predicted concentrations from a model. There are two subsets of this type of plot. The first, DV vs PRED takes predictions based on population parameters (i.e. excluding $\eta$'s) and the second is DV vs IPRED, which bases predictions on individual values for model parameters (including $\eta$'s).
+
+Figure \@ref(fig:frufit) shows these diagnostic plots for the furosemide data.
+
+```{r frufit,echo=T,eval=T,fig.cap="Basic diagnostic plots for furosemide one-compartment, oral-absorption model fit from Chapter 4", fig.subcap=c('DV vs PRED','DV vs IPRED'),fig.ncol = 2, out.width = "50%", fig.align = 'center', warning=F,message=F}
+
+link <- "https://github.com/dlonsdal/SGUL_PK_data/blob/main/frufit.rds?raw=true"
+fru.fit <- readRDS(url(link, method="libcurl"))
+modfit<-data.frame(fru.fit)
+ggplot(modfit,aes(x=PRED,y=DV))+
+  geom_point()+
+  theme_bw(base_size=18)+
+  geom_abline(intercept = 0, slope=1)+
+  geom_smooth(col='red',se=F)+
+  xlim(0,1.25)+ylim(0,1.25)
+ggplot(modfit,aes(x=IPRED,y=DV))+
+  geom_point()+
+  theme_bw(base_size=18)+
+  geom_abline(intercept = 0, slope=1)+
+  geom_smooth(col='red',se=F)+
+  xlim(0,1.25)+ylim(0,1.25)
+
+```
+
+Take a look at Figure \@ref(fig:frufit)(a) first. A *perfect* model fit would have predictions that were identical to the observations from the experiment. All of the points in the scatterplot would fall in a straight line along the line of unity ($DV=PRED$). However, as we have discussed previously, *real-world* data is never perfect, individuals have PK parameters that deviate from the population mean values and there will be un-modelled error. So, what we are really looking for in this plot is a degree of even spread of points above and below the line of unity. Any groups of data points deviating away from this line of unity might make us suspicious that there is some underlying variability not being modelled. 
+
+In our example in Figure \@ref(fig:frufit)(a) we can see that there is pretty reasonable fit, with even distribution of data points. A red 'line of best fit' tracks fairly evenly along the line of unity. This suggests our model fit is pretty good. 
+
+Figure \@ref(fig:frufit)(b) shows DV vs IPRED. 
+This is individualised predictions, taking into account that random-effect associated with an individual ($\eta). Again, the perfect model fit has all lines along the line of unity. DV vs IPRED plots will generally always look a little better than DV vs PRED plots in this regard. However, it is unusual to get such a tight fit as we see in Figure \@ref(fig:frufit)(b) as usually there is additional unexplained variability in data. The example here looks relatively perfect because I simulated these data and I did not simulate complex variability!
+
+## Conditionally-weighted residuals
+We can look at the idea of residuals from our non-linear mixed-effects models in the same way as we did with our linear models. We can look to see that our residuals remain even across the range of sampling times and observed concentrations.
+
+We are going to introduce a further step, normalising the residuals through a weighting step. This is important because residuals might be influenced by the magnitude of the observation (e.g. you might find a greater range of residuals around $C_{max}$ compared to around $C_{min}$). Weighting the residuals in order to standardise them makes it easier to think about what is happening with model predictions across the full range of observations. We will use conditionally weighted residuals (<TT>CWRES</TT>), which are a fairly standard form of residual. You don't need to know exactly how these are created, unless you decide to pursue modelling as a career of course...... 
+
+Additionally, this leads to a situation where the conditionally weighted residuals (<TT>CWRES</TT>) should follow an approximately normal distribution with mean zero and variance 1.$$CWRES\sim N(0,1)$$ This is helpful because we can expect 99.7% of data points to fall within $+/- 3$. We can look for trends in this kind of plot to help with our model building process. 
+
+<TT>nlmixr2</TT> will output <TT>CWRES</TT> through an additional <TT>tableControl()</TT> command.
+
+```{r, cache=F,warning=FALSE,message=FALSE}
+
+one.cmt <- function() {
+  ini({ 
+    tcl <- log(0.01) 
+    tv <- log(1)
+    eta.cl ~ 0.1
+    eta.v ~ 0.1
+    add.sd <- 0.1
+  })
+  model({
+    cl <- exp(tcl + eta.cl)
+    v <- exp(tv + eta.v)
+    linCmt() ~ add(add.sd)
+  })
+}
+
+drugxsim<-read_csv("https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/main/drugxsim.csv")
+
+drugxfit<-nlmixr2(one.cmt,drugxsim,est="saem",
+       list(print=0),
+       table = tableControl(cwres = TRUE))
+
+modfit<-data.frame(drugxfit)
+
+```
+```{r cwres,echo=T,eval=T,fig.cap="Conditionally weighted residuals plotted against time from dose",fig.width=6,fig.height=3,fig.align = 'center',warning=FALSE,message=FALSE}
+ggplot(modfit,aes(x=tad,y=CWRES))+
+  geom_point()+
+  theme_bw(base_size=9)+
+  xlab('Time after dose (h)')+
+  geom_abline(intercept = 0, slope=0)+
+  geom_smooth(col='red',se=F)+
+  ylim(-3,3)
+```
+You can see from Figure \@ref(fig:cwres) that we are lacking in a uniform distribution of <TT>CWRES</TT> across sampling times. In fact, this U-shape that is seen in the <TT>CWRES</TT> plot can be indicative of the need for an additional compartment in the model. 
+
+## The Objective Function Value (OFV)
+Objective function value is measure of model fit. I do not propose that you learn in-depth how it is calculated or what its mathematics are. 
+
+What is important for you to note is that the objective function can be used to compare two models. In general, a lower objective function value indicates a superior model fit.
+
+# Phenobarbital data
+
+Let's dive straight in to some practical work and look at the phenobarbital data that comes with the \texttt{nlmixr2} package. 
+
+These data were published in 1985(!) and come from some clinical data on neonates given the drug, which has been used as a sedative and general anaesthetic (although is less frequently used now). Neonates were given a loading dose IV injection followed by a maintenance 12 hourly IV dose. 
+
+For those interested, the reference is:
+
+Grasela and Donn (1985), Neonatal population pharmacokinetics of phenobarbital derived from routine clinical data, Developmental Pharmacology and Therapeutics, 8, 374-383.
+
+### How to:
+
+* Explore the data with some summary tables and plots
+  + Assess potential covariates in the data?
+* Fit a one-compartment model to these data and report the pharmacokinetic parameters
+* Make some goodness-of-fit plots
+
+```{r,echo = TRUE,eval=TRUE, message=FALSE}
+pheno<-pheno_sd
+head(pheno)
+```
+
+```{r,echo = TRUE,eval=TRUE, message=FALSE}
+summary(pheno)
+```
+
+OK, so we can see we've got an ID variable, WT which is hopefully easy to interpret as weight and APGR which is APGAR score (a measure of how unwell a neonate is when they are born). 
+
+The other variables are hopefully recognisable as \texttt{nlmixr2} default variables. 
+
+Let's see if we can have a little more of a sophisticated summary.
+
+```{r load,echo = TRUE,eval=TRUE, message=FALSE}
+
+pheno %>% 
+  group_by(ID) %>% 
+  slice(1) %>% 
+  ungroup() %>% 
+  select("WT", "APGR") %>% 
+  tbl_summary() %>% 
+  as_kable_extra(booktabs=TRUE, caption="Summary of weight and APGR characteristics")%>%
+  kable_styling(latex_options =c("striped"))
+```
+
+Table \@ref(tab:load) provides summary of the two covariates. 
+
+```{r pheno3,echo = T,eval=T, fig.cap="Final phenobarbital concentration-time plots",fig.width=5,fig.height=2.5,fig.align='center',message=FALSE, fig.show='hold'}
+pheno$ID<-as.factor(pheno$ID)
+ggplot(subset(pheno,EVID==0), aes(x=TIME, y=DV))+
+  geom_point(size=0.5)+
+  theme_bw(base_size=9)
+```
+
+```{r, eval=T,cache=F, message=F,warning=FALSE}
+one.cmt <- function() {
+  ini({ 
+    tcl <- log(0.01) 
+    tv <- log(1)
+    eta.cl ~ 0.1
+    eta.v ~ 0.1
+    add.sd <- 0.1
+  })
+  model({
+    cl <- exp(tcl + eta.cl)
+    v <- exp(tv + eta.v)
+    linCmt() ~ add(add.sd)
+  })
+}
+#nlmixr2(one.cmt)
+run1<-nlmixr2(one.cmt,pheno,est="saem", 
+              list(print=0),table = tableControl(cwres = TRUE, keep='WT'))
+```
+
+
+```{r nlmixfix,echo=F,warning=T,message=F}
+
+kbl(run1$par.fixed ,booktabs = T, caption="Fixed effect parameter estimates from pheno analysis")%>%  kable_styling(latex_options =c("striped"))
+
+
+```
+
+```{r nlmixran,echo=F,warning=T,message=F}
+kbl(signif(diag(run1$omegaR),2), caption="Random effects parameter estimates",booktabs = T,col.names = c(
+                           "Estimate"))%>%  kable_styling(latex_options =c("striped"))
+```
+
+You can see in Table \@ref(tab:nlmixran) that there is quite a bit of inter-individual variability. 
+
+For completeness, we should plot our diagnostic plots.
+
+```{r phenofit,echo=F,eval=T,fig.cap="Basic diagnostic plots forone-compartment  model fit of pheno data", fig.subcap=c('DV vs PRED','DV vs IPRED', 'CWRES vs TAD'),fig.ncol = 3, out.width = "33%", fig.align = 'center', warning=F,message=F}
+
+modfit<-data.frame(run1)
+ggplot(run1,aes(x=PRED,y=DV))+
+  geom_point()+
+  theme_bw(base_size=27)+
+  geom_abline(intercept = 0, slope=1)+
+  geom_smooth(col='red',se=F)
+ggplot(run1,aes(x=IPRED,y=DV))+
+  geom_point()+
+  theme_bw(base_size=27)+
+  geom_abline(intercept = 0, slope=1)+
+  geom_smooth(col='red',se=F)
+
+ggplot(modfit,aes(x=tad,y=CWRES))+
+  geom_point()+
+  theme_bw(base_size=27)+
+  xlab('Time after dose (h)')+
+  geom_abline(intercept = 0, slope=0)+
+  geom_smooth(col='red',se=F)
+```
+
+## Testing a continuous covariate
+
+```{r mw, message=F,warning=FALSE, include=FALSE}
+
+mw<- pheno %>% 
+  group_by(ID) %>% 
+  slice(1) %>% 
+  ungroup() %>% 
+  summarise(median(WT)) %>% 
+  as.numeric
+```
+
+We know from our summary statistics that the median weight for individuals in our data set is `r mw` kg, and that this is a set of neonatal data. We should therefore choose `r mw` kg as our reference weight. 
+
+```{r, eval=T,cache=F, message=F,warning=FALSE}
+
+pheno$rWT<-log(pheno$WT/mw)
+run2.mod <- function() {
+  ini({ 
+    tcl <- log(0.007) 
+    tv <- log(1.4)
+    tw <- 1
+    eta.cl ~ 0.1
+    eta.v ~ 0.1
+    add.sd <- 0.1
+  })
+  model({
+    cl <- exp(tcl + eta.cl +rWT*tw)
+    v <- exp(tv + eta.v)
+    linCmt() ~ add(add.sd)
+  })
+}
+
+#nlmixr2(one.cmt)
+run2<-nlmixr2(run2.mod,pheno,est="saem",
+              list(print=0),table = tableControl(cwres = TRUE))
+```
+
+```{r nlmixfix2,echo=F,warning=T,message=F}
+
+kbl(run2$par.fixed ,booktabs = T, caption="Fixed effect parameter estimates from pheno analysis run 2")%>%  kable_styling(latex_options =c("striped"))
+```
+
+```{r nlmixran2,echo=F,warning=T,message=F}
+kbl(signif(diag(run2$omegaR),2), caption="Random effects parameter estimates run 2",booktabs = T,col.names = c(
+                           "Estimate"))%>%  kable_styling(latex_options =c("striped"))
+```
+
+Compare the parameter estimates from Table \@ref(tab:nlmixfix) & \@ref(tab:nlmixran)  and Table \@ref(tab:nlmixfix2) & \@ref(tab:nlmixran2). 
+
+Repeat the goodness-of-fit plots. 
+
+```{r phenofit2,echo=F,eval=T,fig.cap="Basic diagnostic plots forone-compartment  model fit of pheno data with weight on clearance as a covariate", fig.subcap=c('DV vs PRED','DV vs IPRED', 'CWRES vs TAD'),fig.ncol = 3, out.width = "33%", fig.align = 'center', warning=F,message=F}
+
+
+modfit2<-data.frame(run2)
+ggplot(run2,aes(x=PRED,y=DV))+
+  geom_point()+
+  theme_bw(base_size=27)+
+  geom_abline(intercept = 0, slope=1)+
+  geom_smooth(col='red',se=F)
+ggplot(run2,aes(x=IPRED,y=DV))+
+  geom_point()+
+  theme_bw(base_size=27)+
+  geom_abline(intercept = 0, slope=1)+
+  geom_smooth(col='red',se=F)
+
+ggplot(run2,aes(x=tad,y=CWRES))+
+  geom_point()+
+  theme_bw(base_size=27)+
+  xlab('Time after dose (h)')+
+  geom_abline(intercept = 0, slope=0)+
+  geom_smooth(col='red',se=F)
+```
+
+The PRED vs DV plot shows improved model fit with run2 (Figure \@ref(fig:phenofit2) (a)). Although there is still some room for improvement. 
+
+### Using the Objective Function Value to test for improvement in model fit
+
+If you add one parameter to your model and compare the objective function with and without that parameter, a drop in objective function value >3.84 suggests a statistically significant (p<0.05) improvement in model fit. 
+
+Have a look at the objective function for the two model runs.
+
+```{r,eval=F}
+run1$OBJF
+run2$OBJF
+```
+```{r,echo=F}
+726.5
+673.6
+```
+
+With a drop in OFV of `r round(726.5-673.6
+,1)`, we can be confident that adding weight as a covariate on clearance significantly improves model fit. 
+
+# Modelling categorical covariates
+
+Easiest example of modelling a categorical covariate is where you have two categories - a common example of this might be smoking/non-smoking or perhaps takes an enzyme inducer/doesn't take an enzyme inducer. In a data set, this should be coded with '0' (doesn't have e.g. non-smoking) or '1'.
+
+The model for the covariate may then be (with smoking as an example :$$CL_i=CL_{\theta}(1+ SM\times{\theta_{smoke}}) $$ As $SM$ is smoker (1=yes, 0=no), you can see that for a non-smoker $CL_i$ = $CL_{\theta}$ (since $SM=0$, $SM\times{\theta_{smoke}} = 0$ for a non-smoker)

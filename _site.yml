@@ -15,9 +15,5 @@ navbar:
       href: solutions_non_compartmental.html
     - text: "Session 2"
       href: nlmem.html
-    - text: "Additional materials"
-      menu:
-      - text: "Model diagnostics"
-        href: model_diagnostics.html
-      - text: "Covariate analysis"
-        href: covariate_analysis.html
+    - text: "Session 3"
+      href: variability.html
