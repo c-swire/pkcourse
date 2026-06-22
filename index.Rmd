@@ -5,7 +5,7 @@ title: "Welcome"
 Aim of the PK training day:
 To be able run basic PK analyses in R, interpret the outputs, and describe how sepsis alters drug behaviour in ways that have implications for dosing.
 
-```{r echo=FALSE}
+```{r echo=FALSE, results='hide'}
 library(knitr)
 
 schedule <- data.frame(
