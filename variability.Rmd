@@ -267,12 +267,9 @@ You may come across this in p
 
 The principle is straightforward: if our model is a good description of the data, then concentrations simulated from the model should look like the concentrations we actually observed. To produce a VPC, the fitted model is used to generate prediction intervals, which are then plotted alongside the observed data. A well-fitting model will have the observed data points falling within these intervals.
 
-```{r vpc, eval=TRUE, message=FALSE, warning=FALSE, fig.cap="Visual Predictive Check for one-compartment model fit of phenobarbital data", fig.width=6, fig.height=4, fig.align='center'}
+```{r vpc, eval=TRUE, message=FALSE, warning=FALSE, fig.cap="Visual Predictive Check for one-compartment model fit of furosemide data", fig.width=6, fig.height=4, fig.align='center'}
 
-# install.packages('vpc')
-library(vpc)
-
-vpc(fit, show = list(obs_dv = TRUE)) +
+vpcPlot(fit) +
   theme_bw(base_size = 11) +
   xlab("Time after dose (h)") +
   ylab("Furosemide concentration (mg/L)")
@@ -391,7 +388,7 @@ ggplot(modfit,aes(x=tad,y=CWRES))+
   ylim(-3,3)
 ```
 
-# Testing a continuous covariate
+## Testing a continuous covariate
 
 When we include a continuous covariate such as weight in a population pharmacokinetic model, we need to define a meaningful reference point. 
 
@@ -411,7 +408,7 @@ mw<- pheno %>%
   as.numeric
 ```
 
-We know from our summary statistics that the median weight for individuals in our data set is 1.3 kg, and that this is a set of neonatal data. We should therefore choose 1.3 kg as our reference weight. 
+We know from our summary statistics (Table 1) that the median weight for individuals in the phenobarbital data set is 1.3 kg, and that this is a set of neonatal data. We should therefore choose 1.3 kg as our reference weight. 
 
 ```{r, eval=T,cache=F, message=F,warning=FALSE}
 
@@ -477,7 +474,7 @@ ggplot(run2,aes(x=tad,y=CWRES))+
 
 The PRED vs DV plot shows improved model fit with run2 (Figure \@ref(fig:phenofit2) (a)). Although there is still some room for improvement. 
 
-### Using the Objective Function Value to test for improvement in model fit
+## Using the Objective Function Value
 
 If you add one parameter to your model and compare the objective function with and without that parameter, a drop in objective function value >3.84 suggests a statistically significant (p<0.05) improvement in model fit. 
 

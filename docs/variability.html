@@ -551,17 +551,14 @@ Figure 3: Conditionally weighted residuals plotted against time from dose - 2-co
 <p>The diagnostic plots we have used so far (DV vs PRED, DV vs IPRED, CWRES) assess model fit by examining residuals. A complementary and widely used approach is the <strong>Visual Predictive Check (VPC)</strong>.</p>
 <p>You may come across this in p</p>
 <p>The principle is straightforward: if our model is a good description of the data, then concentrations simulated from the model should look like the concentrations we actually observed. To produce a VPC, the fitted model is used to generate prediction intervals, which are then plotted alongside the observed data. A well-fitting model will have the observed data points falling within these intervals.</p>
-<pre class="r"><code># install.packages(&#39;vpc&#39;)
-library(vpc)
-
-vpc(fit, show = list(obs_dv = TRUE)) +
+<pre class="r"><code>vpcPlot(fit) +
   theme_bw(base_size = 11) +
   xlab(&quot;Time after dose (h)&quot;) +
   ylab(&quot;Furosemide concentration (mg/L)&quot;)</code></pre>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:vpc"></span>
-<img src="variability_files/figure-html/vpc-1.png" alt="Visual Predictive Check for one-compartment model fit of phenobarbital data" width="576" />
+<img src="variability_files/figure-html/vpc-1.png" alt="Visual Predictive Check for one-compartment model fit of furosemide data" width="576" />
 <p class="caption">
-Figure 4: Visual Predictive Check for one-compartment model fit of phenobarbital data
+Figure 4: Visual Predictive Check for one-compartment model fit of furosemide data
 </p>
 </div>
 </div>
@@ -817,9 +814,8 @@ Figure 6: Basic diagnostic plots for one-compartment model fit of pheno data
 </p>
 </div>
 </div>
-</div>
-<div id="testing-a-continuous-covariate" class="section level1">
-<h1>Testing a continuous covariate</h1>
+<div id="testing-a-continuous-covariate" class="section level2">
+<h2>Testing a continuous covariate</h2>
 <p>When we include a continuous covariate such as weight in a population pharmacokinetic model, we need to define a meaningful reference point.</p>
 <p>Because clearance is estimated in the exponential domain, the typical population clearance is only recovered when the covariate term equals zero. So we need to ensure that zero corresponds to a clinically sensible value.</p>
 <p>By expressing weight as <TT>log(WT/median_weight)</TT>, the covariate term equals zero when an individual has exactly the median weight of the study population, meaning our typical clearance estimate corresponds to a patient of average weight.</p>
@@ -830,7 +826,7 @@ Figure 6: Basic diagnostic plots for one-compartment model fit of pheno data
   ungroup() %&gt;% 
   summarise(median(WT)) %&gt;% 
   as.numeric</code></pre>
-<p>We know from our summary statistics that the median weight for individuals in our data set is 1.3 kg, and that this is a set of neonatal data. We should therefore choose 1.3 kg as our reference weight.</p>
+<p>We know from our summary statistics (Table 1) that the median weight for individuals in the phenobarbital data set is 1.3 kg, and that this is a set of neonatal data. We should therefore choose 1.3 kg as our reference weight.</p>
 <pre class="r"><code>pheno$rWT&lt;-log(pheno$WT/mw) # to create centred weight covariate
 
 run2.mod &lt;- function() {
@@ -1010,8 +1006,9 @@ Figure 7: Basic diagnostic plots for one-compartment model fit of pheno data wit
 </p>
 </div>
 <p>The PRED vs DV plot shows improved model fit with run2 (Figure <a href="#fig:phenofit2">7</a> (a)). Although there is still some room for improvement.</p>
-<div id="using-the-objective-function-value-to-test-for-improvement-in-model-fit" class="section level3">
-<h3>Using the Objective Function Value to test for improvement in model fit</h3>
+</div>
+<div id="using-the-objective-function-value" class="section level2">
+<h2>Using the Objective Function Value</h2>
 <p>If you add one parameter to your model and compare the objective function with and without that parameter, a drop in objective function value &gt;3.84 suggests a statistically significant (p&lt;0.05) improvement in model fit.</p>
 <p>Have a look at the objective function for the two model runs.</p>
 <pre class="r"><code>run1$OBJF
