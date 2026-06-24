@@ -356,8 +356,6 @@ Look at the value for $AUC$ produced here and compare it to the one earlier. The
 
 ## Clearance ($Cl$)
 
-## Clearance ($Cl$)
-
 Clearance describes the volume of plasma from which drug is completely removed per unit time. 
 
 $$Cl = \frac{Dose}{AUC_{0-\infty}}$$

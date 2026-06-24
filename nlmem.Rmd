@@ -206,9 +206,22 @@ kbl(head(sparse), booktabs = TRUE, caption = "First few rows of the furosemide d
 * EVID = event identifier (tells <TT>nlmixr2</TT> whether that row represents an observation or dose event)
 * CMT = compartment 
 
-Then you need to build your model. When building the model, you specify two blocks in a standard <TT>R function()</TT>. As always, you give your function a name, I have chosen <TT>one.cmt</TT>. 
+Then you need to build your model. When building the model, you specify two blocks in a standard <TT>R function()</TT>. 
 
 ### Ini block
+
+```{r, eval = F}
+
+ini({ 
+    tka <-log(1.3) 
+    tcl <- log(8) 
+    tv <- log(20)
+    eta.ka~0.1 
+    eta.cl ~ 0.1
+    eta.v ~ 0.1
+    add.sd <- 0.1 
+  })
+```
 
 The first part of the function is to set the initial estimates for your model parameters, this is known as the <TT>ini()</TT> block. We are parameterising using absorption rate constant ($k_a$), clearance ($Cl$) and volume of distribution ($V$) in a one-compartment oral-absorption model. So we need to tell <TT>nlmixr</TT> initial values for each of these parameters *as well as* values for the random effects associated with each parameter. 
 
@@ -218,14 +231,6 @@ The <TT>eta</TT> terms in the code below are initial estimates of the variance o
 
 A further source of variability captured by the model is residual variability, which captures everything that remains unexplained after accounting for inter-individual variability.
 This includes random fluctuations in drug concentrations, errors in recording the exact time a sample was taken or a dose was administered, and assay measurement error. Residual variability is not attributed to any specific cause — it is the irreducible noise around the model's predictions. In the code, this is represented by <TT>add.sd</TT> (additive residual error). 
-
-### Choosing initial estimates
-
-If your initial estimates are too far from the true values, the fitting algorithm may fail to converge, or may converge to an incorrect solution.
-
-A useful starting point is to use your NCA results from Session 1. 
-For inter-individual variability ($\eta$), starting values are typically 0.1. 
-Starting values for residual error of around 0.1–0.2 are generally reasonable.
 
 ### Additive versus proportional residual error
 
@@ -248,15 +253,39 @@ However, analytical assays typically have a **proportional** error — the absol
 
 I have used an **additive** residual error model in all the examples, but you can try running the models with other residual error models as above to see whether this changes the model diagnostics (which we will cover in session 3).
 
+### Choosing initial estimates
+
+If your initial estimates are too far from the true values, the fitting algorithm may fail to converge, or may converge to an incorrect solution.
+
+A useful starting point is to use your NCA results from Session 1. 
+For inter-individual variability ($\eta$), starting values are typically 0.1. 
+Starting values for residual error of around 0.1–0.2 are generally reasonable.
+
 ### Model block
 
-The second part of the function defines the model. The <TT>model()</TT> block. Here you describe the relationship between the effects. 
+```{r, eval = F}
+
+model({ 
+    ka <- exp(tka + eta.ka)
+    cl <- exp(tcl + eta.cl)
+    v <- exp(tv + eta.v)
+    linCmt() ~ add(add.sd) 
+  })
+```
+
+The `model()` block defines how the pharmacokinetic parameters are calculated for each individual. Each line transforms the population-level fixed effects ($\theta$, represented by `tcl`, `tv` and `tka`) and individual random effects ($\eta$) into individual parameter estimates using an exponential function. For example:
+
+$$Cl_i = e^{\theta_{Cl} + \eta_{Cl}}$$
+
+The exponential transformation is used for two reasons. First, it ensures that parameter estimates are always positive — a negative clearance or volume of distribution is physiologically impossible. Second, it places the inter-individual variability on a log-normal scale, which is consistent with the way pharmacokinetic parameters are typically distributed in a population.
+
+`linCmt()` solves the compartmental model equations based on the parameters defined above. The `~ add(add.sd)` part specifies the residual error model.
 
 After building the model we can run a check using <TT>nlmixr(one.cmt)</TT>, which describes the model we have built. And then we fit the model to the data.
 
 ```{r nlmixr,warning=F,message=F, results='hide'}
 
-# First make the model
+# First make the model by combining the ini and model blocks
 one.cmt <- function() {
   ini({ 
     tka <-log(1.3) # set the initial estimates for each parameter, note that ka will not be required for IV datasets
@@ -276,7 +305,7 @@ one.cmt <- function() {
 }
 
 # Fit the data using this model
-fit<-nlmixr2(one.cmt,sparse,est="saem", list(print=0)) # recall that we have named the dataset 'sparse'
+fit<-nlmixr2(one.cmt, sparse, est="saem", list(print=0)) # recall that we have named the dataset 'sparse'
 
 ```
 
