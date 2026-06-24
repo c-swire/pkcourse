@@ -47,7 +47,6 @@ This page walks you through an introduction to RStudio.
 
 ## Learning outcomes  
 
-* Access <TT>R</TT> and <TT>RStudio</TT> using Posit Cloud
 * Understand the different windows in the <TT>RStudio</TT> desktop
 * Make and save an  <TT>R</TT> script
 * Undertake some basic calculations using  <TT>R</TT>
@@ -63,16 +62,6 @@ This page walks you through an introduction to RStudio.
     + Estimate $C_{max}$
 
 This document is designed to provide you with notes of the session and be a handy resource when you come to revision. There are examples of code and the corresponding output from <TT>R</TT> as we go along.  
-
-## Accessing <TT>R</TT> and <TT>RStudio</TT> on Posit Cloud
-
-The two key tools for this session will be <TT>R</TT> and <TT>RStudio</TT>. These are free, open source pieces of software. They are both available on the University computers, but you may choose to download them onto your personal laptop or home computer.
-
-'<TT>R</TT>' is a language and environment for statistical computing. <TT>R</TT> is very powerful but it was not designed with the 'everyday' user in mind. '<TT>RStudio</TT>' is a user interface that makes using '<TT>R</TT>' far easier. You can think of the relationship between '<TT>R</TT>' and '<TT>RStudio</TT>' as similar to the relationship between the lines of code (<TT>R</TT>) running your computer that you do not see behind the user interface you use - MS Windows (<TT>RStudio</TT>) or as the relationship between equipment for an experiment (<TT>R</TT>) and the laboratory that houses it (<TT>RStudio</TT>). 
-
-When you are using a University computer, you need to access <TT>RStudio</TT> via the University servers.
-
-The link for this is [here](https://stats4.sgul.ac.uk/rstudio).
 
 # Some basics in <TT>R</TT>
 Open <TT>RStudio</TT> and then open a new <TT>R</TT> script by clicking on the plus page in the top left hand corner of the <TT>RStudio</TT> window. You are now ready to start writing an <TT>R</TT> script. Try doing some simple maths and running the code by clicking '<TT>Run</TT>' or pressing <TT>ctrl+enter</TT> (<TT>cmd+enter if using a Mac</TT>).
@@ -103,12 +92,6 @@ mon<- c("JAN","FEB","MAR")
 CAL<-data.frame(mon,a)
 CAL #show 'CAL' data frame in R console.
 ```
-
-<br>
-
-**Task:** Run through some basic calculations in R, store a vector of numbers and see if you can work out how to raise this to a power (e.g. square it).  
-
-<br>
 
 ## Creating a directory, setting the working directory and importing a csv file  
 
@@ -153,20 +136,13 @@ I recommend you now click save and save your <TT>R</TT> script in this folder so
 
 ### Import the data 
 
-Let's get some PK data in to work with. I have put the data set on canvas for you but you can also call it straight from my Github using the following command:
+Let's get some PK data in to work with. I have put the data set on Github which you can call using the following command:
 
 ``` {r,eval=TRUE, results='hold', tidy=FALSE}
   
 amox<- read.csv("https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/main/amoxicillin.csv")
 
 ```
-
-
-**Task:** 
-
-* Create a new directory and check it has worked by running <TT>list.files()</TT>
-* Set your working directory to this new folder
-* Import the data from Github
 
 
 ## Inspect the data
@@ -186,8 +162,7 @@ summary(amox$ID) #summarises the ID column. 5 samples per participant
 amox[15,] # looks at row 15
 amox[,2] # looks at column 2
 ```
-<br>
-**Task:** Inspect the data   
+
 
 # Long and wide data  
 ## Long data  
@@ -248,13 +223,8 @@ Here, the three variables in the amoxicillin data set are summarised. It's a sta
 
 I suggest you start by using  <TT>tidyverse</TT>, which is actually a selection of useful packages. When you want to use something like this, you have to call it from the <TT>R library</TT> of packages with the function <TT>library()</TT>. 
 
-Please note, if you are undertaking this work on your own personal computer, you will need to download packages before you use them. This is done with the <TT>install.packages()</TT> function (e.g. <TT>install.packages('tidyverse')</TT>). If you are using <TT>RStudio</TT> on the server, I have downloaded all the packages that you need for this course, but you will have to tell <TT>R</TT> where to find them before you can call them with the <TT>library()</TT> function. To do this you will need to run the following code: <TT>.libPaths( c(.libPaths(), "/homes/dlonsdale-pharmacokinetics/sghms/bms/shares/Advanced-Pharmacokinetics/4.4.2/library"))</TT>
-
 For example:  
 ```{r, eval=FALSE}
-.libPaths( c( .libPaths(),
-              "/homes/dlonsdale-pharmacokinetics/sghms/bms/shares/Advanced-Pharmacokinetics/4.4.2/library") )
-#note that you need the '.' before 'libPaths'
 
 library(tidyverse)
 ```
@@ -271,10 +241,10 @@ Let's say we wanted to check the maximum concentration in our dataset made sense
 amox%>%
   group_by(ID)%>%
   summarise(max(conc))
-# here we tell R to take 'amox', group by 'ID' then give the min conc
+# here we tell R to take 'amox', group by 'ID' then give the max conc
 ```
 
-Now you can see the maximum value for each ID. In pharmacokinetics, the maximum value is known as $C_{max}$. This is an important pharmacokinetic parameter as sometimes, $C_{max}$, the peak drug concentration, influences effect (either desired or adverse). We can build our <TT>summarise()</TT> function to be a bit more powerful. For example:
+Now you can see the maximum value for each ID. In pharmacokinetics, the maximum concentration is known as $C_{max}$. This is an important pharmacokinetic parameter as sometimes, $C_{max}$, the peak drug concentration, influences effect (either desired or adverse). We can build our <TT>summarise()</TT> function to be a bit more powerful. For example:
 
 ```{r, results='hold', message=FALSE, warning=FALSE}
 amox%>%

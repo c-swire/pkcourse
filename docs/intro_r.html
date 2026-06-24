@@ -340,23 +340,23 @@ div.tocify {
 <li>
   <a href="solutions_non_compartmental.html">Session 1</a>
 </li>
-<li>
-  <a href="nlmem.html">Session 2</a>
-</li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-    Additional materials
+    Session 2
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="model_diagnostics.html">Model diagnostics</a>
+      <a href="nlmem.html">Workbook</a>
     </li>
     <li>
-      <a href="covariate_analysis.html">Covariate analysis</a>
+      <a href="nlmem2.html">More information about non-linear mixed effects modelling</a>
     </li>
   </ul>
+</li>
+<li>
+  <a href="variability.html">Session 3</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -393,7 +393,6 @@ text-align: justify}
 <div id="learning-outcomes" class="section level2">
 <h2>Learning outcomes</h2>
 <ul>
-<li>Access <TT>R</TT> and <TT>RStudio</TT> using Posit Cloud</li>
 <li>Understand the different windows in the <TT>RStudio</TT> desktop</li>
 <li>Make and save an <TT>R</TT> script</li>
 <li>Undertake some basic calculations using <TT>R</TT></li>
@@ -413,13 +412,6 @@ text-align: justify}
 </ul></li>
 </ul>
 <p>This document is designed to provide you with notes of the session and be a handy resource when you come to revision. There are examples of code and the corresponding output from <TT>R</TT> as we go along.</p>
-</div>
-<div id="accessing-r-and-rstudio-on-posit-cloud" class="section level2">
-<h2>Accessing <TT>R</TT> and <TT>RStudio</TT> on Posit Cloud</h2>
-<p>The two key tools for this session will be <TT>R</TT> and <TT>RStudio</TT>. These are free, open source pieces of software. They are both available on the University computers, but you may choose to download them onto your personal laptop or home computer.</p>
-<p>‘<TT>R</TT>’ is a language and environment for statistical computing. <TT>R</TT> is very powerful but it was not designed with the ‘everyday’ user in mind. ‘<TT>RStudio</TT>’ is a user interface that makes using ‘<TT>R</TT>’ far easier. You can think of the relationship between ‘<TT>R</TT>’ and ‘<TT>RStudio</TT>’ as similar to the relationship between the lines of code (<TT>R</TT>) running your computer that you do not see behind the user interface you use - MS Windows (<TT>RStudio</TT>) or as the relationship between equipment for an experiment (<TT>R</TT>) and the laboratory that houses it (<TT>RStudio</TT>).</p>
-<p>When you are using a University computer, you need to access <TT>RStudio</TT> via the University servers.</p>
-<p>The link for this is <a href="https://stats4.sgul.ac.uk/rstudio">here</a>.</p>
 </div>
 </div>
 <div id="some-basics-in-r" class="section level1">
@@ -449,9 +441,6 @@ CAL #show &#39;CAL&#39; data frame in R console.</code></pre>
 ## 1 JAN 1
 ## 2 FEB 2
 ## 3 MAR 3</code></pre>
-<p><br></p>
-<p><strong>Task:</strong> Run through some basic calculations in R, store a vector of numbers and see if you can work out how to raise this to a power (e.g. square it).</p>
-<p><br></p>
 <div id="creating-a-directory-setting-the-working-directory-and-importing-a-csv-file" class="section level2">
 <h2>Creating a directory, setting the working directory and importing a csv file</h2>
 <p>When working on a project in <TT>R</TT>, it is standard practice to navigate to a folder where you want to create and store your work for the piece of work you are doing.</p>
@@ -470,14 +459,8 @@ CAL #show &#39;CAL&#39; data frame in R console.</code></pre>
 <p>I recommend you now click save and save your <TT>R</TT> script in this folder so you can come back to it later. You might use a name like ‘firstrscript.r’. Whatever you choose, use the file extension ‘.r’.</p>
 <div id="import-the-data" class="section level3">
 <h3>Import the data</h3>
-<p>Let’s get some PK data in to work with. I have put the data set on canvas for you but you can also call it straight from my Github using the following command:</p>
+<p>Let’s get some PK data in to work with. I have put the data set on Github which you can call using the following command:</p>
 <pre class="r"><code>amox&lt;- read.csv(&quot;https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/main/amoxicillin.csv&quot;)</code></pre>
-<p><strong>Task:</strong></p>
-<ul>
-<li>Create a new directory and check it has worked by running <TT>list.files()</TT></li>
-<li>Set your working directory to this new folder</li>
-<li>Import the data from Github</li>
-</ul>
 </div>
 </div>
 <div id="inspect-the-data" class="section level2">
@@ -504,8 +487,6 @@ CAL #show &#39;CAL&#39; data frame in R console.</code></pre>
 ## 15  C    8 0.09</code></pre>
 <pre class="r"><code>amox[,2] # looks at column 2</code></pre>
 <pre><code>##  [1] 0 2 4 6 8 0 2 4 6 8 0 2 4 6 8 0 2 4 6 8 0 2 4 6 8 0 2 4 6 8</code></pre>
-<p><br>
-<strong>Task:</strong> Inspect the data</p>
 </div>
 </div>
 <div id="long-and-wide-data" class="section level1">
@@ -1212,13 +1193,8 @@ F
 <h1>Calling a package from the <TT>R</TT> library</h1>
 <p><TT>R</TT> is a little bit like an empty laboratory. You can do <em>some</em> useful things in it (like light a bunsen burner and heat something up) but if you want to do more advanced analytics you need to bring in some additional equipment (like an organ bath). In <TT>R</TT> these additional bits of kit are called ‘packages’.</p>
 <p>I suggest you start by using <TT>tidyverse</TT>, which is actually a selection of useful packages. When you want to use something like this, you have to call it from the <TT>R library</TT> of packages with the function <TT>library()</TT>.</p>
-<p>Please note, if you are undertaking this work on your own personal computer, you will need to download packages before you use them. This is done with the <TT>install.packages()</TT> function (e.g. <TT>install.packages(‘tidyverse’)</TT>). If you are using <TT>RStudio</TT> on the server, I have downloaded all the packages that you need for this course, but you will have to tell <TT>R</TT> where to find them before you can call them with the <TT>library()</TT> function. To do this you will need to run the following code: <TT>.libPaths( c(.libPaths(), “/homes/dlonsdale-pharmacokinetics/sghms/bms/shares/Advanced-Pharmacokinetics/4.4.2/library”))</TT></p>
 <p>For example:</p>
-<pre class="r"><code>.libPaths( c( .libPaths(),
-              &quot;/homes/dlonsdale-pharmacokinetics/sghms/bms/shares/Advanced-Pharmacokinetics/4.4.2/library&quot;) )
-#note that you need the &#39;.&#39; before &#39;libPaths&#39;
-
-library(tidyverse)</code></pre>
+<pre class="r"><code>library(tidyverse)</code></pre>
 </div>
 <div id="summarising-data-with-summarise-function-using-piping-and-estimating-c_max" class="section level1">
 <h1>Summarising data with <TT>summarise()</TT> function, using piping <TT>%&gt;%</TT> and estimating <span class="math inline">\(C_{max}\)</span></h1>
@@ -1228,7 +1204,7 @@ library(tidyverse)</code></pre>
 <pre class="r"><code>amox%&gt;%
   group_by(ID)%&gt;%
   summarise(max(conc))
-# here we tell R to take &#39;amox&#39;, group by &#39;ID&#39; then give the min conc</code></pre>
+# here we tell R to take &#39;amox&#39;, group by &#39;ID&#39; then give the max conc</code></pre>
 <pre><code>## # A tibble: 6 × 2
 ##   ID    `max(conc)`
 ##   &lt;chr&gt;       &lt;dbl&gt;
@@ -1238,7 +1214,7 @@ library(tidyverse)</code></pre>
 ## 4 D            43.1
 ## 5 E            41.6
 ## 6 F            43.5</code></pre>
-<p>Now you can see the maximum value for each ID. In pharmacokinetics, the maximum value is known as <span class="math inline">\(C_{max}\)</span>. This is an important pharmacokinetic parameter as sometimes, <span class="math inline">\(C_{max}\)</span>, the peak drug concentration, influences effect (either desired or adverse). We can build our <TT>summarise()</TT> function to be a bit more powerful. For example:</p>
+<p>Now you can see the maximum value for each ID. In pharmacokinetics, the maximum concentration is known as <span class="math inline">\(C_{max}\)</span>. This is an important pharmacokinetic parameter as sometimes, <span class="math inline">\(C_{max}\)</span>, the peak drug concentration, influences effect (either desired or adverse). We can build our <TT>summarise()</TT> function to be a bit more powerful. For example:</p>
 <pre class="r"><code>amox%&gt;%
   group_by(ID)%&gt;%
   summarise(min(conc),median(conc), max(conc),IQR(conc))</code></pre>

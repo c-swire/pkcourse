@@ -21,7 +21,7 @@
 #  - \captionsetup{labelfont=bf,margin=12pt}
 #urlcolor: blue
 
-title: "Non-linear mixed effects models"
+title: "Introduction to compartmental analysis"
 output:
   bookdown::html_document2:
     fig_caption : TRUE
@@ -89,18 +89,24 @@ library(nlmixr2data)
 * Fit a one-compartment IV bolus model for the 'Healthy' dataset
 * Fit a one-compartment IV bolus model for the 'Sepsis' dataset
 * Compare volume of distribution and clearance values for the two datasets
-* Compare volume of distribution and clearance values using non-compartmental and compartmental analysis
+* Compare <TT>Cl</TT> values using non-compartmental and compartmental analysis
 
 ### Extension tasks
 
-* Fit two-compartment models to the datasets
-* Create diagnostic plots for your models (See Additional Materials)
+* Fit two-compartment models to the teaching and task datasets
 
 ## Datasets for tasks
 
 ## Dataset used in workbook example
 
+In this example we fit a one-compartment ORAL absorption model to sparse data after a dose of furosemide is taken. 
 
+```{r dataset,warning=F,message=F}
+sparse<-
+ read_csv("https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/main/sparsefru.csv")
+```
+
+_Hint: The tasks in this session are after IV administration of a drug, so you will need to adapt the model in the example to remove parts relating to absorption_
 
 # Introduction 
 
@@ -114,7 +120,7 @@ The purpose of this session, is to introduce the concept of non-linear mixed-eff
 
 **Advantages of non-linear mixed-effects approach**
 
-* Enables modelling of sparse data, useful in later phase studies
+* Enables modelling of sparse data, useful in later phase/post-marketing studies
 * Allows more complex identification of covariate effects (for example organ function)
 * Alternative sampling and modelling may allow for populations to be studied that are not straightforward to study in traditional phase-0/1 design (for example children, or drugs in pregnancy)
 * Allows complex simulations which can inform subsequent study design and drug dosing
@@ -128,13 +134,13 @@ The purpose of this session, is to introduce the concept of non-linear mixed-eff
 
 # What is the point of a model?
 
-It is clear that understanding data from a clinical trial is important. Pharmacokinetic data is the same as any other output from a trial. It is important to understand the data, what it means for the absorption, distribution, metabolism and excretion (ADME) of the compound AND it allows us to make suggestions for the next stage of drug development. This might include dose selection, frequency of administration or even decisions on formulation.
+It is clear that understanding data from a clinical study is important. Pharmacokinetic data are the same as any other output from a study. It is important to understand the data, what they mean for the absorption, distribution, metabolism and excretion (ADME) of the compound. They allow us to make suggestions for the next stage of drug development or to optimise dosing for different populations in clinical practice. This might include dose selection, frequency of administration or even decisions on formulation.
 
 Compartmental pharmacokinetic models simplify complex human physiology by describing the concentration-time course of a drug with (relatively) simple mathematical equations. These mathematical equations help to quantify ADME processes through the estimation of values for parameters such as clearance and volume of distribution.
 
 ## One-compartment IV bolus model
 
-In the one compartment model IV bolus model, the body is simplified and represented as a single box, into which the dose of the drug is deposited instantaneously. Drug is assumed to distribute evenly and instantaneously throughout this compartment such that the contents of the box is assumed to be the same wherever you are within it.
+In the one compartment model IV bolus model, the body is simplified and represented as a single box, into which the dose of the drug is deposited instantaneously. Drug is assumed to distribute evenly and instantaneously throughout this compartment such that the concentration is assumed to be the same wherever you are within it.
 
 
 ```{r onecpt, echo = FALSE, message=FALSE, fig.align='center', fig.cap='One-compartment model',fig.height=2,out.width="100%"}
@@ -198,13 +204,49 @@ kbl(head(sparse), booktabs = TRUE, caption = "First few rows of the furosemide d
 * DV = dependent variable (drug concentration)
 * AMT = amount (dose)
 * EVID = event identifier (tells <TT>nlmixr2</TT> whether that row represents an observation or dose event)
-* CMT = compartment (1 = depot compartment, 2 = central compartment).
+* CMT = compartment 
 
 Then you need to build your model. When building the model, you specify two blocks in a standard <TT>R function()</TT>. As always, you give your function a name, I have chosen <TT>one.cmt</TT>. 
 
 ### Ini block
 
-The first part of the function is to set the initial estimates for your model parameters, this is known as the <TT>ini()</TT> block. We are parameterising using $k_a$, $Cl$ and $V$ in our one-compartment oral-absorption model. So we need to tell <TT>nlmixr</TT> initial values for each of these parameters *as well as* values for the random effects associated with each parameter. 
+The first part of the function is to set the initial estimates for your model parameters, this is known as the <TT>ini()</TT> block. We are parameterising using absorption rate constant ($k_a$), clearance ($Cl$) and volume of distribution ($V$) in a one-compartment oral-absorption model. So we need to tell <TT>nlmixr</TT> initial values for each of these parameters *as well as* values for the random effects associated with each parameter. 
+
+As described above, the population mean of fixed effects are termed _theta_. In the <TT>ini()</TT> block, <TT>tcl</TT> represents the log of typical clearance. <TT>exp(tcl)</TT> therefore gives you ${\theta}_C$, the typical population <TT>Cl</TT>. 
+
+The <TT>eta</TT> terms in the code below are initial estimates of the variance of the inter-individual variability_eta_. 
+
+A further source of variability captured by the model is residual variability, which captures everything that remains unexplained after accounting for inter-individual variability.
+This includes random fluctuations in drug concentrations, errors in recording the exact time a sample was taken or a dose was administered, and assay measurement error. Residual variability is not attributed to any specific cause — it is the irreducible noise around the model's predictions. In the code, this is represented by <TT>add.sd</TT> (additive residual error). 
+
+### Choosing initial estimates
+
+If your initial estimates are too far from the true values, the fitting algorithm may fail to converge, or may converge to an incorrect solution.
+
+A useful starting point is to use your NCA results from Session 1. 
+For inter-individual variability ($\eta$), starting values are typically 0.1. 
+Starting values for residual error of around 0.1–0.2 are generally reasonable.
+
+### Additive versus proportional residual error
+
+In `nlmixr2`, you can specify these as:
+
+```{r errortypes, eval=FALSE}
+# Additive error
+linCmt() ~ add(add.sd)
+
+# Proportional error
+linCmt() ~ prop(prop.sd)
+
+# Combined additive and proportional (most flexible)
+linCmt() ~ add(add.sd) + prop(prop.sd)
+```
+
+An **additive** residual error model assumes the size of the error is constant regardless of the magnitude of the concentration. This can work well when concentrations are measured over a narrow range.
+
+However, analytical assays typically have a **proportional** error — the absolute error is larger at higher concentrations. A proportional error model accounts for this:
+
+I have used an **additive** residual error model in all the examples, but you can try running the models with other residual error models as above to see whether this changes the model diagnostics (which we will cover in session 3).
 
 ### Model block
 
@@ -212,11 +254,7 @@ The second part of the function defines the model. The <TT>model()</TT> block. H
 
 After building the model we can run a check using <TT>nlmixr(one.cmt)</TT>, which describes the model we have built. And then we fit the model to the data.
 
-```{r nlmixr,warning=F,message=F}
-
-sparse<-
- read_csv("https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/main/sparsefru.csv")
-
+```{r nlmixr,warning=F,message=F, results='hide'}
 
 # First make the model
 one.cmt <- function() {
@@ -224,24 +262,21 @@ one.cmt <- function() {
     tka <-log(1.3) # set the initial estimates for each parameter, note that ka will not be required for IV datasets
     tcl <- log(8) 
     tv <- log(20)
-    eta.ka~0.1 # inter-individual variabilities
+    eta.ka~0.1 # inter-individual variabilities, again note ka line this is not required for IV datasets
     eta.cl ~ 0.1
     eta.v ~ 0.1
-    add.sd <- 0.01 # residual variability
+    add.sd <- 0.1 # residual variability
   })
   model({ # define the model
     ka <- exp(tka + eta.ka) # ka will not be required for IV datasets
     cl <- exp(tcl + eta.cl)
     v <- exp(tv + eta.v)
-    linCmt() ~ add(add.sd)
+    linCmt() ~ add(add.sd) 
   })
 }
 
-# Run a check
-nlmixr2(one.cmt)
-
 # Fit the data using this model
-fit<-nlmixr2(one.cmt,sparse,est="saem", list(print=0))
+fit<-nlmixr2(one.cmt,sparse,est="saem", list(print=0)) # recall that we have named the dataset 'sparse'
 
 ```
 

@@ -77,9 +77,9 @@ By the end of this session you should be able to:
 
 * Estimate $C_{max}$, $T_{max}$ and $AUC_{0-t}$ for the 'Sepsis' dataset
 
-* Estimate $Vd$ and $Cl$ for the 'Healthy' dataset
+* Estimate $Cl$ for the 'Healthy' dataset
 
-* Estimate $Vd$ and $Cl$ for the 'Sepsis' dataset
+* Estimate $Cl$ for the 'Sepsis' dataset
 
 ### Extension tasks:
 
@@ -112,7 +112,7 @@ ORAL<-read.csv("https://raw.githubusercontent.com/dlonsdal/non_compartmental/mai
 
 The first six lines of the IV dataset are shown here.
 
-``` {r ivhead, eval=FALSE}
+``` {r ivhead, eval=TRUE}
 
 head(IV)
 
@@ -130,7 +130,6 @@ Columns in these datasets are:
 _Hint: More detailed notes on putting together plots are included in the Introduction to R page_
 
 ```{r plot,  message=FALSE, warning=FALSE}
-
 
 ggplot(data=IV,aes(x=time, y=conc,col=id) )+
   geom_line()+
@@ -308,55 +307,87 @@ ggplot(data=sIV, aes(time,conc))+
 
 It is worth noting the trapezoid method has limitations. Most notably that it will *overestimate* $AUC$ by virtue of taking a straight line between points, when the true concentration will fall in an logarithmic (curve) fashion (Figure \@ref(fig:trapbest)). There are methods to improve this accuracy, such as the logarithmic trapezoidal method. With this method, the 'trapezoid' is given a curved top (like the red line in Figure \@ref(fig:trapbest)). The formula for this method is $$AUC = \sum_{t=0}^{t=\tau} \frac{\Delta t}{ln(\frac{C_1}{C_2})} (C_1+C_2)$$  
 
+
+
 \newpage 
 
 # Using <TT>R</TT> package <TT>PKNCA</TT> to undertake non-compartmental analysis  
 
 If that all seems like too much hard work and <TT>R</TT> should just jolly well get on and do for us then you are right! There are a few non-compartmental analysis packages available, we will use <TT>PKNCA</TT>. Remember you will need to run <TT>install.packages("PKNCA")</TT> the first time you wish to use this package, once it has been installed you need to run <TT>library(PKNCA)</TT>. 
 
-To run non-compartmental analysis using this package, we need to give <TT>PKNCA</TT> some dosing data. We know that all the participants were given a dose of 1000 mg of amoxicillin at time $t=0$. To add a new column (variable) using <TT>\%>\%</TT> we use the <TT>mutate</TT> function.  
+
+**How to:**
+
+* Use <TT>PKNCA</TT> to undertake non-compartmental analysis on the oral teaching dataset
+
+To run non-compartmental analysis using this package, we need to give <TT>PKNCA</TT> some dosing data. All the participants were given a dose of 1000 mg of the anti-epileptic at time $t=0$. To add a new column (variable) using <TT>\%>\%</TT> we use the <TT>mutate</TT> function.
 
 ```{r, results='hold'}
-amox<- read.csv("https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/refs/heads/main/amoxicillinPK.csv") 
 
-damox<-amox %>%  # remember we will need to save this as a new object
+dORAL<-ORAL %>%  # we will need to save this as a new object
   subset(time==0) %>% 
   mutate(dose=1000) #this produces a new variable dose 1000
 ```
 
 Now we can call and run <TT>PKNCA</TT>. First we create a sampling (or concentration) object and then a dosing object. In each function we instruct <TT>PKNCA</TT> of the names of our data object and the relevant variables in it. Then we combine the two and run our non-compartmental analysis.  
 
-```{r, eval=FALSE}
+```{r, eval=FALSE, message=F}
 
-conc<-PKNCAconc(amox, conc~time|ID) #create sampling object
-dose<-PKNCAdose(damox, dose~time|ID) #create dosing object
-full<-PKNCAdata(conc, dose)  #combine
-results<-pk.nca(full)  # analyse
-summary(results) #summarise the results
+conc1<-PKNCAconc(ORAL, conc~time|id) #create sampling object
+dose1<-PKNCAdose(dORAL, dose~time|id) #create dosing object
+full1<-PKNCAdata(conc1, dose1)  #combine
+results1<-pk.nca(full1)  # analyse
+summary(results1) #summarise the results
 ```
 ```{r, echo=FALSE}
 
-conc<-PKNCAconc(amox, conc~time|ID) #create sampling object
-dose<-PKNCAdose(damox, dose~time|ID) #create dosing object
-full<-PKNCAdata(conc, dose)  #combine
-results<-pk.nca(full)  # analyse
+conc1<-PKNCAconc(ORAL, conc~time|id) #create sampling object
+dose1<-PKNCAdose(dORAL, dose~time|id) #create dosing object
+full1<-PKNCAdata(conc1, dose1)  #combine
+results1<-pk.nca(full1)  # analyse
 
-knitr::kable(summary(results), "latex",booktabs = TRUE, caption='PKNCA output')%>%
-  kable_styling(latex_options = "striped")
+knitr::kable(summary(results1), booktabs = TRUE, caption='PKNCA output') %>%
+  kable_styling(bootstrap_options = "striped")
 ```
 
+Look at the value for $AUC$ produced here and compare it to the one earlier. There is a discrepancy because by default, PKNCA uses a slightly different method to calculate $AUC$. 
 
-Look at the value for $AUC$ produced here and compare it to the one earlier. There is a discrepancy because by default, PKNCA uses logarithmic trapezoid method to calculate $AUC$. 
+# Clearance, half-life and volume of distribution
 
-# Estimating clearance
+## Clearance ($Cl$)
 
-Clearance can be calculated as $$CL = \frac{Dose}{AUC}$$
+## Clearance ($Cl$)
 
+Clearance describes the volume of plasma from which drug is completely removed per unit time. 
+
+$$Cl = \frac{Dose}{AUC_{0-\infty}}$$
+
+Note that this relationship holds exactly only for IV administration. For oral data, the calculated value reflects apparent clearance ($Cl/F$), since bioavailability ($F$) cannot be separated from clearance without an IV reference.
+
+## Volume of distribution ($V_d$)
+
+Volume of distribution describes how widely a drug distributes through the body. It is not a real anatomical volume — it is a proportionality constant relating the total amount of drug in the body to the measured plasma concentration.
+
+For IV data, $V_d$ can be estimated by back-extrapolating the concentration-time curve to $t=0$ to obtain $C_0$:
+
+$$V_d = \frac{Dose}{C_0}$$
+
+For oral data this approach is not valid, as absorption is not instantaneous and $C_0$ cannot be meaningfully defined. Instead, only **apparent** volume of distribution ($V_d/F$) can be estimated from oral data, since bioavailability ($F$) cannot be separated from $V_d$ without an IV reference:
+
+$$V_d/F = \frac{Cl/F \times t_{1/2}}{0.693}$$
+
+## Half-life ($t_{1/2}$)
+
+Half-life is the time taken for drug concentration to fall by half. For a drug following one-compartment kinetics with first-order elimination, this is constant regardless of the starting concentration:
+
+$$t_{1/2} = \frac{0.693 \times V_d}{Cl}$$
 \newpage
 
 # Limitations of non-compartmental analysis
 
-```{r traperror, echo=F, fig.cap="Participant A amoxicillin concentration-time profile showing impact of reduced sampling on AUC calculation", fig.width=4.5,fig.height=2.5,fig.align = 'center'}
+```{r traperror, echo=F, fig.cap="Concentration-time profile showing impact of reduced sampling on AUC calculation", fig.width=4.5,fig.height=2.5,fig.align = 'center'}
+
+amox<- read.csv("https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/refs/heads/main/amoxicillinPK.csv")
 
 Aamox<-amox%>%
         subset(ID=='A')
@@ -389,7 +420,7 @@ Non-compartmental analyses are useful for many reasons. For example, they use re
 There are some disadvantages that are worth being aware of. These include:
 
 * Need for rich sampling (multiple samples from each subject)
-* Use of direct observation of C_{max}$ and T_{max}$ means *true* values are missed for any particular subject
-* Increasing accuracy requires increased number of participants or samples, which can be technically chalenging and expensive
+* Use of direct observation of $C_{max}$ and $T_{max}$ means *true* values are missed for any particular subject
+* Increasing accuracy requires increased number of participants or samples, which can be technically challenging and expensive
 
 Have a look at Figure \@ref(fig:traperror), where a situation is imagined that $time=2$ data point is not sampled. You can see the likely impact on the estimate of AUC from this. 
