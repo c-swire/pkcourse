@@ -80,6 +80,14 @@ library(tidyverse)
 library(nlmixr2)
 ```
 
+# Dataset for tasks during this session
+
+```{r datasets, eval=FALSE}
+
+combined <- read_csv("https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/docs/combined_ca.csv")
+
+```
+
 # Teaching data for this session
 
 In this Session the exemplars are:

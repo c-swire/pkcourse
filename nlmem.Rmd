@@ -102,6 +102,23 @@ library(tidyverse)
 library(nlmixr2)
 ```
 
+# Datasets for tasks during this session
+
+```{r datasets, eval=FALSE}
+
+healthy2 <- read_csv("https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/docs/healthy_ca.csv")
+sepsis2 <- read_csv("https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/docs/sepsis_ca.csv")
+
+```
+
+When you expect these datasets, you will notice there are several new columns. Many of these are required for non-linear mixed effects modelling and are explained below. 
+
+In addition:
+
+* WT = weight
+* CrCL = creatinine clearance
+* ALB = albumin
+
 # Teaching data for this session
 
 In this Session the exemplar fits a one-compartment ORAL absorption model to sparse data after a dose of furosemide is taken.

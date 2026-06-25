@@ -69,6 +69,3 @@ For those of you who already have RStudio, we still recommend using Posit Cloud 
 All the teaching materials on this webpage are adapted from materials developed by Dr Dagan Lonsdale. 
 
 These are designed to walk you through what you need to know to carry out the tasks in each session. 
-
-## Datasets for use during today's tasks
-

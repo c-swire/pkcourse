@@ -425,6 +425,18 @@ text-align: justify}
 <pre class="r"><code>library(tidyverse)
 library(nlmixr2)</code></pre>
 </div>
+<div id="datasets-for-tasks-during-this-session" class="section level1">
+<h1>Datasets for tasks during this session</h1>
+<pre class="r"><code>healthy2 &lt;- read_csv(&quot;https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/docs/healthy_ca.csv&quot;)
+sepsis2 &lt;- read_csv(&quot;https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/docs/sepsis_ca.csv&quot;)</code></pre>
+<p>When you expect these datasets, you will notice there are several new columns. Many of these are required for non-linear mixed effects modelling and are explained below.</p>
+<p>In addition:</p>
+<ul>
+<li>WT = weight</li>
+<li>CrCL = creatinine clearance</li>
+<li>ALB = albumin</li>
+</ul>
+</div>
 <div id="teaching-data-for-this-session" class="section level1">
 <h1>Teaching data for this session</h1>
 <p>In this Session the exemplar fits a one-compartment ORAL absorption model to sparse data after a dose of furosemide is taken.</p>

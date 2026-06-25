@@ -95,6 +95,15 @@ library(PKNCA)
 library(DescTools)
 ```
 
+# Datasets for tasks during this session
+
+```{r datasets, eval=FALSE}
+
+healthy <- read_csv("https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/docs/healthy_nca.csv")
+sepsis <- read_csv("https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/docs/sepsis_nca.csv")
+
+```
+
 # Teaching data for this session
 
 This workbook uses PK data for an anti-epileptic drug. 6 participants were given an IV dose and then one week later they were given an oral dose. Drug concentrations were measured.
