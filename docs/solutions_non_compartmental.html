@@ -417,8 +417,8 @@ text-align: justify}
 <ul>
 <li><p>Make a concentration-time plot for the ‘Healthy’ dataset</p></li>
 <li><p>Make a concentration-time plot for ‘Sepsis’ dataset</p></li>
-<li><p>Estimate <span class="math inline">\(C_{max}\)</span>, <span class="math inline">\(T_{max}\)</span> and <span class="math inline">\(AUC_{0-t}\)</span> for the ‘Healthy’ dataset</p></li>
-<li><p>Estimate <span class="math inline">\(C_{max}\)</span>, <span class="math inline">\(T_{max}\)</span> and <span class="math inline">\(AUC_{0-t}\)</span> for the ‘Sepsis’ dataset</p></li>
+<li><p>Estimate <span class="math inline">\(C_{max}\)</span> and <span class="math inline">\(AUC_{0-t}\)</span> for the ‘Healthy’ dataset</p></li>
+<li><p>Estimate <span class="math inline">\(C_{max}\)</span> and <span class="math inline">\(AUC_{0-t}\)</span> for the ‘Sepsis’ dataset</p></li>
 <li><p>Estimate <span class="math inline">\(Cl\)</span> for the ‘Healthy’ dataset</p></li>
 <li><p>Estimate <span class="math inline">\(Cl\)</span> for the ‘Sepsis’ dataset</p></li>
 </ul>
@@ -438,6 +438,7 @@ library(DescTools)</code></pre>
 </div>
 <div id="datasets-for-tasks-during-this-session" class="section level1">
 <h1>Datasets for tasks during this session</h1>
+<p>Patients with and without sepsis have received a 1000 mg <em>intravenous bolus</em> of Drug A, a renally-cleared antibiotic.</p>
 <pre class="r"><code>healthy &lt;- read_csv(&quot;https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/docs/healthy_nca.csv&quot;)
 sepsis &lt;- read_csv(&quot;https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/docs/sepsis_nca.csv&quot;)</code></pre>
 </div>
@@ -506,39 +507,6 @@ ORAL %&gt;%
 ##   `mean(cmax)`
 ##          &lt;dbl&gt;
 ## 1         14.9</code></pre>
-<pre class="r"><code># we can also output the results for both datasets together
-
-FULL&lt;-rbind(IV,ORAL) # to combine the two datasets
-
-FULL %&gt;% 
-  group_by(id,study) %&gt;% 
-  summarise(max(conc))</code></pre>
-<pre><code>## # A tibble: 12 × 3
-## # Groups:   id [6]
-##    id    study `max(conc)`
-##    &lt;chr&gt; &lt;chr&gt;       &lt;dbl&gt;
-##  1 A     IV           36  
-##  2 A     ORAL         16.1
-##  3 B     IV           27.3
-##  4 B     ORAL         13.6
-##  5 C     IV           24.1
-##  6 C     ORAL         12.8
-##  7 D     IV           47.8
-##  8 D     ORAL         21.6
-##  9 E     IV           26.6
-## 10 E     ORAL         12.8
-## 11 F     IV           26.3
-## 12 F     ORAL         12.4</code></pre>
-<pre class="r"><code>FULL %&gt;% 
-  group_by(id,study) %&gt;% 
-  summarise(cmax=max(conc),.groups=&quot;drop&quot;) %&gt;% 
-  group_by(study)  %&gt;% 
-  summarise(mean(cmax))</code></pre>
-<pre><code>## # A tibble: 2 × 2
-##   study `mean(cmax)`
-##   &lt;chr&gt;        &lt;dbl&gt;
-## 1 IV            31.4
-## 2 ORAL          14.9</code></pre>
 </div>
 <div id="estimating-t_max" class="section level1">
 <h1>Estimating <span class="math inline">\(T_{max}\)</span></h1>
@@ -557,7 +525,11 @@ FULL %&gt;%
 ## 4 D      21.6  1.25
 ## 5 E      12.8  1.75
 ## 6 F      12.4  2</code></pre>
-<pre class="r"><code>FULL %&gt;% 
+<pre class="r"><code># we can also output the results for both datasets together
+
+FULL&lt;-rbind(IV,ORAL) # to combine the two datasets
+
+FULL %&gt;% 
   group_by(id,study) %&gt;% 
   summarise(cmax=max(conc),
             tmax=time[which.max(conc)],.groups=&quot;drop&quot;) %&gt;% 
@@ -569,6 +541,7 @@ FULL %&gt;%
 ##   &lt;chr&gt;        &lt;dbl&gt;        &lt;dbl&gt;
 ## 1 IV            31.4         0   
 ## 2 ORAL          14.9         1.54</code></pre>
+<p>As you can see here, <span class="math inline">\(T_{max}\)</span> after an IV bolus is at t=0. As a result, this is not a parameter that is reported for IV bolus data.</p>
 </div>
 <div id="estimating-the-area-under-the-curve-auc_0-t" class="section level1">
 <h1>Estimating the area under the curve (<span class="math inline">\(AUC_{0-t}\)</span>)</h1>
@@ -642,9 +615,10 @@ Figure 2: Participant ‘A’ IV concentration-time profile with curved line of 
 <li>Use <TT>PKNCA</TT> to undertake non-compartmental analysis on the oral teaching dataset</li>
 </ul>
 <p>To run non-compartmental analysis using this package, we need to give <TT>PKNCA</TT> some dosing data. All the participants were given a dose of 1000 mg of the anti-epileptic at time <span class="math inline">\(t=0\)</span>. To add a new column (variable) using <TT>%&gt;%</TT> we use the <TT>mutate</TT> function.</p>
-<pre class="r"><code>dORAL&lt;-ORAL %&gt;%  # we will need to save this as a new object
-  subset(time==0) %&gt;% 
-  mutate(dose=1000) #this produces a new variable dose 1000</code></pre>
+<pre class="r"><code>dORAL &lt;- ORAL %&gt;% # we will need to save this as a new object
+  group_by(id) %&gt;%
+  slice(1) %&gt;%
+  mutate(dose = 1000) #this produces a new variable dose 1000</code></pre>
 <p>Now we can call and run <TT>PKNCA</TT>. First we create a sampling (or concentration) object and then a dosing object. In each function we instruct <TT>PKNCA</TT> of the names of our data object and the relevant variables in it. Then we combine the two and run our non-compartmental analysis.</p>
 <pre class="r"><code>conc1&lt;-PKNCAconc(ORAL, conc~time|id) #create sampling object
 dose1&lt;-PKNCAdose(dORAL, dose~time|id) #create dosing object

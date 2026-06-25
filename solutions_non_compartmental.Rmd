@@ -318,7 +318,7 @@ To run non-compartmental analysis using this package, we need to give <TT>PKNCA<
 ```{r, results='hold'}
 
 dORAL <- ORAL %>% # we will need to save this as a new object
-  group_by(ID) %>%
+  group_by(id) %>%
   slice(1) %>%
   mutate(dose = 1000) #this produces a new variable dose 1000
 
