@@ -73,9 +73,9 @@ By the end of this session you should be able to:
 
 * Make a concentration-time plot for 'Sepsis' dataset
 
-* Estimate $C_{max}$, $T_{max}$ and $AUC_{0-t}$ for the 'Healthy' dataset
+* Estimate $C_{max}$ and $AUC_{0-t}$ for the 'Healthy' dataset
 
-* Estimate $C_{max}$, $T_{max}$ and $AUC_{0-t}$ for the 'Sepsis' dataset
+* Estimate $C_{max}$ and $AUC_{0-t}$ for the 'Sepsis' dataset
 
 * Estimate $Cl$ for the 'Healthy' dataset
 
@@ -96,6 +96,8 @@ library(DescTools)
 ```
 
 # Datasets for tasks during this session
+
+Patients with and without sepsis have received a 1000 mg *intravenous bolus* of Drug A, a renally-cleared antibiotic.
 
 ```{r datasets, eval=FALSE}
 
@@ -173,20 +175,6 @@ ORAL %>%
   ungroup() %>% 
   summarise(mean(cmax))
 
-# we can also output the results for both datasets together
-
-FULL<-rbind(IV,ORAL) # to combine the two datasets
-
-FULL %>% 
-  group_by(id,study) %>% 
-  summarise(max(conc))
-
-FULL %>% 
-  group_by(id,study) %>% 
-  summarise(cmax=max(conc),.groups="drop") %>% 
-  group_by(study)  %>% 
-  summarise(mean(cmax))
-
 ```
 
 # Estimating $T_{max}$
@@ -202,6 +190,10 @@ ORAL %>%
   summarise(cmax=max(conc),
             tmax=time[which.max(conc)])
 
+# we can also output the results for both datasets together
+
+FULL<-rbind(IV,ORAL) # to combine the two datasets
+
 FULL %>% 
   group_by(id,study) %>% 
   summarise(cmax=max(conc),
@@ -210,6 +202,8 @@ FULL %>%
   summarise(mean(cmax),
             mean(tmax))  
 ```
+
+As you can see here, $T_{max}$ after an IV bolus is at t=0. As a result, this is not a parameter that is reported for IV bolus data. 
 
 # Estimating the area under the curve ($AUC_{0-t}$)
 
@@ -323,9 +317,11 @@ To run non-compartmental analysis using this package, we need to give <TT>PKNCA<
 
 ```{r, results='hold'}
 
-dORAL<-ORAL %>%  # we will need to save this as a new object
-  subset(time==0) %>% 
-  mutate(dose=1000) #this produces a new variable dose 1000
+dORAL <- ORAL %>% # we will need to save this as a new object
+  group_by(ID) %>%
+  slice(1) %>%
+  mutate(dose = 1000) #this produces a new variable dose 1000
+
 ```
 
 Now we can call and run <TT>PKNCA</TT>. First we create a sampling (or concentration) object and then a dosing object. In each function we instruct <TT>PKNCA</TT> of the names of our data object and the relevant variables in it. Then we combine the two and run our non-compartmental analysis.  

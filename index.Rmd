@@ -17,7 +17,7 @@ We won't reach simulation today, but it is worth knowing where this leads: a wel
 
 ### Clinical scenario
 
-All three sessions will use the same dataset. Patients with and without sepsis have received a 100 mg intravenous bolus of Drug A, a renally-cleared antibiotic.
+All three sessions will use the same dataset. Patients with and without sepsis have received a 1000 mg intravenous bolus of Drug A, a renally-cleared antibiotic.
 
 In sepsis human physiology may be altered in ways that are relevant to pharmacokinetics (e.g through enhanced renal clearance). This may affect drug exposure. 
 

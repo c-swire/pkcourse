@@ -68,10 +68,8 @@ library(gtsummary)
 
 ## Extension tasks
 
-* Test for and assess covariate effect of creatinine on clearance
-* Test for and assess covariate effect of weight on clearance
-* Assess whether changing to a proportionate or combined residual error model improves the fit for your models
-* Test for and assess covariate effect of APGAR score on the phenobarbital dataset
+* Test for and assess other covariate effects on clearance and volume of distribution. In the dataset, you have creatinine clearance, albumin, age...
+* Assess whether changing to a different residual error model improves the fit 
 
 # Packages you need for this session
 
@@ -154,13 +152,13 @@ one.cmt <- function() {
     eta.ka~0.1 # inter-individual variabilities, again note ka line this is not required for IV datasets
     eta.cl ~ 0.1
     eta.v ~ 0.1
-    add.sd <- 0.1 # residual variability
+    prop.sd <- 0.1 # residual variability
   })
   model({ # define the model
     ka <- exp(tka + eta.ka) # ka will not be required for IV datasets
     cl <- exp(tcl + eta.cl)
     v <- exp(tv + eta.v)
-    linCmt() ~ add(add.sd) 
+    linCmt() ~ prop(prop.sd) 
   })
 }
 
@@ -178,14 +176,13 @@ ggplot(modfit,aes(x=PRED,y=DV))+
   geom_point()+
   theme_bw(base_size=18)+
   geom_abline(intercept = 0, slope=1)+
-  geom_smooth(col='red',se=F)+
-  xlim(0,1.25)+ylim(0,1.25)
+  geom_smooth(col='red',se=F)
+
 ggplot(modfit,aes(x=IPRED,y=DV))+
   geom_point()+
   theme_bw(base_size=18)+
   geom_abline(intercept = 0, slope=1)+
-  geom_smooth(col='red',se=F)+
-  xlim(0,1.25)+ylim(0,1.25)
+  geom_smooth(col='red',se=F)
 
 ```
 
@@ -240,12 +237,12 @@ one.cmt <- function() {
     tv <- log(1)
         eta.cl ~ 0.1
     eta.v ~ 0.1
-    add.sd <- 0.1
+    prop.sd <- 0.1
   })
   model({
     cl <- exp(tcl + eta.cl)
     v <- exp(tv + eta.v)
-    linCmt() ~ add(add.sd) 
+    linCmt() ~ prop(prop.sd) 
   })
 }
 
@@ -345,12 +342,12 @@ one.cmt <- function() {
     tv <- log(1)
     eta.cl ~ 0.1
     eta.v ~ 0.1
-    add.sd <- 0.1
+    prop.sd <- 0.1
   })
   model({
     cl <- exp(tcl + eta.cl)
     v <- exp(tv + eta.v)
-    linCmt() ~ add(add.sd)
+    linCmt() ~ prop(prop.sd)
   })
 }
 
@@ -435,12 +432,12 @@ run2.mod <- function() {
     tw <- 1 # initial estimate of covariate effect of weight on clearance
     eta.cl ~ 0.1
     eta.v ~ 0.1
-    add.sd <- 0.1
+    prop.sd <- 0.1
   })
   model({
     cl <- exp(tcl + eta.cl +rWT*tw) 
     v <- exp(tv + eta.v)
-    linCmt() ~ add(add.sd) 
+    linCmt() ~ prop(prop.sd) 
   })
 }
 
@@ -503,8 +500,7 @@ run2$OBJF
 673.6
 ```
 
-With a drop in OFV of `r round(726.5-673.6
-,1)`, we can be confident that adding weight as a covariate on clearance significantly improves model fit. 
+With this drop in OFV, we can be confident that adding weight as a covariate on clearance significantly improves model fit. 
 
 # Modelling categorical covariates
 
@@ -517,6 +513,14 @@ $$CL_i = \theta_{CL} \times e^{\eta_{CL}} \times (1 + SM \times \theta_{smoke})$
 As $SM$ is smoker (1=yes, 0=no), you can see that for a non-smoker the covariate term drops out entirely (since $SM=0$, $SM \times \theta_{smoke} = 0$), and individual clearance reduces to:
 
 $$CL_i = \theta_{CL} \times e^{\eta_{CL}}$$
+
+You would all this to your model block like this:
+
+```{r categorical, eval=F}
+
+cl <- exp(tcl + eta.cl) * (1 + SM*tsm)
+
+```
 
 For a smoker ($SM=1$), clearance is scaled by $(1 + \theta_{smoke})$, where $\theta_{smoke}$ represents the proportional difference in clearance between smokers and non-smokers. A positive value of $\theta_{smoke}$ indicates higher clearance in smokers, and a negative value indicates lower clearance.
 

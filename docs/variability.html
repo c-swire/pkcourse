@@ -418,10 +418,8 @@ text-align: justify}
 <div id="extension-tasks" class="section level2">
 <h2>Extension tasks</h2>
 <ul>
-<li>Test for and assess covariate effect of creatinine on clearance</li>
-<li>Test for and assess covariate effect of weight on clearance</li>
-<li>Assess whether changing to a proportionate or combined residual error model improves the fit for your models</li>
-<li>Test for and assess covariate effect of APGAR score on the phenobarbital dataset</li>
+<li>Test for and assess other covariate effects on clearance and volume of distribution. In the dataset, you have creatinine clearance, albumin, age…</li>
+<li>Assess whether changing to a different residual error model improves the fit</li>
 </ul>
 </div>
 </div>
@@ -488,14 +486,13 @@ ggplot(modfit,aes(x=PRED,y=DV))+
   geom_point()+
   theme_bw(base_size=18)+
   geom_abline(intercept = 0, slope=1)+
-  geom_smooth(col=&#39;red&#39;,se=F)+
-  xlim(0,1.25)+ylim(0,1.25)
+  geom_smooth(col=&#39;red&#39;,se=F)
+
 ggplot(modfit,aes(x=IPRED,y=DV))+
   geom_point()+
   theme_bw(base_size=18)+
   geom_abline(intercept = 0, slope=1)+
-  geom_smooth(col=&#39;red&#39;,se=F)+
-  xlim(0,1.25)+ylim(0,1.25)</code></pre>
+  geom_smooth(col=&#39;red&#39;,se=F)</code></pre>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:frufit"></span>
 <img src="variability_files/figure-html/frufit-1.png" alt="Basic diagnostic plots for furosemide one-compartment, oral-absorption model fit from Chapter 4" width="50%" /><img src="variability_files/figure-html/frufit-2.png" alt="Basic diagnostic plots for furosemide one-compartment, oral-absorption model fit from Chapter 4" width="50%" />
 <p class="caption">
@@ -663,12 +660,12 @@ APGR
     tv &lt;- log(1)
     eta.cl ~ 0.1
     eta.v ~ 0.1
-    add.sd &lt;- 0.1
+    prop.sd &lt;- 0.1
   })
   model({
     cl &lt;- exp(tcl + eta.cl)
     v &lt;- exp(tv + eta.v)
-    linCmt() ~ add(add.sd)
+    linCmt() ~ prop(prop.sd)
   })
 }
 
@@ -708,22 +705,22 @@ Shrink(SD)%
 tcl
 </td>
 <td style="text-align:left;">
--5.18
+-5.19
 </td>
 <td style="text-align:left;">
-0.0884
+0.0763
 </td>
 <td style="text-align:left;">
-1.71
+1.47
 </td>
 <td style="text-align:left;">
-0.00563 (0.00473, 0.0067)
+0.00557 (0.0048, 0.00647)
 </td>
 <td style="text-align:left;">
-51.2
+38.6
 </td>
 <td style="text-align:left;">
-30.0%=
+36.6%&gt;
 </td>
 </tr>
 <tr>
@@ -731,37 +728,37 @@ tcl
 tv
 </td>
 <td style="text-align:left;">
-0.366
+0.351
 </td>
 <td style="text-align:left;">
-0.0607
+0.0602
 </td>
 <td style="text-align:left;">
-16.6
+17.1
 </td>
 <td style="text-align:left;">
-1.44 (1.28, 1.62)
+1.42 (1.26, 1.6)
 </td>
 <td style="text-align:left;">
-46.9
+46.8
 </td>
 <td style="text-align:left;">
-2.90%&lt;
+2.29%&lt;
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-add.sd
+prop.sd
 </td>
 <td style="text-align:left;">
-2.79
+0.125
 </td>
 <td style="text-align:left;">
 </td>
 <td style="text-align:left;">
 </td>
 <td style="text-align:left;">
-2.79
+0.125
 </td>
 <td style="text-align:left;">
 </td>
@@ -789,7 +786,7 @@ Estimate
 eta.cl
 </td>
 <td style="text-align:right;">
-0.48
+0.37
 </td>
 </tr>
 <tr>
@@ -836,12 +833,12 @@ run2.mod &lt;- function() {
     tw &lt;- 1 # initial estimate of covariate effect of weight on clearance
     eta.cl ~ 0.1
     eta.v ~ 0.1
-    add.sd &lt;- 0.1
+    prop.sd &lt;- 0.1
   })
   model({
     cl &lt;- exp(tcl + eta.cl +rWT*tw) 
     v &lt;- exp(tv + eta.v)
-    linCmt() ~ add(add.sd) 
+    linCmt() ~ prop(prop.sd) 
   })
 }
 
@@ -882,22 +879,22 @@ Shrink(SD)%
 tcl
 </td>
 <td style="text-align:left;">
--5.14
+-5.13
 </td>
 <td style="text-align:left;">
-0.0483
+0.0468
 </td>
 <td style="text-align:left;">
-0.939
+0.911
 </td>
 <td style="text-align:left;">
-0.00585 (0.00532, 0.00643)
+0.0059 (0.00539, 0.00647)
 </td>
 <td style="text-align:left;">
-18.5
+18.1
 </td>
 <td style="text-align:left;">
-47.2%&gt;
+48.0%&gt;
 </td>
 </tr>
 <tr>
@@ -905,22 +902,22 @@ tcl
 tv
 </td>
 <td style="text-align:left;">
-0.348
+0.332
 </td>
 <td style="text-align:left;">
-0.0555
+0.055
 </td>
 <td style="text-align:left;">
-15.9
+16.6
 </td>
 <td style="text-align:left;">
-1.42 (1.27, 1.58)
+1.39 (1.25, 1.55)
 </td>
 <td style="text-align:left;">
-42.4
+42.6
 </td>
 <td style="text-align:left;">
-2.74%&lt;
+2.20%&lt;
 </td>
 </tr>
 <tr>
@@ -928,16 +925,16 @@ tv
 tw
 </td>
 <td style="text-align:left;">
-1.22
+1.21
 </td>
 <td style="text-align:left;">
-0.123
+0.127
 </td>
 <td style="text-align:left;">
-10.1
+10.5
 </td>
 <td style="text-align:left;">
-1.22 (0.974, 1.46)
+1.21 (0.958, 1.46)
 </td>
 <td style="text-align:left;">
 </td>
@@ -946,17 +943,17 @@ tw
 </tr>
 <tr>
 <td style="text-align:left;">
-add.sd
+prop.sd
 </td>
 <td style="text-align:left;">
-2.8
+0.113
 </td>
 <td style="text-align:left;">
 </td>
 <td style="text-align:left;">
 </td>
 <td style="text-align:left;">
-2.8
+0.113
 </td>
 <td style="text-align:left;">
 </td>
@@ -1015,7 +1012,7 @@ Figure 7: Basic diagnostic plots for one-compartment model fit of pheno data wit
 run2$OBJF</code></pre>
 <pre><code>## [1] 726.5</code></pre>
 <pre><code>## [1] 673.6</code></pre>
-<p>With a drop in OFV of 52.9, we can be confident that adding weight as a covariate on clearance significantly improves model fit.</p>
+<p>With this drop in OFV, we can be confident that adding weight as a covariate on clearance significantly improves model fit.</p>
 </div>
 </div>
 <div id="modelling-categorical-covariates" class="section level1">
@@ -1025,6 +1022,8 @@ run2$OBJF</code></pre>
 <p><span class="math display">\[CL_i = \theta_{CL} \times e^{\eta_{CL}} \times (1 + SM \times \theta_{smoke})\]</span></p>
 <p>As <span class="math inline">\(SM\)</span> is smoker (1=yes, 0=no), you can see that for a non-smoker the covariate term drops out entirely (since <span class="math inline">\(SM=0\)</span>, <span class="math inline">\(SM \times \theta_{smoke} = 0\)</span>), and individual clearance reduces to:</p>
 <p><span class="math display">\[CL_i = \theta_{CL} \times e^{\eta_{CL}}\]</span></p>
+<p>You would all this to your model block like this:</p>
+<pre class="r"><code>cl &lt;- exp(tcl + eta.cl) * (1 + SM*tsm)</code></pre>
 <p>For a smoker (<span class="math inline">\(SM=1\)</span>), clearance is scaled by <span class="math inline">\((1 + \theta_{smoke})\)</span>, where <span class="math inline">\(\theta_{smoke}\)</span> represents the proportional difference in clearance between smokers and non-smokers. A positive value of <span class="math inline">\(\theta_{smoke}\)</span> indicates higher clearance in smokers, and a negative value indicates lower clearance.</p>
 </div>
 <div id="simulations" class="section level1">

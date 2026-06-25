@@ -82,7 +82,7 @@ library(nlmixr2data)
 
 * List advantages and disadvantages of compartmental analysis
 * Describe the difference between a fixed effect and a random effect in a population pharmacokinetic model
-* Interpret the key parameter estimates from a fitted model (clearance and volume of distribution)
+* Interpret some parameter estimates from a fitted model (clearance and volume of distribution)
 
 # Tasks
 
@@ -93,6 +93,7 @@ library(nlmixr2data)
 
 ### Extension tasks
 
+* Try using different residual error models
 * Fit two-compartment models to the teaching and task datasets
 
 # Packages you need for this session
@@ -104,12 +105,7 @@ library(nlmixr2)
 
 # Datasets for tasks during this session
 
-```{r datasets, eval=FALSE}
-
-healthy2 <- read_csv("https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/docs/healthy_ca.csv")
-sepsis2 <- read_csv("https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/docs/sepsis_ca.csv")
-
-```
+Patients with and without sepsis have received a 1000 mg intravenous bolus of Drug A, a renally-cleared antibiotic.
 
 When you expect these datasets, you will notice there are several new columns. Many of these are required for non-linear mixed effects modelling and are explained below. 
 
@@ -118,6 +114,13 @@ In addition:
 * WT = weight
 * CrCL = creatinine clearance
 * ALB = albumin
+
+```{r datasets, eval=FALSE}
+
+healthy2 <- read_csv("https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/docs/healthy_ca.csv")
+sepsis2 <- read_csv("https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/docs/sepsis_ca.csv")
+
+```
 
 # Teaching data for this session
 
@@ -273,7 +276,7 @@ An **additive** residual error model assumes the size of the error is constant r
 
 However, analytical assays typically have a **proportional** error — the absolute error is larger at higher concentrations. A proportional error model accounts for this:
 
-I have used an **additive** residual error model in all the examples, but you can try running the models with other residual error models as above to see whether this changes the model diagnostics (which we will cover in session 3).
+I have used an **proportional** residual error model in all the examples, but you can try running the models with other residual error models as above to see whether this changes the model diagnostics (which we will cover in session 3).
 
 ### Choosing initial estimates
 
@@ -316,13 +319,13 @@ one.cmt <- function() {
     eta.ka~0.1 # inter-individual variabilities, again note ka line this is not required for IV datasets
     eta.cl ~ 0.1
     eta.v ~ 0.1
-    add.sd <- 0.1 # residual variability
+    prop.sd <- 0.1 # residual variability
   })
   model({ # define the model
     ka <- exp(tka + eta.ka) # ka will not be required for IV datasets
     cl <- exp(tcl + eta.cl)
     v <- exp(tv + eta.v)
-    linCmt() ~ add(add.sd) 
+    linCmt() ~ prop(prop.sd) 
   })
 }
 
