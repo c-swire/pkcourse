@@ -444,15 +444,15 @@ library(DescTools)</code></pre>
 
 
 ORAL&lt;-read.csv(&quot;https://raw.githubusercontent.com/dlonsdal/non_compartmental/main/docs/PK_oral.csv&quot;)</code></pre>
-<p>The first six lines of the IV dataset are shown here.</p>
-<pre class="r"><code>head(IV)</code></pre>
+<p>The first six lines of the ORAL dataset are shown here.</p>
+<pre class="r"><code>head(ORAL)</code></pre>
 <pre><code>##   id time  sex study conc
-## 1  A 0.00 Male    IV 36.0
-## 2  A 0.10 Male    IV 35.4
-## 3  A 0.50 Male    IV 33.1
-## 4  A 1.00 Male    IV 30.4
-## 5  A 1.25 Male    IV 29.1
-## 6  A 1.50 Male    IV 27.9</code></pre>
+## 1  A 0.00 Male  ORAL  0.0
+## 2  A 0.10 Male  ORAL  2.7
+## 3  A 0.50 Male  ORAL 10.2
+## 4  A 1.00 Male  ORAL 14.5
+## 5  A 1.25 Male  ORAL 15.5
+## 6  A 1.50 Male  ORAL 15.9</code></pre>
 <p>Columns in these datasets are:</p>
 <ul>
 <li>id = patient ID</li>
@@ -460,14 +460,14 @@ ORAL&lt;-read.csv(&quot;https://raw.githubusercontent.com/dlonsdal/non_compartme
 <li>study = whether IV or ORAL study</li>
 <li>conc = drug concentration</li>
 </ul>
-<p><strong>How to:</strong> Plot the data for the IV data.</p>
+<p><strong>How to:</strong> Plot the data for the ORAL data.</p>
 <p><em>Hint: More detailed notes on putting together plots are included in the Introduction to R page</em></p>
-<pre class="r"><code>ggplot(data=IV,aes(x=time, y=conc,col=id) )+
+<pre class="r"><code>ggplot(data=ORAL,aes(x=time, y=conc,col=id) )+
   geom_line()+
   geom_point()+
   theme_classic()+
   xlab(&quot;time (hours)&quot;)+
-  ylab(&quot;concentration of IV drug (mg/L)&quot;)</code></pre>
+  ylab(&quot;concentration of drug (mg/L)&quot;)</code></pre>
 <p><img src="solutions_non_compartmental_files/figure-html/plot-1.png" alt="" width="672" /></p>
 </div>
 <div id="estimating-c_max" class="section level1">
@@ -475,23 +475,10 @@ ORAL&lt;-read.csv(&quot;https://raw.githubusercontent.com/dlonsdal/non_compartme
 <p><span class="math inline">\(C_{max}\)</span> is observed from our data. We find the max value per participant and report it.</p>
 <p><strong>How to:</strong></p>
 <ul>
-<li>Estimate <span class="math inline">\(C_{max}\)</span> for the IV and oral data</li>
-<li>Estimate the mean <span class="math inline">\(C_{max}\)</span> for the IV and oral data</li>
+<li>Estimate <span class="math inline">\(C_{max}\)</span> for the oral data</li>
+<li>Estimate the mean <span class="math inline">\(C_{max}\)</span> for the oral data</li>
 </ul>
-<pre class="r"><code>IV%&gt;%
-  group_by(id)%&gt;%
-  summarise(cmax=max(conc))</code></pre>
-<pre><code>## # A tibble: 6 × 2
-##   id     cmax
-##   &lt;chr&gt; &lt;dbl&gt;
-## 1 A      36  
-## 2 B      27.3
-## 3 C      24.1
-## 4 D      47.8
-## 5 E      26.6
-## 6 F      26.3</code></pre>
-<pre class="r"><code># here we tell R to take &#39;IV&#39;, group by &#39;id&#39; then give the max conc
-
+<pre class="r"><code># here we tell R to take &#39;ORAL&#39;, group by &#39;id&#39; then give the max conc
 ORAL %&gt;% 
   group_by(id) %&gt;% 
   summarise(cmax=max(conc))</code></pre>
@@ -504,17 +491,7 @@ ORAL %&gt;%
 ## 4 D      21.6
 ## 5 E      12.8
 ## 6 F      12.4</code></pre>
-<pre class="r"><code>IV%&gt;%
-  group_by(id)%&gt;%
-  summarise(cmax=max(conc)) %&gt;% 
-  ungroup() %&gt;% 
-  summarise(mean(cmax))</code></pre>
-<pre><code>## # A tibble: 1 × 1
-##   `mean(cmax)`
-##          &lt;dbl&gt;
-## 1         31.4</code></pre>
-<pre class="r"><code># here we tell R to take &#39;IV&#39;, group by &#39;id&#39; then give the max conc
-
+<pre class="r"><code># here we tell R to take &#39;ORAL&#39;, group by &#39;id&#39; then give the max conc
 ORAL %&gt;% 
   group_by(id) %&gt;% 
   summarise(cmax=max(conc)) %&gt;% 
@@ -524,7 +501,10 @@ ORAL %&gt;%
 ##   `mean(cmax)`
 ##          &lt;dbl&gt;
 ## 1         14.9</code></pre>
-<pre class="r"><code>FULL&lt;-rbind(IV,ORAL) # to combine the two datasets
+<pre class="r"><code># we can also output the results for both datasets together
+
+FULL&lt;-rbind(IV,ORAL) # to combine the two datasets
+
 FULL %&gt;% 
   group_by(id,study) %&gt;% 
   summarise(max(conc))</code></pre>
@@ -612,22 +592,9 @@ The two heights correspond to concentrations B and C and the base is the distanc
 ## 6 F      136.</code></pre>
 <p><strong>How to:</strong></p>
 <ul>
-<li>Calculate <span class="math inline">\(AUC\)</span> for the IV data</li>
 <li>Calculate mean <span class="math inline">\(AUC\)</span> for each dataset</li>
 <li>Estimate the bioavailability (<span class="math inline">\(F\)</span>) of the drug</li>
 </ul>
-<pre class="r"><code>IV%&gt;% 
-  group_by(id) %&gt;% 
-  summarise(AUC=AUC(time,conc,method=&#39;trapezoid&#39;))</code></pre>
-<pre><code>## # A tibble: 6 × 2
-##   id      AUC
-##   &lt;chr&gt; &lt;dbl&gt;
-## 1 A      223.
-## 2 B      219.
-## 3 C      218.
-## 4 D      231.
-## 5 E      217.
-## 6 F      228.</code></pre>
 <pre class="r"><code>FULL %&gt;% 
   group_by(id,study) %&gt;% 
   summarise(AUC=AUC(time,conc,method=&#39;trapezoid&#39;)) %&gt;% 

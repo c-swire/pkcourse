@@ -110,11 +110,11 @@ ORAL<-read.csv("https://raw.githubusercontent.com/dlonsdal/non_compartmental/mai
 
 ```
 
-The first six lines of the IV dataset are shown here.
+The first six lines of the ORAL dataset are shown here.
 
 ``` {r ivhead, eval=TRUE}
 
-head(IV)
+head(ORAL)
 
 ```
 
@@ -125,18 +125,18 @@ Columns in these datasets are:
 * study = whether IV or ORAL study
 * conc = drug concentration
 
-**How to:** Plot the data for the IV data.
+**How to:** Plot the data for the ORAL data.
 
 _Hint: More detailed notes on putting together plots are included in the Introduction to R page_
 
 ```{r plot,  message=FALSE, warning=FALSE}
 
-ggplot(data=IV,aes(x=time, y=conc,col=id) )+
+ggplot(data=ORAL,aes(x=time, y=conc,col=id) )+
   geom_line()+
   geom_point()+
   theme_classic()+
   xlab("time (hours)")+
-  ylab("concentration of IV drug (mg/L)")
+  ylab("concentration of drug (mg/L)")
 
 ```
 
@@ -147,33 +147,27 @@ $C_{max}$ is observed from our data. We find the max value per participant and r
 
 **How to:** 
 
-* Estimate $C_{max}$ for the IV and oral data
-* Estimate the mean $C_{max}$ for the IV and oral data
+* Estimate $C_{max}$ for the oral data
+* Estimate the mean $C_{max}$ for the oral data
 
 ```{r cmax_solution, message=FALSE, warning=FALSE}
-IV%>%
-  group_by(id)%>%
-  summarise(cmax=max(conc))
-# here we tell R to take 'IV', group by 'id' then give the max conc
 
+# here we tell R to take 'ORAL', group by 'id' then give the max conc
 ORAL %>% 
   group_by(id) %>% 
   summarise(cmax=max(conc))
 
-IV%>%
-  group_by(id)%>%
-  summarise(cmax=max(conc)) %>% 
-  ungroup() %>% 
-  summarise(mean(cmax))
-# here we tell R to take 'IV', group by 'id' then give the max conc
-
+# here we tell R to take 'ORAL', group by 'id' then give the max conc
 ORAL %>% 
   group_by(id) %>% 
   summarise(cmax=max(conc)) %>% 
   ungroup() %>% 
   summarise(mean(cmax))
+
+# we can also output the results for both datasets together
 
 FULL<-rbind(IV,ORAL) # to combine the two datasets
+
 FULL %>% 
   group_by(id,study) %>% 
   summarise(max(conc))
@@ -258,14 +252,10 @@ ORAL%>%
 
 **How to:**
 
-* Calculate $AUC$ for the IV data
 * Calculate mean $AUC$ for each dataset
 * Estimate the bioavailability ($F$) of the drug
 
 ```{r AUC_solutions, message=FALSE, warning=FALSE}
-IV%>% 
-  group_by(id) %>% 
-  summarise(AUC=AUC(time,conc,method='trapezoid'))
 
 FULL %>% 
   group_by(id,study) %>% 

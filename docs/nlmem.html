@@ -419,16 +419,18 @@ text-align: justify}
 <li>Fit two-compartment models to the teaching and task datasets</li>
 </ul>
 </div>
-<div id="datasets-for-tasks" class="section level2">
-<h2>Datasets for tasks</h2>
 </div>
-<div id="dataset-used-in-workbook-example" class="section level2">
-<h2>Dataset used in workbook example</h2>
-<p>In this example we fit a one-compartment ORAL absorption model to sparse data after a dose of furosemide is taken.</p>
+<div id="packages-you-need-for-this-session" class="section level1">
+<h1>Packages you need for this session</h1>
+<pre class="r"><code>library(tidyverse)
+library(nlmixr2)</code></pre>
+</div>
+<div id="teaching-data-for-this-session" class="section level1">
+<h1>Teaching data for this session</h1>
+<p>In this Session the exemplar fits a one-compartment ORAL absorption model to sparse data after a dose of furosemide is taken.</p>
 <pre class="r"><code>sparse&lt;-
  read_csv(&quot;https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/main/sparsefru.csv&quot;)</code></pre>
 <p><em>Hint: The tasks in this session are after IV administration of a drug, so you will need to adapt the model in the example to remove parts relating to absorption</em></p>
-</div>
 </div>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
@@ -523,10 +525,10 @@ Figure 1: One-compartment model
     add.sd &lt;- 0.1 
   })</code></pre>
 <p>The first part of the function is to set the initial estimates for your model parameters, this is known as the <TT>ini()</TT> block. We are parameterising using absorption rate constant (<span class="math inline">\(k_a\)</span>), clearance (<span class="math inline">\(Cl\)</span>) and volume of distribution (<span class="math inline">\(V\)</span>) in a one-compartment oral-absorption model. So we need to tell <TT>nlmixr</TT> initial values for each of these parameters <em>as well as</em> values for the random effects associated with each parameter.</p>
-<p>As described above, the population mean of fixed effects are termed <em>theta</em>. In the <TT>ini()</TT> block, <TT>tcl</TT> represents the log of typical clearance. <TT>exp(tcl)</TT> therefore gives you <span class="math inline">\({\theta}_C\)</span>, the typical population <TT>Cl</TT>.</p>
-<p>The <TT>eta</TT> terms in the code below are initial estimates of the variance of the inter-individual variability_eta_.</p>
+<p>As described above, the population mean of fixed effects are termed <em>theta</em>. In the <TT>ini()</TT> block, <TT>tcl</TT> represents the log of typical clearance. <TT>exp(tcl)</TT> therefore gives you <span class="math inline">\({\theta}_{Cl}\)</span>, the typical population <TT>Cl</TT>.</p>
+<p>The <TT>eta</TT> terms in the code below are initial estimates of the variance of the inter-individual variability <em>eta</em>.</p>
 <p>A further source of variability captured by the model is residual variability, which captures everything that remains unexplained after accounting for inter-individual variability.
-This includes random fluctuations in drug concentrations, errors in recording the exact time a sample was taken or a dose was administered, and assay measurement error. Residual variability is not attributed to any specific cause — it is the irreducible noise around the model’s predictions. In the code, this is represented by <TT>add.sd</TT> (additive residual error).</p>
+This includes random fluctuations in drug concentrations, errors in recording the exact time a sample was taken or a dose was administered, and assay measurement error. Residual variability is not attributed to any specific cause. It is the irreducible noise around the model’s predictions. In the code, this is represented by <TT>add.sd</TT> (additive residual error).</p>
 </div>
 <div id="additive-versus-proportional-residual-error" class="section level3">
 <h3>Additive versus proportional residual error</h3>

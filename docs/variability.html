@@ -397,8 +397,8 @@ h4.author {
 body {
 text-align: justify}
 </style>
-<div id="learning-objectives" class="section level1">
-<h1>Learning objectives</h1>
+<div id="learning-outcomes" class="section level1">
+<h1>Learning outcomes</h1>
 <ul>
 <li>Explain what a covariate is</li>
 <li>Give examples of patient characteristics that might influence pharmacokinetic parameters</li>
@@ -421,39 +421,31 @@ text-align: justify}
 <li>Test for and assess covariate effect of creatinine on clearance</li>
 <li>Test for and assess covariate effect of weight on clearance</li>
 <li>Assess whether changing to a proportionate or combined residual error model improves the fit for your models</li>
+<li>Test for and assess covariate effect of APGAR score on the phenobarbital dataset</li>
 </ul>
 </div>
+</div>
+<div id="packages-you-need-for-this-session" class="section level1">
+<h1>Packages you need for this session</h1>
+<pre class="r"><code>library(tidyverse)
+library(nlmixr2)</code></pre>
+</div>
+<div id="teaching-data-for-this-session" class="section level1">
+<h1>Teaching data for this session</h1>
+<p>In this Session the exemplars are:</p>
+<ul>
+<li>Sparse furosemide dataset used in Session 2</li>
+<li>Phenobarbital dataset that comes with the <TT>nlmixr2</TT> package</li>
+</ul>
+<pre class="r"><code>sparse&lt;- read_csv(&quot;https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/main/sparsefru.csv&quot;)
+
+pheno &lt;- pheno_sd</code></pre>
 </div>
 <div id="definition-of-a-covariate" class="section level1">
 <h1>Definition of a covariate</h1>
 <p>In statistical terms a variable is something that can be quantified in some way - e.g. measured or counted.</p>
 <p>A covariate is a variable that changes (varies) with (co) the outcome of interest. In modeling covariates are variables additional to the core predictor variable in the model (e.g. dose) that may be used to help model the outcome variable (e.g. concentration). An example might be that weight would be expected to affect volume of distribution for many drugs and so it might be reasonable to include a weight effect on the volume of distribution parameter in a pharmacokinetic model.</p>
-</div>
-<div id="common-types-of-covariate" class="section level1">
-<h1>Common types of covariate</h1>
-<p>Hopefully it will not come as a surprise to you that covariates may be described as:</p>
-<ul>
-<li>Continuous variable
-<ul>
-<li>Taking any possible (real) value (even within a range of values)</li>
-<li>Examples might include serum creatinine, weight or age</li>
-</ul></li>
-<li>Discrete variable
-<ul>
-<li>Countable numeric</li>
-<li>For example integer values like number of doses</li>
-</ul></li>
-<li>Categorical variable
-<ul>
-<li>Data that is placed in a number of discrete (uncountable) categories</li>
-<li>There are sub-types of categorical variable that it is useful to know:
-<ul>
-<li>Binary (e.g. sex)</li>
-<li>Ordered (e.g. grade of renal injury 1, 2, 3 with increasing severity)</li>
-<li>Un-ordered (e.g. ethnicity)</li>
-</ul></li>
-</ul></li>
-</ul>
+<p>Covariates can be continuous, categorical, discrete…</p>
 </div>
 <div id="why-bother-to-include-covariates-in-a-model" class="section level1">
 <h1>Why bother to include covariates in a model?</h1>
@@ -470,9 +462,12 @@ text-align: justify}
 <div id="choosing-covariates-to-include-in-a-model" class="section level1">
 <h1>Choosing covariates to include in a model</h1>
 <p>The choice of what covariates one should include in a model is complex.</p>
-<p>Broadly (and briefly) modelers may take an approach to test the effect of all variables in a data set on all parameters in the model. A process of testing each covariate can be automated by programs like and . In such a process, each variable is tested in turn in a step-wise fashion. If inclusion of a variable provides an improved model fit, it is retained in the model as a covariate and the program then moves on to test the next variable. This is known as step-wise covariate modelling (SCM). This can be a time-consuming (and processor hungry) process.</p>
-<p>Alternatively, knowledge about the drug’s pharmacology (prior information) may be used by the modeller to choose specific variables to test as part of the model building process. For example, in the knowledge that a drug is renally excreted, it would be prudent to test the effect of some measure of kidney function (for example serum creatinine or estimated glomerular filtration rate) on drug clearance.</p>
-<p>There are some tools that can help us. For example we can plot pharmacokinetic parameters (or <span class="math inline">\(\eta\)</span>) against potential covariates to look for trends/relationships to then test in our model.</p>
+<p>Options include:</p>
+<ul>
+<li>Test the effect of all variables in a data set on all parameters in the model. This can be a time-consuming (and processor hungry) process.</li>
+<li>Knowledge about the drug’s pharmacology (prior information) may guide the choice of which variables to test. E.g. if a drug is renally excreted, you might choose to test the effect of some measure of kidney function on drug clearance.</li>
+<li>There are some tools that can help us. For example we can plot pharmacokinetic parameters (or <span class="math inline">\(\eta\)</span>) against potential covariates to look for trends/relationships to test</li>
+</ul>
 </div>
 <div id="introduction-to-model-diagnostics" class="section level1">
 <h1>Introduction to model diagnostics</h1>
@@ -481,7 +476,7 @@ text-align: justify}
 <p>You are likely to come across these plots and terms if you read any population pharmacokinetic modelling papers. We have explained them in a bit of detail so you should be able to interpret/understand these plots in future.</p>
 <div id="dv-vs-pred-and-dv-vs-ipred" class="section level2">
 <h2>DV vs PRED and DV vs IPRED</h2>
-<p>The most straightforward diagnostic plot available is a plot of observations (dependent variable, DV) vs predicted concentrations from a model. There are two subsets of this type of plot. The first, DV vs PRED takes predictions based on population parameters (i.e. excluding <span class="math inline">\(\eta\)</span>’s) and the second is DV vs IPRED, which bases predictions on individual values for model parameters (including <span class="math inline">\(\eta\)</span>’s).</p>
+<p>The most straightforward diagnostic plot available is a plot of observations (dependent variable, DV) vs predicted concentrations from a model. There are two subsets of this type of plot. The first, DV vs PRED takes predictions based on population parameters (i.e. excluding <span class="math inline">\(\eta\)</span>s) and the second is DV vs IPRED, which bases predictions on individual values for model parameters (including <span class="math inline">\(\eta\)</span>s).</p>
 <p>Figure <a href="#fig:frufit">1</a> shows these diagnostic plots for the furosemide data we used in Session 2.</p>
 <pre class="r"><code>modfit&lt;-data.frame(fit) # make a dataframe out of the output of the model
 
@@ -503,16 +498,16 @@ ggplot(modfit,aes(x=IPRED,y=DV))+
 Figure 1: Basic diagnostic plots for furosemide one-compartment, oral-absorption model fit from Chapter 4
 </p>
 </div>
-<p>Take a look at Figure <a href="#fig:frufit">1</a>(a) first. A <em>perfect</em> model fit would have predictions that were identical to the observations from the experiment. All of the points in the scatterplot would fall in a straight line along the line of unity (<span class="math inline">\(DV=PRED\)</span>). However, as we have discussed previously, <em>real-world</em> data is never perfect, individuals have PK parameters that deviate from the population mean values and there will be un-modelled error. So, what we are really looking for in this plot is a degree of even spread of points above and below the line of unity. Any groups of data points deviating away from this line of unity might make us suspicious that there is some underlying variability not being modelled.</p>
+<p>Take a look at Figure <a href="#fig:frufit">1</a>(a) first. A <em>perfect</em> model fit would have predictions that were identical to the observations from the experiment. All of the points in the scatterplot would fall in a straight line along the line of unity (<span class="math inline">\(DV=PRED\)</span>). However, <em>real-world</em> data are never perfect, so what we are really looking for in this plot is even spread of points above and below the line of unity. Any groups of data points deviating away from this line of unity might make us suspicious that there is some underlying variability not being modelled.</p>
 <p>In our example in Figure <a href="#fig:frufit">1</a>(a) we can see that there is pretty reasonable fit, with even distribution of data points. A red ‘line of best fit’ tracks fairly evenly along the line of unity. This suggests our model fit is pretty good.</p>
 <p>Figure <a href="#fig:frufit">1</a>(b) shows DV vs IPRED.
-This is individualised predictions, taking into account that random-effect associated with an individual (<span class="math inline">\(\eta\)</span>). Again, the perfect model fit has all lines along the line of unity. DV vs IPRED plots will generally always look a little better than DV vs PRED plots in this regard. However, it is unusual to get such a tight fit as we see in Figure <a href="#fig:frufit">1</a>(b) as usually there is additional unexplained variability in data. The example here looks relatively perfect because I simulated these data and I did not simulate complex variability!</p>
+This is individualised predictions, taking into account random effect associated with an individual (<span class="math inline">\(\eta\)</span>). Again, the perfect model fit has all lines along the line of unity. DV vs IPRED plots will generally always look a little better than DV vs PRED plots in this regard. However, it is unusual to get such a tight fit as we see in Figure <a href="#fig:frufit">1</a>(b) as usually there is additional unexplained variability in data. The example here looks relatively perfect because I simulated these data and I did not simulate complex variability!</p>
 </div>
 <div id="conditionally-weighted-residuals" class="section level2">
 <h2>Conditionally-weighted residuals</h2>
 <p>When we fit a pharmacokinetic model to data, we can assess how well the model fits by examining the difference between each observed concentration and the concentration our model predicted. This difference is called a residual.</p>
 <p>However, raw residuals can be misleading because their size tends to scale with the magnitude of the observation: residuals around a high concentration early after dosing will naturally be larger than those around a low concentration at later time points, making it difficult to assess model fit consistently across the full concentration-time profile.</p>
-<p>Conditionally weighted residuals (<TT>CWRES</TT>) address this by standardising the residuals so that they are comparable across the full range of observations.</p>
+<p>Conditionally weighted residuals (CWRES) address this by standardising the residuals so that they are comparable across the full range of observations.</p>
 <p>If the model fits well, CWRES should be roughly normally distributed with a mean of zero and a standard deviation of one, meaning we would expect approximately 99.7% of values to fall between −3 and +3.</p>
 <p>When we plot CWRES against time, we are looking for an even, random scatter of points around zero. Any systematic trend, such as a U-shape or a consistent drift above or below zero, suggests that the model is not capturing something important in the data and may need to be refined.</p>
 <p><TT>nlmixr2</TT> will output <TT>CWRES</TT> through an additional <TT>tableControl()</TT> command.</p>
@@ -533,7 +528,8 @@ fit&lt;-nlmixr2(one.cmt,sparse,est=&quot;saem&quot;,
 Figure 2: Conditionally weighted residuals plotted against time from dose - furosemide dataset
 </p>
 </div>
-<p>Below is an example using a different dataset. You can see from Figure <a href="#fig:2comp">3</a> that we are lacking in a uniform distribution of <TT>CWRES</TT> across sampling times. In fact, this U-shape that is seen in the <TT>CWRES</TT> plot can be indicative of the need for an additional compartment in the model.</p>
+<p>Figure <a href="#fig:cwres">2</a> is consistent with a well-fitted model.</p>
+<p>Figure <a href="#fig:2comp">3</a> is an example using a different dataset which is not well-fitted using a basic one-compartment model.</p>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:2comp"></span>
 <img src="variability_files/figure-html/2comp-1.png" alt="Conditionally weighted residuals plotted against time from dose - 2-compartment dataset" width="576" />
 <p class="caption">
@@ -563,17 +559,14 @@ Figure 4: Visual Predictive Check for one-compartment model fit of furosemide da
 </div>
 </div>
 </div>
-<div id="phenobarbital-data" class="section level1">
-<h1>Phenobarbital data</h1>
+<div id="modelling-continuous-covariates" class="section level1">
+<h1>Modelling continuous covariates</h1>
 <p>Let’s dive in to some practical work and look at the phenobarbital data that comes with the <TT>nlmixr2</TT> package.</p>
 <p>These data were published in 1985(!) and come from some clinical data on neonates given the drug, which has been used as a sedative and general anaesthetic (although is less frequently used now). Neonates were given a loading dose IV injection followed by a maintenance 12 hourly IV dose.</p>
 <div id="how-to" class="section level3">
 <h3>How to:</h3>
 <ul>
-<li>Explore the data with some summary tables and plots
-<ul>
-<li>Assess potential covariates in the data?</li>
-</ul></li>
+<li>Explore the data with some summary tables and plots</li>
 <li>Fit a one-compartment model to these data and report the pharmacokinetic parameters</li>
 <li>Make some goodness-of-fit plots</li>
 </ul>
@@ -814,8 +807,8 @@ Figure 6: Basic diagnostic plots for one-compartment model fit of pheno data
 </p>
 </div>
 </div>
-<div id="testing-a-continuous-covariate" class="section level2">
-<h2>Testing a continuous covariate</h2>
+<div id="making-a-reference" class="section level2">
+<h2>Making a reference</h2>
 <p>When we include a continuous covariate such as weight in a population pharmacokinetic model, we need to define a meaningful reference point.</p>
 <p>Because clearance is estimated in the exponential domain, the typical population clearance is only recovered when the covariate term equals zero. So we need to ensure that zero corresponds to a clinically sensible value.</p>
 <p>By expressing weight as <TT>log(WT/median_weight)</TT>, the covariate term equals zero when an individual has exactly the median weight of the study population, meaning our typical clearance estimate corresponds to a patient of average weight.</p>
@@ -827,6 +820,9 @@ Figure 6: Basic diagnostic plots for one-compartment model fit of pheno data
   summarise(median(WT)) %&gt;% 
   as.numeric</code></pre>
 <p>We know from our summary statistics (Table 1) that the median weight for individuals in the phenobarbital data set is 1.3 kg, and that this is a set of neonatal data. We should therefore choose 1.3 kg as our reference weight.</p>
+</div>
+<div id="running-the-model" class="section level2">
+<h2>Running the model</h2>
 <pre class="r"><code>pheno$rWT&lt;-log(pheno$WT/mw) # to create centred weight covariate
 
 run2.mod &lt;- function() {

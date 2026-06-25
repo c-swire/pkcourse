@@ -51,7 +51,7 @@ library(nlmixr2)
 library(gtsummary)
 ```
 
-# Learning objectives
+# Learning outcomes
 
 * Explain what a covariate is 
 * Give examples of patient characteristics that might influence pharmacokinetic parameters
@@ -71,6 +71,27 @@ library(gtsummary)
 * Test for and assess covariate effect of creatinine on clearance
 * Test for and assess covariate effect of weight on clearance
 * Assess whether changing to a proportionate or combined residual error model improves the fit for your models
+* Test for and assess covariate effect of APGAR score on the phenobarbital dataset
+
+# Packages you need for this session
+
+```{r, eval=FALSE}
+library(tidyverse)
+library(nlmixr2)
+```
+
+# Teaching data for this session
+
+In this Session the exemplars are:
+
+* Sparse furosemide dataset used in Session 2
+* Phenobarbital dataset that comes with the <TT>nlmixr2</TT> package
+
+```{r dataset,warning=F,message=F}
+sparse<- read_csv("https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/main/sparsefru.csv")
+
+pheno <- pheno_sd
+```
 
 # Definition of a covariate
 
@@ -78,22 +99,7 @@ In statistical terms a variable is something that can be quantified in some way 
 
 A covariate is a variable that changes (varies) with (co) the outcome of interest. In modeling covariates are variables additional to the core predictor variable in the model (e.g. dose) that may be used to help model the outcome variable (e.g. concentration). An example might be that weight would be expected to affect volume of distribution for many drugs and so it might be reasonable to include a weight effect on the volume of distribution parameter in a pharmacokinetic model.  
 
-# Common types of covariate
-
-Hopefully it will not come as a surprise to you that covariates may be described as:
-
-* Continuous variable
-  + Taking any possible (real) value (even within a range of values)
-  + Examples might include serum creatinine, weight or age
-* Discrete variable
-  + Countable numeric
-  + For example integer values like number of doses
-* Categorical variable
-  + Data that is placed in a number of discrete (uncountable) categories
-  + There are sub-types of categorical variable that it is useful to know:
-    - Binary (e.g. sex)
-    - Ordered (e.g. grade of renal injury 1, 2, 3 with increasing severity)
-    - Un-ordered (e.g. ethnicity)
+Covariates can be continuous, categorical, discrete...
 
 # Why bother to include covariates in a model?
 
@@ -109,11 +115,11 @@ As an extension of this, it would be nice to try and understand and explain some
 
 The choice of what covariates one should include in a model is complex. 
 
-Broadly (and briefly) modelers may take an approach to test the effect of all variables in a data set on all parameters in the model. A process of testing each covariate can be automated by programs like \texttt{nlmixr2} and \texttt{NONMEM}. In such a process, each variable is tested in turn in a step-wise fashion. If inclusion of a variable provides an improved model fit, it is retained in the model as a covariate and the program then moves on to test the next variable. This is known as step-wise covariate modelling (SCM). This can be a time-consuming (and processor hungry) process. 
+Options include:
 
-Alternatively, knowledge about the drug's pharmacology (prior information) may be used by the modeller to choose specific variables to test as part of the model building process. For example, in the knowledge that a drug is renally excreted, it would be prudent to test the effect of some measure of kidney function (for example serum creatinine or estimated glomerular filtration rate) on drug clearance. 
-
-There are some tools that can help us. For example we can plot pharmacokinetic parameters (or $\eta$) against potential covariates to look for trends/relationships to then test in our model. 
+* Test the effect of all variables in a data set on all parameters in the model. This can be a time-consuming (and processor hungry) process. 
+* Knowledge about the drug's pharmacology (prior information) may guide the choice of which variables to test. E.g. if a drug is renally excreted, you might choose to test the effect of some measure of kidney function on drug clearance. 
+* There are some tools that can help us. For example we can plot pharmacokinetic parameters (or $\eta$) against potential covariates to look for trends/relationships to test
 
 # Introduction to model diagnostics 
 
@@ -125,14 +131,11 @@ You are likely to come across these plots and terms if you read any population p
 
 ## DV vs PRED and DV vs IPRED
 
-The most straightforward diagnostic plot available is a plot of observations (dependent variable, DV) vs predicted concentrations from a model. There are two subsets of this type of plot. The first, DV vs PRED takes predictions based on population parameters (i.e. excluding $\eta$'s) and the second is DV vs IPRED, which bases predictions on individual values for model parameters (including $\eta$'s).
+The most straightforward diagnostic plot available is a plot of observations (dependent variable, DV) vs predicted concentrations from a model. There are two subsets of this type of plot. The first, DV vs PRED takes predictions based on population parameters (i.e. excluding $\eta$s) and the second is DV vs IPRED, which bases predictions on individual values for model parameters (including $\eta$s).
 
 Figure \@ref(fig:frufit) shows these diagnostic plots for the furosemide data we used in Session 2.
 
 ```{r hide, eval=T, include=F, warning=F, message= F}
-
-sparse<-
- read_csv("https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/main/sparsefru.csv")
 
 # First make the model
 one.cmt <- function() {
@@ -178,12 +181,12 @@ ggplot(modfit,aes(x=IPRED,y=DV))+
 
 ```
 
-Take a look at Figure \@ref(fig:frufit)(a) first. A *perfect* model fit would have predictions that were identical to the observations from the experiment. All of the points in the scatterplot would fall in a straight line along the line of unity ($DV=PRED$). However, as we have discussed previously, *real-world* data is never perfect, individuals have PK parameters that deviate from the population mean values and there will be un-modelled error. So, what we are really looking for in this plot is a degree of even spread of points above and below the line of unity. Any groups of data points deviating away from this line of unity might make us suspicious that there is some underlying variability not being modelled. 
+Take a look at Figure \@ref(fig:frufit)(a) first. A *perfect* model fit would have predictions that were identical to the observations from the experiment. All of the points in the scatterplot would fall in a straight line along the line of unity ($DV=PRED$). However, *real-world* data are never perfect, so what we are really looking for in this plot is even spread of points above and below the line of unity. Any groups of data points deviating away from this line of unity might make us suspicious that there is some underlying variability not being modelled. 
 
 In our example in Figure \@ref(fig:frufit)(a) we can see that there is pretty reasonable fit, with even distribution of data points. A red 'line of best fit' tracks fairly evenly along the line of unity. This suggests our model fit is pretty good. 
 
 Figure \@ref(fig:frufit)(b) shows DV vs IPRED. 
-This is individualised predictions, taking into account that random-effect associated with an individual ($\eta$). Again, the perfect model fit has all lines along the line of unity. DV vs IPRED plots will generally always look a little better than DV vs PRED plots in this regard. However, it is unusual to get such a tight fit as we see in Figure \@ref(fig:frufit)(b) as usually there is additional unexplained variability in data. The example here looks relatively perfect because I simulated these data and I did not simulate complex variability!
+This is individualised predictions, taking into account random effect associated with an individual ($\eta$). Again, the perfect model fit has all lines along the line of unity. DV vs IPRED plots will generally always look a little better than DV vs PRED plots in this regard. However, it is unusual to get such a tight fit as we see in Figure \@ref(fig:frufit)(b) as usually there is additional unexplained variability in data. The example here looks relatively perfect because I simulated these data and I did not simulate complex variability!
 
 ## Conditionally-weighted residuals
 
@@ -191,7 +194,7 @@ When we fit a pharmacokinetic model to data, we can assess how well the model fi
 
 However, raw residuals can be misleading because their size tends to scale with the magnitude of the observation: residuals around a high concentration early after dosing will naturally be larger than those around a low concentration at later time points, making it difficult to assess model fit consistently across the full concentration-time profile. 
 
-Conditionally weighted residuals (<TT>CWRES</TT>) address this by standardising the residuals so that they are comparable across the full range of observations. 
+Conditionally weighted residuals (CWRES) address this by standardising the residuals so that they are comparable across the full range of observations. 
 
 If the model fits well, CWRES should be roughly normally distributed with a mean of zero and a standard deviation of one, meaning we would expect approximately 99.7% of values to fall between −3 and +3. 
 
@@ -217,7 +220,9 @@ ggplot(modfit,aes(x=tad,y=CWRES))+
   ylim(-3,3)
 ```
 
-Below is an example using a different dataset. You can see from Figure \@ref(fig:2comp) that we are lacking in a uniform distribution of <TT>CWRES</TT> across sampling times. In fact, this U-shape that is seen in the <TT>CWRES</TT> plot can be indicative of the need for an additional compartment in the model. 
+Figure \@ref(fig:cwres) is consistent with a well-fitted model. 
+
+Figure \@ref(fig:2comp) is an example using a different dataset which is not well-fitted using a basic one-compartment model. 
 
 ```{r 2comp, echo=F, cache=F,warning=FALSE,message=FALSE, fig.cap="Conditionally weighted residuals plotted against time from dose - 2-compartment dataset",fig.width=6,fig.height=3,fig.align = 'center'}
 
@@ -275,7 +280,7 @@ vpcPlot(fit) +
   ylab("Furosemide concentration (mg/L)")
 ```
 
-# Phenobarbital data
+# Modelling continuous covariates
 
 Let's dive in to some practical work and look at the phenobarbital data that comes with the <TT>nlmixr2</TT> package. 
 
@@ -284,7 +289,6 @@ These data were published in 1985(!) and come from some clinical data on neonate
 ### How to:
 
 * Explore the data with some summary tables and plots
-  + Assess potential covariates in the data?
 * Fit a one-compartment model to these data and report the pharmacokinetic parameters
 * Make some goodness-of-fit plots
 
@@ -388,7 +392,7 @@ ggplot(modfit,aes(x=tad,y=CWRES))+
   ylim(-3,3)
 ```
 
-## Testing a continuous covariate
+## Making a reference
 
 When we include a continuous covariate such as weight in a population pharmacokinetic model, we need to define a meaningful reference point. 
 
@@ -409,6 +413,8 @@ mw<- pheno %>%
 ```
 
 We know from our summary statistics (Table 1) that the median weight for individuals in the phenobarbital data set is 1.3 kg, and that this is a set of neonatal data. We should therefore choose 1.3 kg as our reference weight. 
+
+## Running the model
 
 ```{r, eval=T,cache=F, message=F,warning=FALSE}
 

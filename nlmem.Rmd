@@ -95,11 +95,16 @@ library(nlmixr2data)
 
 * Fit two-compartment models to the teaching and task datasets
 
-## Datasets for tasks
+# Packages you need for this session
 
-## Dataset used in workbook example
+```{r, eval=FALSE}
+library(tidyverse)
+library(nlmixr2)
+```
 
-In this example we fit a one-compartment ORAL absorption model to sparse data after a dose of furosemide is taken. 
+# Teaching data for this session
+
+In this Session the exemplar fits a one-compartment ORAL absorption model to sparse data after a dose of furosemide is taken.
 
 ```{r dataset,warning=F,message=F}
 sparse<-
@@ -225,12 +230,12 @@ ini({
 
 The first part of the function is to set the initial estimates for your model parameters, this is known as the <TT>ini()</TT> block. We are parameterising using absorption rate constant ($k_a$), clearance ($Cl$) and volume of distribution ($V$) in a one-compartment oral-absorption model. So we need to tell <TT>nlmixr</TT> initial values for each of these parameters *as well as* values for the random effects associated with each parameter. 
 
-As described above, the population mean of fixed effects are termed _theta_. In the <TT>ini()</TT> block, <TT>tcl</TT> represents the log of typical clearance. <TT>exp(tcl)</TT> therefore gives you ${\theta}_C$, the typical population <TT>Cl</TT>. 
+As described above, the population mean of fixed effects are termed _theta_. In the <TT>ini()</TT> block, <TT>tcl</TT> represents the log of typical clearance. <TT>exp(tcl)</TT> therefore gives you ${\theta}_{Cl}$, the typical population <TT>Cl</TT>. 
 
-The <TT>eta</TT> terms in the code below are initial estimates of the variance of the inter-individual variability_eta_. 
+The <TT>eta</TT> terms in the code below are initial estimates of the variance of the inter-individual variability _eta_. 
 
 A further source of variability captured by the model is residual variability, which captures everything that remains unexplained after accounting for inter-individual variability.
-This includes random fluctuations in drug concentrations, errors in recording the exact time a sample was taken or a dose was administered, and assay measurement error. Residual variability is not attributed to any specific cause — it is the irreducible noise around the model's predictions. In the code, this is represented by <TT>add.sd</TT> (additive residual error). 
+This includes random fluctuations in drug concentrations, errors in recording the exact time a sample was taken or a dose was administered, and assay measurement error. Residual variability is not attributed to any specific cause. It is the irreducible noise around the model's predictions. In the code, this is represented by <TT>add.sd</TT> (additive residual error). 
 
 ### Additive versus proportional residual error
 
