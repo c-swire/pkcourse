@@ -84,7 +84,7 @@ I have combined the two datasets you have been using throughout the day together
 
 ```{r datasets, eval=FALSE}
 
-combined <- read_csv("https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/docs/combined_ca.csv")
+combined <- read_csv("https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/combined_ca.csv")
 
 ```
 

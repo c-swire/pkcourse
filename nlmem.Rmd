@@ -117,8 +117,8 @@ In addition:
 
 ```{r datasets, eval=FALSE}
 
-healthy2 <- read_csv("https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/docs/healthy_ca.csv")
-sepsis2 <- read_csv("https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/docs/sepsis_ca.csv")
+healthy2 <- read_csv("https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/healthy_ca.csv")
+sepsis2 <- read_csv("https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/sepsis_ca.csv")
 
 ```
 

@@ -101,8 +101,8 @@ Patients with and without sepsis have received a 1000 mg *intravenous bolus* of 
 
 ```{r datasets, eval=FALSE}
 
-healthy <- read_csv("https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/docs/healthy_nca.csv")
-sepsis <- read_csv("https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/docs/sepsis_nca.csv")
+healthy <- read_csv("https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/healthy_nca.csv")
+sepsis <- read_csv("https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/sepsis_nca.csv")
 
 ```
 
