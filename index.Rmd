@@ -9,7 +9,7 @@ library(knitr)
 
 ## Aims of the training day
 
-Pharmacokinetic analysis allows us to characterise drug exposure in clinical populations, including the variability in exposure between patients — and to understand what drives that variability. This kind of analysis underpins model-informed  dosing, an approach that is increasingly used in clinical practice to optimise drug exposure for individual patients or patient groups.
+Pharmacokinetic analysis allows us to characterise drug exposure in clinical populations, including the variability in exposure between patients, and to understand what drives that variability. This kind of analysis underpins model-informed  dosing, an approach that is increasingly used in clinical practice to optimise drug exposure for individual patients or patient groups.
 
 By the end of today, you should have a clearer understanding of the basic principles of pharmacokinetics and an appreciation of what pharmacokinetic analysis can offer. We do not expect that you will routinely build these models yourself, but working through the process is a good way to understand what the numbers mean and what questions this kind of analysis can answer.
 
@@ -28,8 +28,8 @@ In Sessions 1 and 2 you will analyse the 'healthy' and 'sepsis' populations sepa
 We may adapt this based on how we progress, but we are planning to cover:
 
 * Session 1: Describing Drug A exposure using non-compartmental analysis
-* Session 2: Describing Drug A exposure using a compartmental model
-* Session 3: Explaining variability in Drug A exposure
+* Session 2: Describing Drug A exposure using compartmental analysis
+* Session 3: Assessing compartmental models and explaining variability in Drug A exposure
 
 ```{r echo=FALSE}
 schedule <- data.frame(

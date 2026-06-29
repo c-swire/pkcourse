@@ -80,13 +80,15 @@ library(nlmixr2)
 
 # Dataset for tasks during this session
 
+I have combined the two datasets you have been using throughout the day together. 
+
 ```{r datasets, eval=FALSE}
 
 combined <- read_csv("https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/docs/combined_ca.csv")
 
 ```
 
-# Teaching data for this session
+# Datasets used in workbook examples
 
 In this Session the exemplars are:
 
@@ -103,13 +105,15 @@ pheno <- pheno_sd
 
 In statistical terms a variable is something that can be quantified in some way - e.g. measured or counted. 
 
-A covariate is a variable that changes (varies) with (co) the outcome of interest. In modeling covariates are variables additional to the core predictor variable in the model (e.g. dose) that may be used to help model the outcome variable (e.g. concentration). An example might be that weight would be expected to affect volume of distribution for many drugs and so it might be reasonable to include a weight effect on the volume of distribution parameter in a pharmacokinetic model.  
+A covariate is a variable that changes (varies) with (co) the outcome of interest. In modelling covariates are variables additional to the core predictor variable in the model (e.g. dose) that may be used to help model the outcome variable (e.g. concentration). 
+
+An example might be that weight would be expected to affect volume of distribution for many drugs and so it might be reasonable to include a weight effect on the volume of distribution parameter in a pharmacokinetic model.  
 
 Covariates can be continuous, categorical, discrete...
 
 # Why bother to include covariates in a model?
 
-We have discussed how non-linear mixed-effects models allow us to describe inter-individual differences in pharmacokinetic parameters - these are our $\eta$ terms. 
+We have discussed how non-linear mixed-effects modelling allows us to describe inter-individual differences in pharmacokinetic parameters - these are our $\eta$ terms. 
 
 As an extension of this, it would be nice to try and understand and explain some of this variability so that we can:
 
@@ -273,9 +277,7 @@ What is important for you to note is that the objective function can be used to 
 
 The diagnostic plots we have used so far (DV vs PRED, DV vs IPRED, CWRES) assess model fit by examining residuals. A complementary and widely used approach is the **Visual Predictive Check (VPC)**.
 
-You may come across this in p
-
-The principle is straightforward: if our model is a good description of the data, then concentrations simulated from the model should look like the concentrations we actually observed. To produce a VPC, the fitted model is used to generate prediction intervals, which are then plotted alongside the observed data. A well-fitting model will have the observed data points falling within these intervals.
+The principle is straightforward: if our model is a good description of the data, then concentrations simulated from the model should look like the concentrations we actually observed. To produce a VPC, the fitted model is used to generate prediction intervals, which are then plotted alongside the observed data. 
 
 ```{r vpc, eval=TRUE, message=FALSE, warning=FALSE, fig.cap="Visual Predictive Check for one-compartment model fit of furosemide data", fig.width=6, fig.height=4, fig.align='center'}
 
@@ -285,11 +287,15 @@ vpcPlot(fit) +
   ylab("Furosemide concentration (mg/L)")
 ```
 
+The VPC plot contains several elements. The **solid black line** represents the median of the observed data at each timepoint. The **dashed black lines** represent the 5th and 95th percentiles of the observed data, capturing the spread of concentrations across individuals. The **shaded blue areas** represent the model predictions — the darker central band shows the 95% confidence interval around the predicted median, and the lighter outer bands show the 95% confidence intervals around the predicted 5th and 95th percentiles. 
+
+A well-fitting model will have the solid line running through the darker central band, and the dashed lines running through the lighter outer bands throughout the concentration-time profile. In this example, the observed lines track reasonably well through their corresponding prediction intervals, suggesting an adequate model fit.
+
 # Modelling continuous covariates
 
 Let's dive in to some practical work and look at the phenobarbital data that comes with the <TT>nlmixr2</TT> package. 
 
-These data were published in 1985(!) and come from some clinical data on neonates given the drug, which has been used as a sedative and general anaesthetic (although is less frequently used now). Neonates were given a loading dose IV injection followed by a maintenance 12 hourly IV dose. 
+These data were published in 1985(!) and come from some clinical data from neonates given the drug. Neonates were given a loading dose IV injection followed by a maintenance 12 hourly IV dose. 
 
 ### How to:
 
@@ -364,8 +370,12 @@ kbl(run1$par.fixed ,booktabs = T, caption="Fixed effect parameter estimates from
 ```
 
 ```{r nlmixran,echo=F,warning=T,message=F}
-kbl(signif(diag(run1$omegaR),2), caption="Random effects parameter estimates",booktabs = T,col.names = c(
-                           "Estimate"))%>%  kable_styling(latex_options =c("striped"))
+kbl(signif(diag(run1$omegaR),2), 
+    caption="Random effects parameter estimates",
+    booktabs = T,
+    col.names = c("Estimate")) %>%  
+  kable_styling(latex_options = c("striped"), 
+                full_width = FALSE)
 ```
 
 You can see in Table \@ref(tab:nlmixran) that there is quite a bit of inter-individual variability. 
@@ -399,31 +409,36 @@ ggplot(modfit,aes(x=tad,y=CWRES))+
 
 ## Making a reference
 
-When we include a continuous covariate such as weight in a population pharmacokinetic model, we need to define a meaningful reference point. 
+When we include a continuous covariate such as weight in a population pharmacokinetic model, we need to think carefully about how we express it. We need to choose a reference value i.e. the value at which the covariate term has no effect on the parameter estimate. For example, with the continuous covariate weight a sensible choice is the median weight of the study population.
 
-Because clearance is estimated in the exponential domain, the typical population clearance is only recovered when the covariate term equals zero. So we need to ensure that zero corresponds to a clinically sensible value. 
+We do this by expressing weight as:
 
-By expressing weight as <TT>log(WT/median_weight)</TT>, the covariate term equals zero when an individual has exactly the median weight of the study population, meaning our typical clearance estimate corresponds to a patient of average weight.
+$$WT_{centred} = \log\left(\frac{WT}{WT_{median}}\right)$$
 
-Without this step, zero weight would be the reference point, which is biologically meaningless. Centering around the median is therefore standard practice and ensures that the parameter estimates you report are both mathematically sound and clinically interpretable.
+When an individual has exactly the median weight, $\log(WT/WT_{median}) = \log(1) = 0$, and the covariate term disappears entirely. This means our typical clearance estimate corresponds to a patient of median weight, which is clinically interpretable. For individuals above or below the median, the covariate term scales clearance up or down accordingly.
+
+Without this step, the reference point would be a weight of zero, which is biologically meaningless.
+
+### How to:
+
+* Calculate median weight for phenobarbital dataset
 
 ```{r mw, message=F,warning=FALSE}
 
-mw<- pheno %>% 
+mw <- pheno %>% 
   group_by(ID) %>% 
   slice(1) %>% # take only one weight per patient
   ungroup() %>% 
   summarise(median(WT)) %>% 
   as.numeric
+
+mw
 ```
-
-We know from our summary statistics (Table 1) that the median weight for individuals in the phenobarbital data set is 1.3 kg, and that this is a set of neonatal data. We should therefore choose 1.3 kg as our reference weight. 
-
 ## Running the model
 
 ```{r, eval=T,cache=F, message=F,warning=FALSE}
 
-pheno$rWT<-log(pheno$WT/mw) # to create centred weight covariate
+pheno$rWT<- log(pheno$WT/mw) # to create centred weight covariate (rWT)
 
 run2.mod <- function() {
   ini({ 
@@ -458,7 +473,7 @@ kbl(signif(diag(run2$omegaR),2), caption="Random effects parameter estimates run
 
 Compare the parameter estimates from Table \@ref(tab:nlmixfix) & \@ref(tab:nlmixran)  and Table \@ref(tab:nlmixfix2) & \@ref(tab:nlmixran2). 
 
-Repeat the goodness-of-fit plots. 
+### Goodness of fit plots for phenobarbital data after Run 2
 
 ```{r phenofit2,echo=F,eval=T,fig.cap="Basic diagnostic plots for one-compartment  model fit of pheno data with weight on clearance as a covariate", fig.subcap=c('DV vs PRED','DV vs IPRED', 'CWRES vs TAD'),fig.ncol = 3, out.width = "33%", fig.align = 'center', warning=F,message=F}
 
@@ -514,7 +529,7 @@ As $SM$ is smoker (1=yes, 0=no), you can see that for a non-smoker the covariate
 
 $$CL_i = \theta_{CL} \times e^{\eta_{CL}}$$
 
-You would all this to your model block like this:
+You could this to your model block with this code:
 
 ```{r categorical, eval=F}
 

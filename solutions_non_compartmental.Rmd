@@ -83,9 +83,9 @@ By the end of this session you should be able to:
 
 ### Extension tasks:
 
-* Plot 'Healthy' and 'Sepsis' datasets on the same Figure
+* Plot 'Healthy' and 'Sepsis' concentrationt-time profiles on the same Figure
 
-* Make a table to compare $C_{max}$, $T_{max}$ and $AUC_{0-t}$ for 'Healthy' and 'Sepsis' datasets
+* Make a table comparing $C_{max}$ and $AUC_{0-t}$ for 'Healthy' and 'Sepsis' datasets
 
 # Packages you need for this session
 
@@ -106,17 +106,15 @@ sepsis <- read_csv("https://raw.githubusercontent.com/c-swire/pkcourse/refs/head
 
 ```
 
-# Teaching data for this session
+# Datasets used for workbook examples
 
-This workbook uses PK data for an anti-epileptic drug. 6 participants were given an IV dose and then one week later they were given an oral dose. Drug concentrations were measured.
+This workbook uses PK data for an anti-epileptic drug. 6 participants were given an *IV bolus* dose and then one week later they were given an *oral* dose. Serial drug concentrations were measured.
 
 If you want to access these datasets yourself you can copy the code below. 
 
 ```{r, eval=TRUE}
 
 IV<-read.csv("https://raw.githubusercontent.com/dlonsdal/non_compartmental/main/docs/PK_IV.csv")
-
-
 ORAL<-read.csv("https://raw.githubusercontent.com/dlonsdal/non_compartmental/main/docs/PK_oral.csv")
 
 ```
@@ -136,7 +134,7 @@ Columns in these datasets are:
 * study = whether IV or ORAL study
 * conc = drug concentration
 
-**How to:** Plot the data for the ORAL data.
+**How to:** Make a concentration-time plot for the ORAL data.
 
 _Hint: More detailed notes on putting together plots are included in the Introduction to R page_
 
@@ -154,7 +152,7 @@ ggplot(data=ORAL,aes(x=time, y=conc,col=id) )+
 
 # Estimating $C_{max}$
 
-$C_{max}$ is observed from our data. We find the max value per participant and report it. 
+$C_{max}$ is observed from our data. We find the maximum value per participant and report it. 
 
 **How to:** 
 
@@ -168,7 +166,7 @@ ORAL %>%
   group_by(id) %>% 
   summarise(cmax=max(conc))
 
-# here we tell R to take 'ORAL', group by 'id' then give the max conc
+# here we tell R to take 'ORAL', group by 'id', find the max conc for each 'id' and then output the mean of the those values
 ORAL %>% 
   group_by(id) %>% 
   summarise(cmax=max(conc)) %>% 
@@ -181,7 +179,7 @@ ORAL %>%
 
 This is a little more tricky. We need to get <TT>R</TT> to find $C_{max}$ and then keep the associated value for time.
 
-**How to:** Estimate $T_{max}$ for the IV and oral data
+**How to:** Estimate $T_{max}$ for the oral data
 
 ```{r tmax_solution,   message=FALSE, warning=FALSE}
 
@@ -203,7 +201,7 @@ FULL %>%
             mean(tmax))  
 ```
 
-As you can see here, $T_{max}$ after an IV bolus is at t=0. As a result, this is not a parameter that is reported for IV bolus data. 
+As you can see here, $T_{max}$ after an IV bolus is at t=0. As a result, this is not a parameter that is reported for IV bolus studies.  
 
 # Estimating the area under the curve ($AUC_{0-t}$)
 
@@ -275,7 +273,6 @@ FULL %>%
               mean(AUC)) %>% 
   summarise(F=mAUC[study=="ORAL"]/mAUC[study=="IV"])
 
-
 ```
 
 ## Limitations of the linear trapezoid method 
@@ -298,15 +295,14 @@ ggplot(data=sIV, aes(time,conc))+
 
 ```
 
-It is worth noting the trapezoid method has limitations. Most notably that it will *overestimate* $AUC$ by virtue of taking a straight line between points, when the true concentration will fall in an logarithmic (curve) fashion (Figure \@ref(fig:trapbest)). There are methods to improve this accuracy, such as the logarithmic trapezoidal method. With this method, the 'trapezoid' is given a curved top (like the red line in Figure \@ref(fig:trapbest)). The formula for this method is $$AUC = \sum_{t=0}^{t=\tau} \frac{\Delta t}{ln(\frac{C_1}{C_2})} (C_1+C_2)$$  
-
+It is worth noting the trapezoid method has limitations. Most notably that it will *overestimate* $AUC$ by virtue of taking a straight line between points, when the true concentration will fall in an logarithmic (curve) fashion (Figure \@ref(fig:trapbest)). There are methods to improve this accuracy, such as the logarithmic trapezoidal method. With this method, the 'trapezoid' is given a curved top (like the red line in Figure \@ref(fig:trapbest)). 
 
 
 \newpage 
 
 # Using <TT>R</TT> package <TT>PKNCA</TT> to undertake non-compartmental analysis  
 
-If that all seems like too much hard work and <TT>R</TT> should just jolly well get on and do for us then you are right! There are a few non-compartmental analysis packages available, we will use <TT>PKNCA</TT>. Remember you will need to run <TT>install.packages("PKNCA")</TT> the first time you wish to use this package, once it has been installed you need to run <TT>library(PKNCA)</TT>. 
+If that all seems like too much hard work and <TT>R</TT> should just jolly well get on and do for us then you are right! There are a few non-compartmental analysis packages available, we will use <TT>PKNCA</TT>. Remember you will need to run <TT>install.packages('PKNCA')</TT> the first time you wish to use this package, once it has been installed you need to run <TT>library(PKNCA)</TT>. 
 
 
 **How to:**
@@ -328,20 +324,21 @@ Now we can call and run <TT>PKNCA</TT>. First we create a sampling (or concentra
 
 ```{r, eval=FALSE, message=F}
 
-conc1<-PKNCAconc(ORAL, conc~time|id) #create sampling object
-dose1<-PKNCAdose(dORAL, dose~time|id) #create dosing object
-full1<-PKNCAdata(conc1, dose1)  #combine
-results1<-pk.nca(full1)  # analyse
-summary(results1) #summarise the results
+conc<-PKNCAconc(ORAL, conc~time|id) #create sampling object
+dose<-PKNCAdose(dORAL, dose~time|id) #create dosing object
+full<-PKNCAdata(conc, dose)  #combine
+results<-pk.nca(full)  # analyse
+summary(results) #summarise the results
 ```
 ```{r, echo=FALSE}
 
-conc1<-PKNCAconc(ORAL, conc~time|id) #create sampling object
-dose1<-PKNCAdose(dORAL, dose~time|id) #create dosing object
-full1<-PKNCAdata(conc1, dose1)  #combine
-results1<-pk.nca(full1)  # analyse
+conc<-PKNCAconc(ORAL, conc~time|id) #create sampling object
+dose<-PKNCAdose(dORAL, dose~time|id) #create dosing object
+full<-PKNCAdata(conc, dose)  #combine
+results<-pk.nca(full)  # analyse
+summary(results) #summarise the results
 
-knitr::kable(summary(results1), booktabs = TRUE, caption='PKNCA output') %>%
+knitr::kable(summary(results), booktabs = TRUE, caption='PKNCA output') %>%
   kable_styling(bootstrap_options = "striped")
 ```
 
@@ -357,11 +354,16 @@ $$Cl = \frac{Dose}{AUC_{0-\infty}}$$
 
 Note that this relationship holds exactly only for IV administration. For oral data, the calculated value reflects apparent clearance ($Cl/F$), since bioavailability ($F$) cannot be separated from clearance without an IV reference.
 
+## Half-life ($t_{1/2}$)
+
+Half-life is the time taken for drug concentration to fall by half. For a drug following one-compartment kinetics with first-order elimination, this is constant regardless of the starting concentration:
+
+$$t_{1/2} = \frac{0.693 \times V_d}{Cl}$$
 ## Volume of distribution ($V_d$)
 
-Volume of distribution describes how widely a drug distributes through the body. It is not a real anatomical volume — it is a proportionality constant relating the total amount of drug in the body to the measured plasma concentration.
+Volume of distribution describes how widely a drug distributes through the body. It is not a real anatomical volume, it is a proportionality constant relating the total amount of drug in the body to the measured plasma concentration.
 
-For IV data, $V_d$ can be estimated by back-extrapolating the concentration-time curve to $t=0$ to obtain $C_0$:
+For IV data, $V_d$ can be estimated by back-extrapolating the concentration-time curve to $t=0$ to obtain $C_0$ (concentration of drug when $t=0$):
 
 $$V_d = \frac{Dose}{C_0}$$
 
@@ -369,11 +371,7 @@ For oral data this approach is not valid, as absorption is not instantaneous and
 
 $$V_d/F = \frac{Cl/F \times t_{1/2}}{0.693}$$
 
-## Half-life ($t_{1/2}$)
 
-Half-life is the time taken for drug concentration to fall by half. For a drug following one-compartment kinetics with first-order elimination, this is constant regardless of the starting concentration:
-
-$$t_{1/2} = \frac{0.693 \times V_d}{Cl}$$
 \newpage
 
 # Limitations of non-compartmental analysis
@@ -416,4 +414,4 @@ There are some disadvantages that are worth being aware of. These include:
 * Use of direct observation of $C_{max}$ and $T_{max}$ means *true* values are missed for any particular subject
 * Increasing accuracy requires increased number of participants or samples, which can be technically challenging and expensive
 
-Have a look at Figure \@ref(fig:traperror), where a situation is imagined that $time=2$ data point is not sampled. You can see the likely impact on the estimate of AUC from this. 
+Have a look at Figure \@ref(fig:traperror), where a situation is imagined where $time=2$ data point is not sampled. You can see the likely impact on the estimate of AUC from this. 

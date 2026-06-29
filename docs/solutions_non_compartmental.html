@@ -425,8 +425,8 @@ text-align: justify}
 <div id="extension-tasks" class="section level3">
 <h3>Extension tasks:</h3>
 <ul>
-<li><p>Plot ‘Healthy’ and ‘Sepsis’ datasets on the same Figure</p></li>
-<li><p>Make a table to compare <span class="math inline">\(C_{max}\)</span>, <span class="math inline">\(T_{max}\)</span> and <span class="math inline">\(AUC_{0-t}\)</span> for ‘Healthy’ and ‘Sepsis’ datasets</p></li>
+<li><p>Plot ‘Healthy’ and ‘Sepsis’ concentrationt-time profiles on the same Figure</p></li>
+<li><p>Make a table comparing <span class="math inline">\(C_{max}\)</span> and <span class="math inline">\(AUC_{0-t}\)</span> for ‘Healthy’ and ‘Sepsis’ datasets</p></li>
 </ul>
 </div>
 </div>
@@ -442,13 +442,11 @@ library(DescTools)</code></pre>
 <pre class="r"><code>healthy &lt;- read_csv(&quot;https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/docs/healthy_nca.csv&quot;)
 sepsis &lt;- read_csv(&quot;https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/docs/sepsis_nca.csv&quot;)</code></pre>
 </div>
-<div id="teaching-data-for-this-session" class="section level1">
-<h1>Teaching data for this session</h1>
-<p>This workbook uses PK data for an anti-epileptic drug. 6 participants were given an IV dose and then one week later they were given an oral dose. Drug concentrations were measured.</p>
+<div id="datasets-used-for-workbook-examples" class="section level1">
+<h1>Datasets used for workbook examples</h1>
+<p>This workbook uses PK data for an anti-epileptic drug. 6 participants were given an <em>IV bolus</em> dose and then one week later they were given an <em>oral</em> dose. Serial drug concentrations were measured.</p>
 <p>If you want to access these datasets yourself you can copy the code below.</p>
 <pre class="r"><code>IV&lt;-read.csv(&quot;https://raw.githubusercontent.com/dlonsdal/non_compartmental/main/docs/PK_IV.csv&quot;)
-
-
 ORAL&lt;-read.csv(&quot;https://raw.githubusercontent.com/dlonsdal/non_compartmental/main/docs/PK_oral.csv&quot;)</code></pre>
 <p>The first six lines of the ORAL dataset are shown here.</p>
 <pre class="r"><code>head(ORAL)</code></pre>
@@ -466,7 +464,7 @@ ORAL&lt;-read.csv(&quot;https://raw.githubusercontent.com/dlonsdal/non_compartme
 <li>study = whether IV or ORAL study</li>
 <li>conc = drug concentration</li>
 </ul>
-<p><strong>How to:</strong> Plot the data for the ORAL data.</p>
+<p><strong>How to:</strong> Make a concentration-time plot for the ORAL data.</p>
 <p><em>Hint: More detailed notes on putting together plots are included in the Introduction to R page</em></p>
 <pre class="r"><code>ggplot(data=ORAL,aes(x=time, y=conc,col=id) )+
   geom_line()+
@@ -478,7 +476,7 @@ ORAL&lt;-read.csv(&quot;https://raw.githubusercontent.com/dlonsdal/non_compartme
 </div>
 <div id="estimating-c_max" class="section level1">
 <h1>Estimating <span class="math inline">\(C_{max}\)</span></h1>
-<p><span class="math inline">\(C_{max}\)</span> is observed from our data. We find the max value per participant and report it.</p>
+<p><span class="math inline">\(C_{max}\)</span> is observed from our data. We find the maximum value per participant and report it.</p>
 <p><strong>How to:</strong></p>
 <ul>
 <li>Estimate <span class="math inline">\(C_{max}\)</span> for the oral data</li>
@@ -497,7 +495,7 @@ ORAL %&gt;%
 ## 4 D      21.6
 ## 5 E      12.8
 ## 6 F      12.4</code></pre>
-<pre class="r"><code># here we tell R to take &#39;ORAL&#39;, group by &#39;id&#39; then give the max conc
+<pre class="r"><code># here we tell R to take &#39;ORAL&#39;, group by &#39;id&#39;, find the max conc for each &#39;id&#39; and then output the mean of the those values
 ORAL %&gt;% 
   group_by(id) %&gt;% 
   summarise(cmax=max(conc)) %&gt;% 
@@ -511,7 +509,7 @@ ORAL %&gt;%
 <div id="estimating-t_max" class="section level1">
 <h1>Estimating <span class="math inline">\(T_{max}\)</span></h1>
 <p>This is a little more tricky. We need to get <TT>R</TT> to find <span class="math inline">\(C_{max}\)</span> and then keep the associated value for time.</p>
-<p><strong>How to:</strong> Estimate <span class="math inline">\(T_{max}\)</span> for the IV and oral data</p>
+<p><strong>How to:</strong> Estimate <span class="math inline">\(T_{max}\)</span> for the oral data</p>
 <pre class="r"><code>ORAL %&gt;% 
   group_by(id) %&gt;% 
   summarise(cmax=max(conc),
@@ -541,7 +539,7 @@ FULL %&gt;%
 ##   &lt;chr&gt;        &lt;dbl&gt;        &lt;dbl&gt;
 ## 1 IV            31.4         0   
 ## 2 ORAL          14.9         1.54</code></pre>
-<p>As you can see here, <span class="math inline">\(T_{max}\)</span> after an IV bolus is at t=0. As a result, this is not a parameter that is reported for IV bolus data.</p>
+<p>As you can see here, <span class="math inline">\(T_{max}\)</span> after an IV bolus is at t=0. As a result, this is not a parameter that is reported for IV bolus studies.</p>
 </div>
 <div id="estimating-the-area-under-the-curve-auc_0-t" class="section level1">
 <h1>Estimating the area under the curve (<span class="math inline">\(AUC_{0-t}\)</span>)</h1>
@@ -603,13 +601,13 @@ The two heights correspond to concentrations B and C and the base is the distanc
 Figure 2: Participant ‘A’ IV concentration-time profile with curved line of best fit
 </p>
 </div>
-<p>It is worth noting the trapezoid method has limitations. Most notably that it will <em>overestimate</em> <span class="math inline">\(AUC\)</span> by virtue of taking a straight line between points, when the true concentration will fall in an logarithmic (curve) fashion (Figure <a href="#fig:trapbest">2</a>). There are methods to improve this accuracy, such as the logarithmic trapezoidal method. With this method, the ‘trapezoid’ is given a curved top (like the red line in Figure <a href="#fig:trapbest">2</a>). The formula for this method is <span class="math display">\[AUC = \sum_{t=0}^{t=\tau} \frac{\Delta t}{ln(\frac{C_1}{C_2})} (C_1+C_2)\]</span></p>
+<p>It is worth noting the trapezoid method has limitations. Most notably that it will <em>overestimate</em> <span class="math inline">\(AUC\)</span> by virtue of taking a straight line between points, when the true concentration will fall in an logarithmic (curve) fashion (Figure <a href="#fig:trapbest">2</a>). There are methods to improve this accuracy, such as the logarithmic trapezoidal method. With this method, the ‘trapezoid’ is given a curved top (like the red line in Figure <a href="#fig:trapbest">2</a>).</p>
 <div style="page-break-after: always;"></div>
 </div>
 </div>
 <div id="using-r-package-pknca-to-undertake-non-compartmental-analysis" class="section level1">
 <h1>Using <TT>R</TT> package <TT>PKNCA</TT> to undertake non-compartmental analysis</h1>
-<p>If that all seems like too much hard work and <TT>R</TT> should just jolly well get on and do for us then you are right! There are a few non-compartmental analysis packages available, we will use <TT>PKNCA</TT>. Remember you will need to run <TT>install.packages(“PKNCA”)</TT> the first time you wish to use this package, once it has been installed you need to run <TT>library(PKNCA)</TT>.</p>
+<p>If that all seems like too much hard work and <TT>R</TT> should just jolly well get on and do for us then you are right! There are a few non-compartmental analysis packages available, we will use <TT>PKNCA</TT>. Remember you will need to run <TT>install.packages(‘PKNCA’)</TT> the first time you wish to use this package, once it has been installed you need to run <TT>library(PKNCA)</TT>.</p>
 <p><strong>How to:</strong></p>
 <ul>
 <li>Use <TT>PKNCA</TT> to undertake non-compartmental analysis on the oral teaching dataset</li>
@@ -620,11 +618,16 @@ Figure 2: Participant ‘A’ IV concentration-time profile with curved line of 
   slice(1) %&gt;%
   mutate(dose = 1000) #this produces a new variable dose 1000</code></pre>
 <p>Now we can call and run <TT>PKNCA</TT>. First we create a sampling (or concentration) object and then a dosing object. In each function we instruct <TT>PKNCA</TT> of the names of our data object and the relevant variables in it. Then we combine the two and run our non-compartmental analysis.</p>
-<pre class="r"><code>conc1&lt;-PKNCAconc(ORAL, conc~time|id) #create sampling object
-dose1&lt;-PKNCAdose(dORAL, dose~time|id) #create dosing object
-full1&lt;-PKNCAdata(conc1, dose1)  #combine
-results1&lt;-pk.nca(full1)  # analyse
-summary(results1) #summarise the results</code></pre>
+<pre class="r"><code>conc&lt;-PKNCAconc(ORAL, conc~time|id) #create sampling object
+dose&lt;-PKNCAdose(dORAL, dose~time|id) #create dosing object
+full&lt;-PKNCAdata(conc, dose)  #combine
+results&lt;-pk.nca(full)  # analyse
+summary(results) #summarise the results</code></pre>
+<pre><code>##  start end N    auclast        cmax              tmax   half.life aucinf.obs
+##      0  24 6 122 [3.80]           .                 .           .          .
+##      0 Inf 6          . 14.6 [21.7] 1.62 [1.00, 2.00] 5.15 [1.08] 128 [2.03]
+## 
+## Caption: auclast, cmax, aucinf.obs: geometric mean and geometric coefficient of variation; tmax: median and range; half.life: arithmetic mean and standard deviation; N: number of subjects</code></pre>
 <table class="table table-striped" style="margin-left: auto; margin-right: auto;">
 <caption>
 <span id="tab:unnamed-chunk-5">Table 1: </span><span id="tab:unnamed-chunk-5">Table 2: </span>PKNCA output
@@ -722,19 +725,17 @@ Inf
 <p><span class="math display">\[Cl = \frac{Dose}{AUC_{0-\infty}}\]</span></p>
 <p>Note that this relationship holds exactly only for IV administration. For oral data, the calculated value reflects apparent clearance (<span class="math inline">\(Cl/F\)</span>), since bioavailability (<span class="math inline">\(F\)</span>) cannot be separated from clearance without an IV reference.</p>
 </div>
-<div id="volume-of-distribution-v_d" class="section level2">
-<h2>Volume of distribution (<span class="math inline">\(V_d\)</span>)</h2>
-<p>Volume of distribution describes how widely a drug distributes through the body. It is not a real anatomical volume — it is a proportionality constant relating the total amount of drug in the body to the measured plasma concentration.</p>
-<p>For IV data, <span class="math inline">\(V_d\)</span> can be estimated by back-extrapolating the concentration-time curve to <span class="math inline">\(t=0\)</span> to obtain <span class="math inline">\(C_0\)</span>:</p>
-<p><span class="math display">\[V_d = \frac{Dose}{C_0}\]</span></p>
-<p>For oral data this approach is not valid, as absorption is not instantaneous and <span class="math inline">\(C_0\)</span> cannot be meaningfully defined. Instead, only <strong>apparent</strong> volume of distribution (<span class="math inline">\(V_d/F\)</span>) can be estimated from oral data, since bioavailability (<span class="math inline">\(F\)</span>) cannot be separated from <span class="math inline">\(V_d\)</span> without an IV reference:</p>
-<p><span class="math display">\[V_d/F = \frac{Cl/F \times t_{1/2}}{0.693}\]</span></p>
-</div>
 <div id="half-life-t_12" class="section level2">
 <h2>Half-life (<span class="math inline">\(t_{1/2}\)</span>)</h2>
 <p>Half-life is the time taken for drug concentration to fall by half. For a drug following one-compartment kinetics with first-order elimination, this is constant regardless of the starting concentration:</p>
 <p><span class="math display">\[t_{1/2} = \frac{0.693 \times V_d}{Cl}\]</span>
-</p>
+## Volume of distribution (<span class="math inline">\(V_d\)</span>)</p>
+<p>Volume of distribution describes how widely a drug distributes through the body. It is not a real anatomical volume, it is a proportionality constant relating the total amount of drug in the body to the measured plasma concentration.</p>
+<p>For IV data, <span class="math inline">\(V_d\)</span> can be estimated by back-extrapolating the concentration-time curve to <span class="math inline">\(t=0\)</span> to obtain <span class="math inline">\(C_0\)</span> (concentration of drug when <span class="math inline">\(t=0\)</span>):</p>
+<p><span class="math display">\[V_d = \frac{Dose}{C_0}\]</span></p>
+<p>For oral data this approach is not valid, as absorption is not instantaneous and <span class="math inline">\(C_0\)</span> cannot be meaningfully defined. Instead, only <strong>apparent</strong> volume of distribution (<span class="math inline">\(V_d/F\)</span>) can be estimated from oral data, since bioavailability (<span class="math inline">\(F\)</span>) cannot be separated from <span class="math inline">\(V_d\)</span> without an IV reference:</p>
+<p><span class="math display">\[V_d/F = \frac{Cl/F \times t_{1/2}}{0.693}\]</span></p>
+<div style="page-break-after: always;"></div>
 </div>
 </div>
 <div id="limitations-of-non-compartmental-analysis" class="section level1">
@@ -752,7 +753,7 @@ Figure 3: Concentration-time profile showing impact of reduced sampling on AUC c
 <li>Use of direct observation of <span class="math inline">\(C_{max}\)</span> and <span class="math inline">\(T_{max}\)</span> means <em>true</em> values are missed for any particular subject</li>
 <li>Increasing accuracy requires increased number of participants or samples, which can be technically challenging and expensive</li>
 </ul>
-<p>Have a look at Figure <a href="#fig:traperror">3</a>, where a situation is imagined that <span class="math inline">\(time=2\)</span> data point is not sampled. You can see the likely impact on the estimate of AUC from this.</p>
+<p>Have a look at Figure <a href="#fig:traperror">3</a>, where a situation is imagined where <span class="math inline">\(time=2\)</span> data point is not sampled. You can see the likely impact on the estimate of AUC from this.</p>
 </div>
 
 

@@ -402,7 +402,7 @@ text-align: justify}
 <ul>
 <li>List advantages and disadvantages of compartmental analysis</li>
 <li>Describe the difference between a fixed effect and a random effect in a population pharmacokinetic model</li>
-<li>Interpret the key parameter estimates from a fitted model (clearance and volume of distribution)</li>
+<li>Interpret some parameter estimates from a fitted model (clearance and volume of distribution)</li>
 </ul>
 </div>
 <div id="tasks" class="section level1">
@@ -411,11 +411,12 @@ text-align: justify}
 <li>Fit a one-compartment IV bolus model for the ‘Healthy’ dataset</li>
 <li>Fit a one-compartment IV bolus model for the ‘Sepsis’ dataset</li>
 <li>Compare volume of distribution and clearance values for the two datasets</li>
-<li>Compare <TT>Cl</TT> values using non-compartmental and compartmental analysis</li>
+<li>Compare clearance values using non-compartmental and compartmental analysis</li>
 </ul>
 <div id="extension-tasks" class="section level3">
 <h3>Extension tasks</h3>
 <ul>
+<li>Try using different residual error models</li>
 <li>Fit two-compartment models to the teaching and task datasets</li>
 </ul>
 </div>
@@ -427,19 +428,20 @@ library(nlmixr2)</code></pre>
 </div>
 <div id="datasets-for-tasks-during-this-session" class="section level1">
 <h1>Datasets for tasks during this session</h1>
-<pre class="r"><code>healthy2 &lt;- read_csv(&quot;https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/docs/healthy_ca.csv&quot;)
-sepsis2 &lt;- read_csv(&quot;https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/docs/sepsis_ca.csv&quot;)</code></pre>
-<p>When you expect these datasets, you will notice there are several new columns. Many of these are required for non-linear mixed effects modelling and are explained below.</p>
+<p>Patients with and without sepsis have received a 1000 mg intravenous bolus of Drug A, a renally-cleared antibiotic.</p>
+<p>When you inspect these datasets, you will notice there are several new columns compared to the datasets for Session 1. Many of these are required for non-linear mixed effects modelling and are explained below.</p>
 <p>In addition:</p>
 <ul>
 <li>WT = weight</li>
 <li>CrCL = creatinine clearance</li>
 <li>ALB = albumin</li>
 </ul>
+<pre class="r"><code>healthy2 &lt;- read_csv(&quot;https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/docs/healthy_ca.csv&quot;)
+sepsis2 &lt;- read_csv(&quot;https://raw.githubusercontent.com/c-swire/pkcourse/refs/heads/main/docs/sepsis_ca.csv&quot;)</code></pre>
 </div>
-<div id="teaching-data-for-this-session" class="section level1">
-<h1>Teaching data for this session</h1>
-<p>In this Session the exemplar fits a one-compartment ORAL absorption model to sparse data after a dose of furosemide is taken.</p>
+<div id="dataset-used-for-workbook-example" class="section level1">
+<h1>Dataset used for workbook example</h1>
+<p>In this Session the exemplar fits a one-compartment <em>oral</em> absorption model to sparse data after a dose of furosemide is taken.</p>
 <pre class="r"><code>sparse&lt;-
  read_csv(&quot;https://raw.githubusercontent.com/dlonsdal/SGUL_PK_data/main/sparsefru.csv&quot;)</code></pre>
 <p><em>Hint: The tasks in this session are after IV administration of a drug, so you will need to adapt the model in the example to remove parts relating to absorption</em></p>
@@ -447,10 +449,11 @@ sepsis2 &lt;- read_csv(&quot;https://raw.githubusercontent.com/c-swire/pkcourse/
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
 <p>‘Rich’ data are where there are lots of samples for each individual at each time point. This kind of data is really easy to produce in early-phase trials, including entry-into-human studies.</p>
-<p>However, at later phases of drug development, including post-marketing, pharmacokinetic data are often more challenging to obtain. In addition, rigid sampling times are less easy to implement outside of the confines of a dedicated pharmacokinetic study as patients or study participants are often at clinic or study visits at irregular times and so sampling may be somewhat opportunistic. Self-administered doses are also less likely to be accurately taken at prescribed times. These factors make modelling data using the non-compartmental methods we have used so far challenging and less accurate.</p>
-<p>The purpose of this session, is to introduce the concept of non-linear mixed-effects modelling. This will include introduction to the modelling package <TT>nlmixr</TT>. This package is challenging to install on your own machine, <TT>install.packages(‘nlmixr2’)</TT> may work. If you run a Windows operating system, you are likely to also need <TT>rtools</TT>. You will need to follow instructions online on how to install and download this. Installation on an Apple Mac usually requires <TT>Xcode command line tools</TT> to be downloaded. We recommend using <a href="https://posit.cloud/">Posit Cloud</a> for this session.</p>
-<div id="advantages-and-disadvantages-of-non-linear-mixed-effects-models" class="section level2">
-<h2>Advantages and disadvantages of non-linear mixed-effects models</h2>
+<p>However, at later phases of drug development, including post-marketing, pharmacokinetic data are often more challenging to obtain. In addition, rigid sampling times are less easy to implement outside of the confines of a dedicated pharmacokinetic study, so sampling may be opportunistic. Self-administered doses are also less likely to be accurately taken at prescribed times. These factors make data analysis using the non-compartmental methods we have used so far challenging and less accurate.</p>
+<p>The purpose of this session is to introduce the concept of non-linear mixed-effects modelling, which is one approach to compartmental pharmacokinetic analysis.</p>
+<p>This will include introduction to the modelling package <TT>nlmixr</TT>. This package is challenging to install on your own machine, <TT>install.packages(‘nlmixr2’)</TT> may work. If you run a Windows operating system, you are likely to also need <TT>rtools</TT>. You will need to follow instructions online on how to install and download this. Installation on an Apple Mac usually requires <TT>Xcode command line tools</TT> to be downloaded. We recommend using <a href="https://posit.cloud/">Posit Cloud</a> for this session.</p>
+<div id="advantages-and-disadvantages-of-non-linear-mixed-effects-modelling" class="section level2">
+<h2>Advantages and disadvantages of non-linear mixed-effects modelling</h2>
 <p><strong>Advantages of non-linear mixed-effects approach</strong></p>
 <ul>
 <li>Enables modelling of sparse data, useful in later phase/post-marketing studies</li>
@@ -469,8 +472,8 @@ sepsis2 &lt;- read_csv(&quot;https://raw.githubusercontent.com/c-swire/pkcourse/
 </div>
 <div id="what-is-the-point-of-a-model" class="section level1">
 <h1>What is the point of a model?</h1>
-<p>It is clear that understanding data from a clinical study is important. Pharmacokinetic data are the same as any other output from a study. It is important to understand the data, what they mean for the absorption, distribution, metabolism and excretion (ADME) of the compound. They allow us to make suggestions for the next stage of drug development or to optimise dosing for different populations in clinical practice. This might include dose selection, frequency of administration or even decisions on formulation.</p>
-<p>Compartmental pharmacokinetic models simplify complex human physiology by describing the concentration-time course of a drug with (relatively) simple mathematical equations. These mathematical equations help to quantify ADME processes through the estimation of values for parameters such as clearance and volume of distribution.</p>
+<p>It is clear that understanding data from a clinical study is important. Pharmacokinetic data are the same as any other output from a study. It is important to understand the data, what they mean for the absorption, distribution, metabolism and excretion (ADME) of the compound. They allow us to make suggestions for the next stage of drug development or to optimise dosing for different populations in clinical practice. This might include dose selection, frequency of administration or decisions on formulation.</p>
+<p>Compartmental pharmacokinetic models simplify complex human physiology by describing the concentration-time course of a drug with (relatively) simple mathematical equations. These mathematical equations help to quantify ADME processes through the estimation of values for parameters such as clearance (<span class="math inline">\(Cl\)</span>) and volume of distribution (<span class="math inline">\(V_d\)</span>).</p>
 <div id="one-compartment-iv-bolus-model" class="section level2">
 <h2>One-compartment IV bolus model</h2>
 <p>In the one compartment model IV bolus model, the body is simplified and represented as a single box, into which the dose of the drug is deposited instantaneously. Drug is assumed to distribute evenly and instantaneously throughout this compartment such that the concentration is assumed to be the same wherever you are within it.</p>
@@ -501,7 +504,7 @@ Figure 1: One-compartment model
 <p>A mixed-effects model contains both components.</p>
 <div id="how-this-applies-to-compartmental-pharmacokinetic-modelling" class="section level3">
 <h3>How this applies to compartmental pharmacokinetic modelling</h3>
-<p>Let’s return to the one-compartment IV-bolus model once more. Let us parameterise using <em>primary</em> pharmacokinetic parameters (clearance and volume of distribution). Broadly, our model remains the same <span class="math display">\[C=C_{0}e^{-\frac{Cl}{V}t}\]</span> however, we now add a further layer, by stating that our parameters are made up of a fixed (population mean, <span class="math inline">\(\theta\)</span>) effect and a random (inter-individual variability, <span class="math inline">\(\eta\)</span>) effect. <span class="math display">\[Cl=\theta_{Cl}\times e^{\eta_{Cl}}\]</span> the modelling process then estimates <span class="math display">\[\theta_{Cl}\textrm{ -the population mean value for clearance (a fixed effect)}\]</span> and makes some estimate of <span class="math display">\[\eta_{Cl} \textrm{ -individual variability of clearance (a random-effect)}\]</span></p>
+<p>Let’s return to the one-compartment IV-bolus model once more. <span class="math display">\[C=C_{0}e^{-\frac{Cl}{V}t}\]</span> however, we now add a further layer, by stating that our parameters are made up of a fixed (population mean, <span class="math inline">\(\theta\)</span>) effect and a random (inter-individual variability, <span class="math inline">\(\eta\)</span>) effect. <span class="math display">\[Cl=\theta_{Cl}\times e^{\eta_{Cl}}\]</span> the modelling process then estimates <span class="math display">\[\theta_{Cl}\textrm{ -the population mean value for clearance (a fixed effect)}\]</span> and makes some estimate of <span class="math display">\[\eta_{Cl} \textrm{ -individual variability of clearance (a random-effect)}\]</span></p>
 <p>Similarly, we model volume of distribution as <span class="math display">\[V=\theta_{V}\times e^{\eta_{V}}\]</span></p>
 </div>
 </div>
@@ -524,9 +527,10 @@ Figure 1: One-compartment model
 <li>EVID = event identifier (tells <TT>nlmixr2</TT> whether that row represents an observation or dose event)</li>
 <li>CMT = compartment</li>
 </ul>
-<p>Then you need to build your model. When building the model, you specify two blocks in a standard <TT>R function()</TT>.</p>
+<p>Then you need to build your model. When building the model, you specify two blocks in a standard <TT>R function()</TT>. These are called the <em>Ini</em> and <em>Model</em> blocks.</p>
 <div id="ini-block" class="section level3">
 <h3>Ini block</h3>
+<p>The first part of the function is to set the initial estimates for your model parameters, this is known as the <TT>ini()</TT> block. We are parameterising using absorption rate constant (<span class="math inline">\(k_a\)</span>), clearance (<span class="math inline">\(Cl\)</span>) and volume of distribution (<span class="math inline">\(V\)</span>) in a one-compartment oral-absorption model. So we need to tell <TT>nlmixr</TT> initial values for each of these parameters <em>as well as</em> values for the random effects associated with each parameter.</p>
 <pre class="r"><code>ini({ 
     tka &lt;-log(1.3) 
     tcl &lt;- log(8) 
@@ -534,16 +538,15 @@ Figure 1: One-compartment model
     eta.ka~0.1 
     eta.cl ~ 0.1
     eta.v ~ 0.1
-    add.sd &lt;- 0.1 
+    prop.sd &lt;- 0.1 
   })</code></pre>
-<p>The first part of the function is to set the initial estimates for your model parameters, this is known as the <TT>ini()</TT> block. We are parameterising using absorption rate constant (<span class="math inline">\(k_a\)</span>), clearance (<span class="math inline">\(Cl\)</span>) and volume of distribution (<span class="math inline">\(V\)</span>) in a one-compartment oral-absorption model. So we need to tell <TT>nlmixr</TT> initial values for each of these parameters <em>as well as</em> values for the random effects associated with each parameter.</p>
-<p>As described above, the population mean of fixed effects are termed <em>theta</em>. In the <TT>ini()</TT> block, <TT>tcl</TT> represents the log of typical clearance. <TT>exp(tcl)</TT> therefore gives you <span class="math inline">\({\theta}_{Cl}\)</span>, the typical population <TT>Cl</TT>.</p>
-<p>The <TT>eta</TT> terms in the code below are initial estimates of the variance of the inter-individual variability <em>eta</em>.</p>
-<p>A further source of variability captured by the model is residual variability, which captures everything that remains unexplained after accounting for inter-individual variability.
-This includes random fluctuations in drug concentrations, errors in recording the exact time a sample was taken or a dose was administered, and assay measurement error. Residual variability is not attributed to any specific cause. It is the irreducible noise around the model’s predictions. In the code, this is represented by <TT>add.sd</TT> (additive residual error).</p>
+<p>As described above, the population mean of fixed effects are termed <span class="math inline">\(\theta\)</span>. In the <TT>ini()</TT> block, <TT>tcl</TT> represents the log of typical clearance. <TT>exp(tcl)</TT> therefore gives you <span class="math inline">\({\theta}_{Cl}\)</span>, the typical population <TT>Cl</TT>.</p>
+<p>The <TT>eta</TT> terms in the code below are initial estimates of the variance of the inter-individual variability <span class="math inline">\(\eta\)</span>.</p>
 </div>
 <div id="additive-versus-proportional-residual-error" class="section level3">
 <h3>Additive versus proportional residual error</h3>
+<p>A further source of variability captured by the model is residual variability, which captures everything that remains unexplained after accounting for inter-individual variability.</p>
+<p>This includes random fluctuations in drug concentrations, errors in recording the exact time a sample was taken or a dose was administered, and assay measurement error. Residual variability is not attributed to any specific cause. It is the irreducible noise around the model’s predictions. In the code, this is represented by <TT>prop.sd</TT> (proportional residual error).</p>
 <p>In <code>nlmixr2</code>, you can specify these as:</p>
 <pre class="r"><code># Additive error
 linCmt() ~ add(add.sd)
@@ -555,7 +558,7 @@ linCmt() ~ prop(prop.sd)
 linCmt() ~ add(add.sd) + prop(prop.sd)</code></pre>
 <p>An <strong>additive</strong> residual error model assumes the size of the error is constant regardless of the magnitude of the concentration. This can work well when concentrations are measured over a narrow range.</p>
 <p>However, analytical assays typically have a <strong>proportional</strong> error — the absolute error is larger at higher concentrations. A proportional error model accounts for this:</p>
-<p>I have used an <strong>additive</strong> residual error model in all the examples, but you can try running the models with other residual error models as above to see whether this changes the model diagnostics (which we will cover in session 3).</p>
+<p>I have used an <strong>proportional</strong> residual error model in all the examples, but you can try running the models with other residual error models as above to see whether this changes the model diagnostics (which we will cover in session 3).</p>
 </div>
 <div id="choosing-initial-estimates" class="section level3">
 <h3>Choosing initial estimates</h3>
@@ -570,12 +573,12 @@ Starting values for residual error of around 0.1–0.2 are generally reasonable.
     ka &lt;- exp(tka + eta.ka)
     cl &lt;- exp(tcl + eta.cl)
     v &lt;- exp(tv + eta.v)
-    linCmt() ~ add(add.sd) 
+    linCmt() ~ prop(prop.sd) 
   })</code></pre>
-<p>The <code>model()</code> block defines how the pharmacokinetic parameters are calculated for each individual. Each line transforms the population-level fixed effects (<span class="math inline">\(\theta\)</span>, represented by <code>tcl</code>, <code>tv</code> and <code>tka</code>) and individual random effects (<span class="math inline">\(\eta\)</span>) into individual parameter estimates using an exponential function. For example:</p>
+<p>The <code>model()</code> block defines how the pharmacokinetic parameters are calculated for each individual. Each line transforms the population-level fixed effects and individual random effects into individual parameter estimates using an exponential function. For example:</p>
 <p><span class="math display">\[Cl_i = e^{\theta_{Cl} + \eta_{Cl}}\]</span></p>
 <p>The exponential transformation is used for two reasons. First, it ensures that parameter estimates are always positive — a negative clearance or volume of distribution is physiologically impossible. Second, it places the inter-individual variability on a log-normal scale, which is consistent with the way pharmacokinetic parameters are typically distributed in a population.</p>
-<p><code>linCmt()</code> solves the compartmental model equations based on the parameters defined above. The <code>~ add(add.sd)</code> part specifies the residual error model.</p>
+<p><code>linCmt()</code> solves the compartmental model equations based on the parameters defined above. The <code>~ prop(prop.sd)</code> part specifies the residual error model.</p>
 <p>After building the model we can run a check using <TT>nlmixr(one.cmt)</TT>, which describes the model we have built. And then we fit the model to the data.</p>
 <pre class="r"><code># First make the model by combining the ini and model blocks
 one.cmt &lt;- function() {
@@ -586,13 +589,13 @@ one.cmt &lt;- function() {
     eta.ka~0.1 # inter-individual variabilities, again note ka line this is not required for IV datasets
     eta.cl ~ 0.1
     eta.v ~ 0.1
-    add.sd &lt;- 0.1 # residual variability
+    prop.sd &lt;- 0.1 # residual variability
   })
   model({ # define the model
     ka &lt;- exp(tka + eta.ka) # ka will not be required for IV datasets
     cl &lt;- exp(tcl + eta.cl)
     v &lt;- exp(tv + eta.v)
-    linCmt() ~ add(add.sd) 
+    linCmt() ~ prop(prop.sd) 
   })
 }
 
@@ -630,19 +633,19 @@ BSV(CV%)
 tka
 </td>
 <td style="text-align:left;">
-0.261
+0.207
 </td>
 <td style="text-align:left;">
-0.0793
+0.0559
 </td>
 <td style="text-align:left;">
-30.4
+26.9
 </td>
 <td style="text-align:left;">
-1.3 (1.11, 1.52)
+1.23 (1.1, 1.37)
 </td>
 <td style="text-align:left;">
-13.6
+14.6
 </td>
 </tr>
 <tr>
@@ -653,16 +656,16 @@ tcl
 2.74
 </td>
 <td style="text-align:left;">
-0.0326
+0.0315
 </td>
 <td style="text-align:left;">
-1.19
+1.15
 </td>
 <td style="text-align:left;">
 15.5 (14.5, 16.5)
 </td>
 <td style="text-align:left;">
-18.6
+18.3
 </td>
 </tr>
 <tr>
@@ -670,34 +673,34 @@ tcl
 tv
 </td>
 <td style="text-align:left;">
-2.91
+2.88
 </td>
 <td style="text-align:left;">
-0.0661
+0.0471
 </td>
 <td style="text-align:left;">
-2.27
+1.64
 </td>
 <td style="text-align:left;">
-18.4 (16.2, 21)
+17.8 (16.2, 19.5)
 </td>
 <td style="text-align:left;">
-15.5
+15.7
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-add.sd
+prop.sd
 </td>
 <td style="text-align:left;">
-0.013
+0.0183
 </td>
 <td style="text-align:left;">
 </td>
 <td style="text-align:left;">
 </td>
 <td style="text-align:left;">
-0.013
+0.0183
 </td>
 <td style="text-align:left;">
 </td>
@@ -723,7 +726,7 @@ Estimate
 eta.ka
 </td>
 <td style="text-align:right;">
-0.14
+0.15
 </td>
 </tr>
 <tr>
@@ -739,7 +742,7 @@ eta.cl
 eta.v
 </td>
 <td style="text-align:right;">
-0.15
+0.16
 </td>
 </tr>
 </tbody>
