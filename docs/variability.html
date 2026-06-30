@@ -484,13 +484,13 @@ pheno &lt;- pheno_sd</code></pre>
 <p>Figure <a href="#fig:frufit">1</a> shows these diagnostic plots for the furosemide data we used in Session 2.</p>
 <pre class="r"><code>modfit&lt;-data.frame(fit) # make a dataframe out of the output of the model
 
-ggplot(modfit,aes(x=PRED,y=DV))+
+ggplot(modfit,aes(x=DV,y=PRED))+
   geom_point()+
   theme_bw(base_size=18)+
   geom_abline(intercept = 0, slope=1)+
   geom_smooth(col=&#39;red&#39;,se=F)
 
-ggplot(modfit,aes(x=IPRED,y=DV))+
+ggplot(modfit,aes(x=DV,y=IPRED))+
   geom_point()+
   theme_bw(base_size=18)+
   geom_abline(intercept = 0, slope=1)+

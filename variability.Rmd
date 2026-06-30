@@ -176,13 +176,13 @@ fit<-nlmixr2(one.cmt,sparse,est="saem",
 
 modfit<-data.frame(fit) # make a dataframe out of the output of the model
 
-ggplot(modfit,aes(x=PRED,y=DV))+
+ggplot(modfit,aes(x=DV,y=PRED))+
   geom_point()+
   theme_bw(base_size=18)+
   geom_abline(intercept = 0, slope=1)+
   geom_smooth(col='red',se=F)
 
-ggplot(modfit,aes(x=IPRED,y=DV))+
+ggplot(modfit,aes(x=DV,y=IPRED))+
   geom_point()+
   theme_bw(base_size=18)+
   geom_abline(intercept = 0, slope=1)+
@@ -386,13 +386,13 @@ For completeness, we should plot our diagnostic plots.
 
 modfit<-data.frame(run1)
 
-ggplot(modfit,aes(x=PRED,y=DV))+
+ggplot(modfit,aes(x=DV,y=PRED))+
   geom_point()+
   theme_bw(base_size=27)+
   geom_abline(intercept = 0, slope=1)+
   geom_smooth(col='red',se=F)
 
-ggplot(modfit,aes(x=IPRED,y=DV))+
+ggplot(modfit,aes(x=DV,y=IPRED))+
   geom_point()+
   theme_bw(base_size=27)+
   geom_abline(intercept = 0, slope=1)+
@@ -479,12 +479,12 @@ Compare the parameter estimates from Table \@ref(tab:nlmixfix) & \@ref(tab:nlmix
 
 
 modfit2<-data.frame(run2)
-ggplot(modfit2,aes(x=PRED,y=DV))+
+ggplot(modfit2,aes(x=DV,y=PRED))+
   geom_point()+
   theme_bw(base_size=27)+
   geom_abline(intercept = 0, slope=1)+
   geom_smooth(col='red',se=F)
-ggplot(modfit2,aes(x=IPRED,y=DV))+
+ggplot(modfit2,aes(x=DV,y=IPRED))+
   geom_point()+
   theme_bw(base_size=27)+
   geom_abline(intercept = 0, slope=1)+
